@@ -26,7 +26,14 @@ const ROBOT_TYPE_COEF = [ 1250, 750, 500, 250, 0 ]; // 로봇이 타자를 치�
 const ROBOT_THINK_COEF = [ 4, 2, 1, 0, 0 ]; // 로봇이 단어를 생각하는데 걸리는 시간 계수?
 const ROBOT_HIT_LIMIT = [ 8, 4, 2, 1, 0 ]; // 로봇이 단어를 선택할 때 최소 히트수?
 const ROBOT_LENGTH_LIMIT = [ 3, 4, 9, 99, 99 ]; // 로봇의 최대 단어 길이?
-const ROBOT_UNK_LENGTH_LIMIT = [ 3, 6, 5, 8, 10 ]; // 로봇의 최대 비사전 단어 길이?
+const ROBOT_LENGTH_RANGES = [
+    [3, 4],   // 왕초보: 3~4 글자
+    [4, 6],   // 초보  : 4~6 글자
+    [5, 8],   // 적절  : 5~8 글자
+    [6, 10],  // 고수  : 6~10 글자
+    [8, 15]   // 사기  : 8~15 글자
+] // 로봇의 비사전 단어 길이 범위? , 어차피 비사전이여서 최대길이 제한은 의미가 없을듯
+
 const RIEUL_TO_NIEUN = [4449, 4450, 4457, 4460, 4462, 4467]; // ㄹ->ㄴ 변환 가능한 자음
 const RIEUL_TO_IEUNG = [4451, 4455, 4456, 4461, 4466, 4469]; // ㄹ->ㅇ 변환 가능한 자음
 const NIEUN_TO_IEUNG = [4455, 4461, 4466, 4469]; // ㄴ->ㅇ 변환 가능한 자음
@@ -375,6 +382,7 @@ exports.readyRobot = function(robot){
 	var lmax;
 	var isRev = Const.GAME_TYPE[my.mode] == "KAP";
 	var isKkt = Const.GAME_TYPE[my.mode] == "KKT";
+	var isEng = my.rule.lang == "en";
 	
 	getAuto.call(my, my.game.char, my.game.subChar, 2).then(function(list){
 		if(list.length){
@@ -403,27 +411,52 @@ exports.readyRobot = function(robot){
 		}else denied();
 	});
 	function denied(){
-		if(my.opts.unknown && my.game.char){
+		if(my.opts.unknown && my.game.char){ // 비사전 단어 (그냥 잇기가 불가할때 랜덤 글자)
 			var char = my.game.char;
 			var subChar = my.game.subChar;
 			// var len = 2 + Math.floor(Math.random() * 3);
-			var len = isKkt ? my.game.wordLength : 3 + Math.floor(Math.random() * (ROBOT_UNK_LENGTH_LIMIT[level] - 2));
+			const [min, max] = ROBOT_LENGTH_RANGES[level];
+			// var len = isKkt ? my.game.wordLength : 3 + Math.floor(Math.random() * 2 * (ROBOT_UNK_LENGTH_LIMIT[level]));
+			var len = Math.floor(min / 1.5) + Math.floor(Math.random() * (max - min + 1));
 			var res = '';
 			
-			if(isRev){
-				for (i=1; i<len; i++){
-					res += String.fromCharCode(97 + Math.floor(Math.random() * 26));
+			// korean char range 44032 ~ 55203
+			if(isRev){ // 만약 앞말잇기 라면
+				if (isEng) {
+					for (i=1; i<len; i++){
+						res += String.fromCharCode(97 + Math.floor(Math.random() * 26));
+					}
+					res += char;
+				} else {
+					for (i=1; i<len; i++){
+						res += String.fromCharCode(44032 + Math.floor(Math.random() * (55203 - 44032 + 1)));
+					}
+					res += char;
 				}
-				res += char;
-			}else if (isKkt){
-				res += char;
-				for(i=1; i<4; i++){
-					res += String.fromCharCode(97 + Math.floor(Math.random() * 26));
+
+			}else if (isKkt){ // 만약 쿵쿵따 라면
+				if (isEng) {
+					res += char;
+					for (i=0; i<2; i++){
+						res += String.fromCharCode(97 + Math.floor(Math.random() * 26));
+					}
+				} else {
+					res += char;
+					for (i=0; i<2; i++){
+						res += String.fromCharCode(44032 + Math.floor(Math.random() * (55203 - 44032 + 1)));
+					}
 				}
-			}else{
-				res += char;
-				for (i=1; i<len; i++){
-				res += String.fromCharCode(97 + Math.floor(Math.random() * 26));
+			}else{ // 일반적인 경우
+				if (isEng) {
+					res += char;
+					for (i=0; i<len-1; i++){
+						res += String.fromCharCode(97 + Math.floor(Math.random() * 26));
+					}
+				} else {
+					res += char;
+					for (i=0; i<len-1; i++){
+						res += String.fromCharCode(44032 + Math.floor(Math.random() * (55203 - 44032 + 1)));
+					}
 				}
 			}
 			text = res;

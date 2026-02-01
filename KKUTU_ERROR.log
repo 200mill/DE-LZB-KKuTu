@@ -1,0 +1,25 @@
+This is an error log file of the game server.
+You may use like `tail -f KKUTU_ERROR.log` to watch this.
+:2083 [1/27/2026, 21:42:36] ERROR: SyntaxError: Invalid regular expression: /^())./: Unmatched ')'
+SyntaxError: Invalid regular expression: /^())./: Unmatched ')'
+    at new RegExp (<anonymous>)
+    at produce (/kkutu/Server/lib/Game/games/classic.js:1110:23)
+    at /kkutu/Server/lib/Game/games/classic.js:1106:4
+    at callback (/kkutu/Server/lib/sub/collection.js:316:13)
+    at Query.preCB (/kkutu/Server/lib/sub/collection.js:298:6)
+    at Query.handleReadyForQuery (/kkutu/Server/lib/node_modules/pg/lib/query.js:138:12)
+    at Client._handleReadyForQuery (/kkutu/Server/lib/node_modules/pg/lib/client.js:290:19)
+    at Connection.emit (events.js:314:20)
+    at /kkutu/Server/lib/node_modules/pg/lib/connection.js:114:12
+    at Parser.parse (/kkutu/Server/lib/node_modules/pg-protocol/dist/parser.js:40:17):2083 [1/27/2026, 21:42:45] ERROR: SyntaxError: Invalid regular expression: /^())./: Unmatched ')'
+SyntaxError: Invalid regular expression: /^())./: Unmatched ')'
+    at new RegExp (<anonymous>)
+    at produce (/kkutu/Server/lib/Game/games/classic.js:1110:23)
+    at /kkutu/Server/lib/Game/games/classic.js:1106:4
+    at callback (/kkutu/Server/lib/sub/collection.js:316:13)
+    at Query.preCB (/kkutu/Server/lib/sub/collection.js:298:6)
+    at Query.handleReadyForQuery (/kkutu/Server/lib/node_modules/pg/lib/query.js:138:12)
+    at Client._handleReadyForQuery (/kkutu/Server/lib/node_modules/pg/lib/client.js:290:19)
+    at Connection.emit (events.js:314:20)
+    at /kkutu/Server/lib/node_modules/pg/lib/connection.js:114:12
+    at Parser.parse (/kkutu/Server/lib/node_modules/pg-protocol/dist/parser.js:40:17)

@@ -1,0 +1,139 @@
+//-
+	Rule the words! KKuTu Online
+	Copyright (C) 2017 JJoriping(op@jjo.kr)
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program. If not, see <http://www.gnu.org/licenses/>.
+extends layout
+
+block Subject
+	title 끄투 관리 페이지
+
+block JS
+	script(type="text/javascript", src="/js/in_admin.min.js")
+	
+block Middle
+	fieldset
+		legend 자격
+		input#db-password(type='password', placeholder='암호')
+		input#db-lang(placeholder='테이블')
+	fieldset
+		legend 추가 요청 받기
+		div
+			button#injeong-go 조회
+			div
+				table
+					thead: tr
+						td 승인?
+						td 링크
+						td #
+						td 주제
+						td 한사람
+						td 언제
+					tbody#injeong-data
+			button#injeong-everything 모두 승인
+			button#injeong-nothing 모두 거절
+			button#injeong-apply 적용
+	fieldset
+		legend 상점 DB 다루기
+		div
+			input#shop-word(placeholder='품목 ("~ALL" ⮕ 항목 전체)')
+			button#shop-go 조회
+			button#shop-hide 숨기기
+			div
+				table
+					thead: tr
+						td #
+						td 가격
+						td 산횟수
+						td term
+						td 종류
+						td 업데이트날짜
+						td 장착효과
+						td 한국어이름
+						td 한국어설명
+						td 영어이름
+						td 영어설명
+					tbody#shop-data
+			button#shop-add 추가
+			button#shop-apply 적용
+	fieldset
+		legend 유저 DB 다루기
+		div
+			input#user-id(placeholder='ID')
+			input#user-nick(placeholder='닉네임')
+			button#user-go 조회
+			div
+				table
+					thead: tr
+						td #
+						td 돈
+						td 전적
+						td 인벤토리
+						td 장착중
+						td 닉네임
+						td 닉네임 변경날짜
+						td 소개글
+						td 서버
+						td 마지막 접속
+						td 밴사유
+						td 밴끝(없으면 무기한)
+						td 친구
+					tbody#user-data
+			button#user-apply 적용
+	fieldset
+		legend 유저 감시하기
+		div
+			input#gamsi-id(placeholder='ID (,로 구분)')
+			button#gamsi-go 감시
+			div
+				table
+					thead: tr
+						td #
+						td 닉네임
+						td 서버
+					tbody#gamsi-data
+	fieldset
+		legend 끄투 DB 다루기
+		div
+			input#db-word(placeholder='단어')
+			button#db-go 조회
+			div#word-data
+				div#wd-id
+				input#wd-flag
+				table
+					thead: tr
+						td #
+						td 타입
+						td 주제
+						td 뜻
+						td 행동
+					tbody#wd-data
+			div#word-flag
+			div#word-hit
+			button#word-add 추가
+			button#db-apply 적용
+	fieldset
+		legend 끄투 DB에 단어 추가하기
+		div
+			h5 OK가 안뜨면 1000개가 넘지는 않았는지, 비밀번호, 테이블(ko혹은 en), <a href='/daneodb/list.txt' style="color: #0000EE;" target="_blank">주제</a>가 올바른지 확인해보자
+			input#db-theme(placeholder='주제 ("~주제" ⮕ 주제 전체)')
+			textarea#db-list(rows=20, cols=100, placeholder='단어 목록 (한 줄에 하나씩 1000개씩)')
+			button#db-ok 확인
+	fieldset
+		//- 외않되
+		legend 끄투에서의 인기 단어 | 사용중지 | 해당 기능을 사용시 정신지배 정신붕괴 트라우마 기절 전쟁 바이러스 외계침공 우주 멸망 및 웹서버 다운 등의 피해가 발생할 수 있습니다
+		button#kpw-query 조회
+		textarea#kpw-html
+		div#kpw-table
+		button#kpw-flush 반영

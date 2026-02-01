@@ -1,0 +1,47 @@
+//-
+	Rule the words! KKuTu Online
+	Copyright (C) 2017 JJoriping(op@jjo.kr)
+	
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+extends layout
+
+block Subject
+	title 단어 검색기
+
+block CSS
+	link(rel='stylesheet', href='/css/in_search.css')
+
+block JS
+	script(type="text/javascript", src="/js/in_search.js", defer)
+
+block Middle
+	h1 검색할 단어를 선택하세요.
+	h4 오류가 있을 수 있습니다. 제보해주시면 감사 하겠습니다.
+	div.theme-buttons
+		button.theme-btn(data-theme="hgs") 한국 교통시설
+		button.theme-btn(data-theme="jan") 만화/애니메이션
+		button.theme-btn(data-theme="jln") 라이트노벨
+		button.theme-btn(data-theme="kmv") 영화
+		button.theme-btn(data-theme="ktv") 국내 방송 프로그램
+		button.theme-btn(data-theme="ssh") 소설/시/희곡
+		button.theme-btn(data-theme="bmk") Be끄투K
+		button.theme-btn(data-theme="unu") 유네스코 세계유산
+		button.theme-btn(data-theme="hhg") 한국 행정구역
+		button.theme-btn(data-theme="mct") 마인크래프트
+		button.theme-btn(data-theme="gbd") 기업/브랜드
+		button.theme-btn(data-theme="gsi") 원신
+	div.word-list-container
+		p.message#initial-message 단어 주제를 선택해주세요.
+		ul#word-list

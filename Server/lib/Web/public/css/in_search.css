@@ -1,0 +1,88 @@
+/**
+ * Rule the words! KKuTu Online
+ * Copyright (C) 2017 JJoriping(op@jjo.kr)
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * Rule the words! DE LZB KKuTu
+ * You can see this file in <https://github.com/minjun1177/DE-LZB-KKuTu>
+*/
+
+#Top{
+	background-color: #7CC4F8;
+	background-image: none;
+}
+#Top .menu-btn{
+	color: #111111;
+	background-color: #7CC4F8;
+	background-image: none;
+}
+.container {
+    width: 90%;
+    max-width: 800px;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.theme-buttons {
+    margin-bottom: 30px;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+.theme-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.theme-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+.word-list-container {
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    padding: 20px;
+    min-height: 200px;
+    text-align: left;
+}
+#word-list {
+    list-style-type: none;
+    padding: 0;
+    margin: -10px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+#word-list li {
+    padding: 5px 0;
+    color:#111111;
+    /* border-bottom: 1px solid #dde1e2; */
+}
+.message {
+    margin-top: -10px;
+    color: #7f8c8d;
+    font-size: 18px;
+}

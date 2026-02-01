@@ -1,0 +1,6 @@
+sudo sh -c 'nohup node Server/lib/Game/cluster.js 0 1 > game.log 2>&1 &'
+sudo sh -c 'nohup node Server/lib/Web/cluster.js 1 > web.log 2>&1 &'
+
+# improved !
+
+sudo sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &'

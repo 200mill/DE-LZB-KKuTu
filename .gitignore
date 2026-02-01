@@ -1,0 +1,26 @@
+Client/node_modules
+# ^^^^^^^ ?
+Server/run.bat
+Server/node_modules
+Server/lib/node_modules
+Server/lib/Web/public/js/**
+!Server/lib/Web/public/js/jquery.js
+Server/lib/sub/auth.json
+Server/lib/sub/global.json
+.vscode
+
+# db search
+# but html is not used
+Server/lib/Web/public/words/
+Server/lib/Web/public/daneodb/theme_search.html
+Server/lib/Web/public/daneodb/list.txt
+
+
+# ssl
+Server/ca_bundle.crt
+Server/certificate.crt
+Server/private.key
+
+# log
+Server/web.log
+Server/game.log

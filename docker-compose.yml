@@ -17,6 +17,7 @@ services:
     build: .
     volumes:
 #      - ./Server/lib:/app/Server/lib/
+      - ./Server/lib/sub/:/app/Server/lib/sub/
       - kkutu_data:/kkutu
     command: [ "node", "/app/Server/lib/Web/cluster.js", "1" ]
     restart: always
@@ -24,7 +25,7 @@ services:
       - db
       - game
     ports:
-      - 801:80
+      - 80:80
   db:
     build:
       context: .

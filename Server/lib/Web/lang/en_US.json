@@ -136,7 +136,7 @@
 	},
 	"kkutu": {
 		"title": "Rule the words! KKuTu Online",
-		"version": "2.5.2",
+		"version": "2.5.3",
 		
 		"meta_desc": "Online Word Chain, Shiritori, Initial Quiz, Crossword, Typing Battle! Be the master of vocabulary in KKuTu.",
 		"meta_keys": "kkutu,shiritori,online,web,kungkungtta,english shiritori,typing,word game",
@@ -356,6 +356,8 @@
 		"explNo2": "Prevents use of 2-letter words.",
 		"optUnknown": "Non-dictionary",
 		"explUnknown": "Allows use of words not listed in the dictionary.",
+		"optEasyMission": "Easy Mission",
+		"explEasyMission": "Easier mission letters are given.\nUse with Special Rules \"Mission.\"",
 		"hidden": "(Hidden)",
 		"pickInjeong": "Select Topic",
 		"explInjPick": "Select topics to use in the game.",

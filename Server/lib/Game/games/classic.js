@@ -141,7 +141,9 @@ exports.roundReady = function(){
 		my.game.char = my.game.title[my.game.round - 1];
 		my.game.subChar = getSubChar.call(my, my.game.char);
 		my.game.chain = [];
-		if(my.opts.mission) my.game.mission = getMission(my.rule.lang);
+		// if(my.opts.mission) my.game.mission = getMission(my.rule.lang, my.opts.ezm);
+		// if(my.opts.EasyMission) my.game.mission = getMission(my.rule.lang, true);
+		if (my.opts.mission) my.game.mission = getMission(my.rule.lang, my.opts.easymission, my.opts.mission);
 		if(my.opts.sami) my.game.wordLength = 2;
 		
 		my.byMaster('roundReady', {
@@ -273,7 +275,7 @@ exports.submit = function(client, text){
 					baby: baby
 				}, true);
 				if(my.game.mission === true){
-					my.game.mission = getMission(my.rule.lang);
+					my.game.mission = getMission(my.rule.lang, my.opts.easymission, my.opts.mission);
 				}
 				setTimeout(my.turnNext, my.game.turnTime / 6);
 				if(!client.robot){
@@ -506,17 +508,38 @@ exports.readyRobot = function(robot){
 		return R;
 	}
 };
-function getMission(l){
-	var arr = (l == "ko") ? Const.MISSION_ko : Const.MISSION_en;
+function getMission(l, ezm, mis){
+	var arr;
+	switch(l){
+		case "ko":
+			if (ezm && mis) {
+				// if (true) { // for testing
+				// 아 해결
+				if (Math.random() > 0.5) {
+					arr = Const.EZ_MISSION_ko;
+				} else {
+					arr = Const.MISSION_ko;
+				}
+			} else if (ezm && !mis) {
+				arr = Const.EZ_MISSION_ko;
+			} else if (!ezm && mis) {
+				arr = Const.MISSION_ko;
+			}
+			break;
+		case "en":
+			arr = Const.MISSION_en;
+			break;
+	}
+
 	
 	if(!arr) return "-";
 	return arr[Math.floor(Math.random() * arr.length)];
 }
 function getAuto(char, subc, type){
 	/* type
-		0 ������ �ܾ� �ϳ�
-		1 ���� ����
-		2 �ܾ� ���
+		0 무작위 단어 하나
+		1 존재 여부
+		2 단어 목록
 	*/
 	var my = this;
 	var R = new Lizard.Tail();

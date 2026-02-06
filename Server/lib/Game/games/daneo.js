@@ -49,7 +49,7 @@ exports.roundReady = function(){
 	if(my.game.round <= my.round){
 		my.game.theme = my.opts.injpick[Math.floor(Math.random() * ijl)];
 		my.game.chain = [];
-		if(my.opts.mission) my.game.mission = getMission(my.rule.lang);
+		if(my.opts.mission) my.game.mission = getMission(my.rule.lang, my.opts.easymission, my.opts.mission);
 		my.byMaster('roundReady', {
 			round: my.game.round,
 			theme: my.game.theme,
@@ -149,7 +149,7 @@ exports.submit = function(client, text, data){
 					baby: $doc.baby
 				}, true);
 				if(my.game.mission === true){
-					my.game.mission = getMission(my.rule.lang);
+					my.game.mission = getMission(my.rule.lang, my.opts.easymission, my.opts.mission);
 				}
 				setTimeout(my.turnNext, my.game.turnTime / 6);
 				if(!client.robot){
@@ -220,8 +220,29 @@ exports.readyRobot = function(robot){
 function toRegex(theme){
 	return new RegExp(`(^|,)${theme}($|,)`);
 }
-function getMission(l){
-	var arr = (l == "ko") ? Const.MISSION_ko : Const.MISSION_en;
+function getMission(l, ezm, mis){
+	// var arr = (l == "ko") ? Const.MISSION_ko : Const.MISSION_en;
+	var arr;
+	switch(l){
+		case "ko":
+			if (ezm && mis) {
+				// if (true) { // for testing
+				// 아 해결
+				if (Math.random() > 0.5) {
+					arr = Const.EZ_MISSION_ko;
+				} else {
+					arr = Const.MISSION_ko;
+				}
+			} else if (ezm && !mis) {
+				arr = Const.EZ_MISSION_ko;
+			} else if (!ezm && mis) {
+				arr = Const.MISSION_ko;
+			}
+			break;
+		case "en":
+			arr = Const.MISSION_en;
+			break;
+	}
 	
 	if(!arr) return "-";
 	return arr[Math.floor(Math.random() * arr.length)];

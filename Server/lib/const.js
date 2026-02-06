@@ -18,22 +18,22 @@
 
 var GLOBAL = require("./sub/global.json");
 
-exports.KKUTU_MAX = 400;
-exports.MAIN_PORTS = GLOBAL.MAIN_PORTS;
+exports.KKUTU_MAX = 400; // 서버 최대 동시접속자 수
+exports.MAIN_PORTS = GLOBAL.MAIN_PORTS; // 운영 서버 포트
 exports.TEST_PORT = 2052; // 테스트 서버 포트
-exports.SPAM_CLEAR_DELAY = 1600;
-exports.SPAM_ADD_DELAY = 750;
-exports.SPAM_LIMIT = 7;
-exports.BLOCKED_LENGTH = 10000;
-exports.KICK_BY_SPAM = 9;
-exports.MAX_OBSERVER = 4;
+exports.SPAM_CLEAR_DELAY = 1600; // 스팸 기록 삭제 시간 간격 (밀리초)
+exports.SPAM_ADD_DELAY = 750; // 스팸 기록 추가 시간 간격 (밀리초)
+exports.SPAM_LIMIT = 7; // 스팸으로 간주하는 입력 횟수
+exports.BLOCKED_LENGTH = 10000; // 차단 단어 길이 제한
+exports.KICK_BY_SPAM = 9; // 스팸으로 간주하여 강제퇴장 입력 횟수
+exports.MAX_OBSERVER = 4; // 관전자 최대 인원
 exports.TESTER = GLOBAL.ADMIN.concat([ // 서버 점검중 일때 접속 가능 아이디?
 	"discord-740191615716425780",
 	"discord-863626417479352340",
 	"discord-842559452825255946"
 ]);
-exports.IS_SECURED = GLOBAL.IS_SECURED;
-exports.SSL_OPTIONS = GLOBAL.SSL_OPTIONS;
+exports.IS_SECURED = GLOBAL.IS_SECURED; // SSL 사용 여부
+exports.SSL_OPTIONS = GLOBAL.SSL_OPTIONS; // SSL 옵션
 exports.OPTIONS = {
 	'man': { name: "Manner" },
 	'ext': { name: "Injeong" },
@@ -43,8 +43,9 @@ exports.OPTIONS = {
 	'str': { name: "Strict" },
 	'k32': { name: "Sami" },
 	'no2': { name: "No2" },
-	'unk': { name: "Unknown" }
-};
+	'unk': { name: "Unknown" },
+	'ezm': { name: "EasyMission" },
+}; // 특수규칙 옵션
 exports.MOREMI_PART = [ 'back', 'eye', 'mouth', 'shoes', 'clothes', 'head', 'lhand', 'rhand', 'front' ];
 exports.CATEGORIES = [ "all", "spec", "skin", "badge", "head", "eye", "mouth", "clothes", "hs", "back" ];
 exports.AVAIL_EQUIP = [
@@ -62,7 +63,7 @@ exports.GROUPS = {
 	'hs': [ "Mhand", "Mshoes" ],
 	'back': [ "Mback", "Mfront" ]
 };
-exports.RULE = {
+exports.RULE = { // 규칙
 /*
 	유형: { lang: 언어,
 		rule: 이름,
@@ -91,7 +92,7 @@ exports.RULE = {
 	},
 	'KKT': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "k32", "unk" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "k32", "unk", "ezm" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -99,7 +100,7 @@ exports.RULE = {
 	},
 	'KSH': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "unk" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -139,7 +140,7 @@ exports.RULE = {
 	},
 	'KAP': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "unk" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -156,7 +157,7 @@ exports.RULE = {
 	},
 	'KDA': { lang: "ko",
 		rule: "Daneo",
-		opts: [ "ijp", "mis" ],
+		opts: [ "ijp", "mis", "ezm" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -200,7 +201,9 @@ exports.EXAMPLE_TITLE = {
 };
 exports.INIT_SOUNDS = [ "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ" ];
 exports.MISSION_ko = [ "가", "나", "다", "라", "마", "바", "사", "아", "자", "차", "카", "타", "파", "하" ];
+exports.EZ_MISSION_ko = [ "이", "기", "자", "도", "지", "사", "리", "스", "트", "법" ]; // TODO - Add easy missions - OK
 exports.MISSION_en = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" ];
+exports.EZ_MISSION_en = [ "a", "e", "i", "o", "u" ]; // 굳이?
 
 exports.KO_INJEONG = [ // 한국어 어인정 주제
 	"IMS", "VOC", "KRR", "KTV",
@@ -209,12 +212,12 @@ exports.KO_INJEONG = [ // 한국어 어인정 주제
 	"MOB", "HYK", "CYP", "HRH", "STA", "OIJ",
 	"KGR", "ESB", "ELW", "OIM", "OVW", "NEX", /*"WOW",*/ // 왜 주석임
 	"YRY", "KPO", "JLN", "JAN", "ZEL", "POK", "HAI",
-	"HSS", "KMV", "HDC", "HOS", "BMK", "SCO", "RMJ", "MAN", "HGS", "SSH", "UNU", "HHG", "MCT", "GBD", "GSI"
+	"HSS", "KMV", "HDC", "HOS", "BMK", "SCO", "RMJ", "MAN", "HGS", "SSH", "UNU", "HHG", "MCT", "GBD", "GSI" // 아너무많다
 ];
 exports.EN_INJEONG = [
 	"LOL"
 ];
-exports.KO_THEME = [ // 한국어 어인정 아닌 주제
+exports.KO_THEME = [ // 한국어 테마인데 어인정 아닌 주제
 	"30", "40", "60", "80", "90",
 	"140", "150", "160", "170", "190",
 	"220", "230", "240", "270", "310",

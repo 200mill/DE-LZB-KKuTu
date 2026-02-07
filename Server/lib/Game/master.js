@@ -436,7 +436,7 @@ exports.init = function(_SID, CHAN){
 						isBlockRelease = true;
 					}
 					/* Enhanced User Block System [E] */						
-					
+					// ^V ?
 					/* Enhanced User Block System [S] */
 					if(ref.result == 200 || isBlockRelease){
 					/* Enhanced User Block System [E] */

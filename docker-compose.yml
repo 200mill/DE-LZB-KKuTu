@@ -12,7 +12,9 @@ services:
     command: [ "node", "/app/Server/lib/Game/cluster.js", "0", "1" ]
     restart: always
     ports:
+      - 110:110
       - 8496:8496
+      - 8110:8110
       - 8080:8080
   web:
     build: .

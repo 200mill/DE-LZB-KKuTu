@@ -268,7 +268,7 @@ sudo pkill node
 
 ### 주요 클래스
 
- 클래스 | 파일 | 역할 |
+| 클래스 | 파일 | 역할 |
 | --- | --- | --- |
 | Room | `lib/Game/kkutu.js` | 게임방 관리 (플레이어, 게임상태, 스코어) |
 | Client | `lib/Game/kkutu.js` | 개별 클라이언트 연결 관리 |
@@ -427,13 +427,14 @@ psql -U postgres kkutu < backup_users.sql
 | /injeong/"단어" |  get   | theme - 단어 주제 | GET /injeong/놈놈놈?theme=MAN -> {message: "OK"}                                                              | 로그인 필요 |
 | /language/flush |  get   |         -         | GET /language/flush -> OK                                                                                     | - | 
 | /ranking        |  get   |    p - 페이지     | GET /ranking?p=0 -> {"page":0,"data":[{"id":"discord-1234567","rank":0,"score":"161971"} . . . ]}             | - |
+| /cf/"단어" | get | - | GET /cf/사과 -> {"data":[{"key":"dictPage","value":1,"rate":1},{"key":"boxB4","value":1,"rate":0},{"key":"$WPC?","value":1,"rate":0.05555555555555555}],"cost":0} | - | 
 
 ---
 
 ## 기타
 
-언어팩을 수정하였다면 `'서버주소'/language/flush`로 접속하여 새로고침합니다.
-
+- 언어팩을 수정하였다면 `'서버주소'/language/flush`로 접속하여 새로고침합니다.
+- 사기 봇을 제외한 봇은 최소 hit값이 있습니다. 따라서 정상적인 봇을 사용하려면 데이터베이스 kkutu_en/kkutu_ko 테이블안의 hit값을 수정해야 합니다.
 
 
 # EN

@@ -355,7 +355,7 @@
 		"optNo2": "No 2-letter",
 		"explNo2": "Prevents use of 2-letter words.",
 		"optUnknown": "Non-dictionary",
-		"explUnknown": "Allows use of words not listed in the dictionary.",
+		"explUnknown": "Allows use of words not listed in the dictionary. Cannot be used with Special Rules \"Manner.\"",
 		"optEasyMission": "Easy Mission",
 		"explEasyMission": "Easier mission letters are given.\nUse with Special Rules \"Mission.\"",
 		"hidden": "(Hidden)",

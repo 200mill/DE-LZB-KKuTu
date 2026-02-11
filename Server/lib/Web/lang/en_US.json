@@ -358,6 +358,8 @@
 		"explUnknown": "Allows use of words not listed in the dictionary. Cannot be used with Special Rules \"Manner.\"",
 		"optEasyMission": "Easy Mission",
 		"explEasyMission": "Easier mission letters are given.\nUse with Special Rules \"Mission.\"",
+		"optLongWord": "Long Word",
+		"explLongWord": "Longer words will appear. Cannot be used with Special Rules \"Proverb.\"",
 		"hidden": "(Hidden)",
 		"pickInjeong": "Select Topic",
 		"explInjPick": "Select topics to use in the game.",

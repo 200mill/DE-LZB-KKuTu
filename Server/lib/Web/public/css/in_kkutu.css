@@ -145,6 +145,7 @@ iframe{
 		.dialog-opt{ float: left; width: 100px; }
 	.tail-button{ margin-top: 7px; }
 	#roombtn{ margin-top: 18px;}
+	#room-ok{ margin-top: 10px; }
 	.tail-button button{ float: right; margin-right: 5px; width: 80px; height: 20px; }
 	.dialog .closeBtn{
 		float: right;

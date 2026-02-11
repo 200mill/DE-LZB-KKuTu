@@ -122,7 +122,7 @@ exports.submit = function(client, text, data){
 	if(!mgt) return;
 	if(!mgt.robot) if(mgt != client.id) return;
 	if(!my.game.theme) return;
-	if(my.game.chain.indexOf(text) == -1){
+	if(my.game.chain.indexOf(text) == -1){ // 사용된 단어?
 		l = my.rule.lang;
 		my.game.loading = true;
 		function onDB($doc){
@@ -161,14 +161,14 @@ exports.submit = function(client, text, data){
 				my.game.loading = false;
 				client.publish('turnError', { code: code || 404, value: text }, true);
 			}
-			if($doc){
+			if($doc){ // $doc (단어 데이터) 가 존재하는가
 				if($doc.theme.match(toRegex(my.game.theme)) == null) denied(407);
 				else preApproved();
 			}else{
 				denied();
 			}
 		}
-		DB.kkutu[l].findOne([ '_id', text ]).on(onDB);
+		DB.kkutu[l].findOne([ '_id', text ]).on(onDB); // 단어 존재 여부
 	}else{
 		client.publish('turnError', { code: 409, value: text }, true);
 	}

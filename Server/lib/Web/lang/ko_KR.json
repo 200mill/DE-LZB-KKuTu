@@ -349,6 +349,8 @@
 		"explEasyMission": "더 쉬운 미션 글자가 주어집니다. 미션과 같이 사용합니다.",
 		"optLongWord": "긴 단어",
 		"explLongWord": "더 긴 단어가 나옵니다. 속담과 같이 사용할 수 없습니다.",
+		"optHard": "어려운 단어",
+		"explHard": "더 어려운 단어가 나옵니다. 속담, 긴단어와 같이 사용할 수 없습니다.",
 		"hidden": "(미공개)",
 		"pickInjeong": "주제 선택",
 		"explInjPick": "게임에서 사용할 주제를 선택하세요.",

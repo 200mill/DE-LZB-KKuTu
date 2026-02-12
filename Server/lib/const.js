@@ -46,6 +46,7 @@ exports.OPTIONS = {
 	'unk': { name: "Unknown" },
 	'ezm': { name: "EasyMission" },
 	'low': { name: "LongWord" },
+	'hrd': { name: "Hard" },
 }; // 특수규칙 옵션
 exports.MOREMI_PART = [ 'back', 'eye', 'mouth', 'shoes', 'clothes', 'head', 'lhand', 'rhand', 'front' ];
 exports.CATEGORIES = [ "all", "spec", "skin", "badge", "head", "eye", "mouth", "clothes", "hs", "back" ];
@@ -125,7 +126,7 @@ exports.RULE = { // 규칙
 	},
 	'KTY': { lang: "ko",
 		rule: "Typing",
-		opts: [ "prv", "low" ],
+		opts: [ "prv", "low", "hrd" ],
 		time: 1,
 		ai: false,
 		big: false,

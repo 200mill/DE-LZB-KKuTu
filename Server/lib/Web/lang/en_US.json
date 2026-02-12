@@ -360,6 +360,8 @@
 		"explEasyMission": "Easier mission letters are given.\nUse with Special Rules \"Mission.\"",
 		"optLongWord": "Long Word",
 		"explLongWord": "Longer words will appear. Cannot be used with Special Rules \"Proverb.\"",
+		"optHard": "Hard Word",
+		"explHard": "More difficult words will appear. Cannot be used with Special Rules \"Proverb\" or \"Long Word.\"",
 		"hidden": "(Hidden)",
 		"pickInjeong": "Select Topic",
 		"explInjPick": "Select topics to use in the game.",

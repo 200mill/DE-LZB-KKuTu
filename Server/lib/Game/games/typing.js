@@ -26,6 +26,7 @@ var LONGWORD_MIN_LENGTH = 6;
 var LONGWORD_MAX_LENGTH = 12;
 var WORD_MIN_LENGTH = 2;
 var WORD_MAX_LENGTH = 5;
+var HARD_LENGTH = 4;
 var LIST_LENGTH = 200;
 var DOUBLE_VOWELS = [ 9, 10, 11, 14, 15, 16, 19 ];
 var DOUBLE_TAILS = [ 3, 5, 6, 9, 10, 11, 12, 13, 14, 15, 18 ];
@@ -70,6 +71,11 @@ exports.getTitle = function(){
 		});
 	}
 
+	 // LZB - Added hard word
+	else if (my.opts.hard) { // 어려운 단어
+		pickHard();
+	}
+
 	else DB.kkutu[my.rule.lang].find([ '_id', new RegExp(`^.{${WORD_MIN_LENGTH},${WORD_MAX_LENGTH}}$`) ], [ 'hit', { $gte: 1 } ]).limit(416).on(function($res){ // 일반 단어
 		pick($res.map(function(item){ return item._id; }));
 	});
@@ -88,6 +94,27 @@ exports.getTitle = function(){
 		my.game.lists = data;
 		R.go("①②③④⑤⑥⑦⑧⑨⑩");
 	}
+
+	function pickHard(){ // LZB - Added hard word
+		var data = [];
+		var arr;
+
+		for (i=0; i<my.round; i++){
+			arr = [];
+			for (j=0; j<LIST_LENGTH; j++){
+				// String.fromCharCode(44032 + Math.floor(Math.random() * (55203 - 44032 + 1)));
+				tmp = String.fromCharCode(44032 + Math.floor(Math.random() * (55203 - 44032 + 1)));
+				for (k=0; k<HARD_LENGTH - 1; k++){
+					tmp = tmp.concat(String.fromCharCode(44032 + Math.floor(Math.random() * (55203 - 44032 + 1))));
+				}
+				arr.push(tmp);
+			}
+			data.push(arr);
+		}
+		my.game.lists = data;
+		R.go("①②③④⑤⑥⑦⑧⑨⑩");
+	}
+
 	traverse.call(my, function(o){
 		o.game.spl = 0;
 	});

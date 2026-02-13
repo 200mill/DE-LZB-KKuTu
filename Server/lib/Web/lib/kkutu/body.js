@@ -531,7 +531,7 @@ function onMessage(data){
 			}
 			alert("[#" + data.code + "] " + L['error_'+data.code] + i);
 			break;
-		case 'maintainConnection':
+		case 'heartbeat':
 		default:
 			break;
 	}

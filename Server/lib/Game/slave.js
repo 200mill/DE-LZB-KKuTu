@@ -192,6 +192,9 @@ KKuTu.onClientMessage = function($c, msg){
 	if(!msg) return;
 	
 	switch(msg.type){
+		case 'heartbeat': // TNX to https://github.com/kitt3n69420/KKuTu
+			$c._lastHeartbeat = Date.now();
+			break;
 		case 'yell':
 			if(!msg.value) return;
 			if(!$c.admin) return;

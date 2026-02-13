@@ -499,12 +499,17 @@ function joinNewUser($c) {
 	
 	JLog.info("New user #" + $c.id);
 	if(GLOBAL.WAF) setInterval(() => {
-		$c.send('maintainConnection');
-	}, 20000);
+		$c.send('heartbeat');
+	}, 30000);
 }
 
 KKuTu.onClientMessage = function ($c, msg) {
 	if (!msg) return;
+
+	if (msg.type === 'heartbeat') { // TNX to https://github.com/kitt3n69420/KKuTu
+		$c._lastHeartbeat = Date.now();
+		return;
+	}
 	
 	if ($c.passRecaptcha) {
 		processClientRequest($c, msg);

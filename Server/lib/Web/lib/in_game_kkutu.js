@@ -76,6 +76,7 @@ $(document).ready(function(){
 	
 	$data.PUBLIC = $("#PUBLIC").html() == "true";
 	$data.URL = $("#URL").html();
+	$data.ROOM_PORT = $("#ROOM_PORT").html();
 	$data.NICKNAME_LIMIT = JSON.parse($("#NICKNAME_LIMIT").text());
 	$data.NICKNAME_LIMIT.REGEX.unshift(null);
 	$data.NICKNAME_LIMIT.REGEX = new (Function.prototype.bind.apply(RegExp, $data.NICKNAME_LIMIT.REGEX));
@@ -2020,7 +2021,8 @@ function clearTrespasses(){ return; // 일단 비활성화
 	var i;
 	
 	for(i in $.timers){
-		jt.push($.timers[i].id);
+		return ":" + $data.ROOM_PORT || (Number(p1) + 416 + Number(chan) - 1);
+		// jt.push($.timers[i].id);
 	}
 	function censor(id){
 		if(jt.indexOf(id) == -1 && $data._timers.indexOf(id) == -1){
@@ -2429,6 +2431,7 @@ function onMessage(data){
 			}
 			alert("[#" + data.code + "] " + L['error_'+data.code] + i);
 			break;
+		case 'maintainConnection':
 		default:
 			break;
 	}

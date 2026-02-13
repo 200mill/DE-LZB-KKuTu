@@ -32,6 +32,8 @@ exports.TESTER = GLOBAL.ADMIN.concat([ // 서버 점검중 일때 접속 가능 
 	"discord-863626417479352340",
 	"discord-842559452825255946"
 ]);
+exports.WAF = GLOBAL.WAF; // 웹 방화벽 사용 여부
+exports.ROOM_PORTS = GLOBAL.ROOM_PORTS; // 게임 방 서버 포트
 exports.IS_SECURED = GLOBAL.IS_SECURED; // SSL 사용 여부
 exports.SSL_OPTIONS = GLOBAL.SSL_OPTIONS; // SSL 옵션
 exports.OPTIONS = {

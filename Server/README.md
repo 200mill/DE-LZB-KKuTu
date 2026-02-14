@@ -13,7 +13,7 @@
 ### 서버켜기
 
 ```shell
-sudo sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &'
+sudo sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &' && sudo sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &'
 ```
 
 로그는 web.log, game.log에 저장 됩니다.
@@ -296,9 +296,17 @@ sudo pkill node
  - **미션 글자**: 미션 설정
  - **어인정 주제**: 단어 주제 설정
 
-### 웹소켓
+---
 
-클라이언트와 게임서버는 웹소켓으로 통신합니다.
+## Web서버 관련
+
+(추가바람)
+
+---
+
+## 웹소켓 관련
+
+클라이언트와 서버는 웹소켓으로 통신합니다.
 
 #### 주요 이벤트 (클라이언트 → 서버)
 - `enter`: 방 입장
@@ -319,12 +327,7 @@ sudo pkill node
 - `roundEnd`: 라운드 종료
 - `kickVote`: 방 추방 투표 진행
 - `kickDeny`: 방 추방 투표 부결
-
----
-
-## Web서버 관련
-
-(추가바람)
+- `heartbeat`: 클라우드플레어 타임아웃 방지
 
 ---
 
@@ -362,7 +365,7 @@ PostgreSQL을 사용하며, 주요 쿼리와 설정은 `lib/Web/db.js`에 정의
 | `equip` | JSON | 장착중인 아이템 |
 | `nickname` | VARCHAR | 닉네임 |
 | `exordial` | BIGINT | 설명 |
-| `black` | VARCHAR | 밴 사유, 없으면 밴X |
+| `black` | VARCHAR | 밴 사유, 없으면 밴 아님 |
 | `blockedUntil` | INTERGER | 밴 기한 |
 | `server` | VARCHAR | 현재 접속 서버 |
 | `password` | VARCHAR | (추가바람) |
@@ -435,6 +438,7 @@ psql -U postgres kkutu < backup_users.sql
 
 - 언어팩을 수정하였다면 `'서버주소'/language/flush`로 접속하여 새로고침합니다.
 - 사기 봇을 제외한 봇은 최소 hit값이 있습니다. 따라서 정상적인 봇을 사용하려면 데이터베이스 kkutu_en/kkutu_ko 테이블안의 hit값을 수정해야 합니다.
+- 클라우드플레어 사용 시 서버와 유저가 통신하는 모든 포트는 [클라우드플레어가 지원하는 포트](https://developers.cloudflare.com/fundamentals/reference/network-ports/) 중 하나로 설정하셔야 합니다.
 
 
 # EN

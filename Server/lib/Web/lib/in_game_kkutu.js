@@ -76,6 +76,7 @@ $(document).ready(function(){
 	
 	$data.PUBLIC = $("#PUBLIC").html() == "true";
 	$data.URL = $("#URL").html();
+	$data.ROOM_PORT = $("#ROOM_PORT").html();
 	$data.NICKNAME_LIMIT = JSON.parse($("#NICKNAME_LIMIT").text());
 	$data.NICKNAME_LIMIT.REGEX.unshift(null);
 	$data.NICKNAME_LIMIT.REGEX = new (Function.prototype.bind.apply(RegExp, $data.NICKNAME_LIMIT.REGEX));
@@ -1034,8 +1035,18 @@ $(document).ready(function(){
 
 // 웹소켓 연결
 	function connect(){
+		// var heartbeatInterval;
 		ws = new _WebSocket($data.URL);
 		ws.onopen = function(e){
+			if (heartbeatInterval) clearInterval(heartbeatInterval);
+			heartbeatInterval = _setInterval(function(){ // TNX to https://github.com/kitt3n69420/KKuTu
+				if(ws && ws.readyState === WebSocket.OPEN){
+					ws.send(JSON.stringify({ type: "heartbeat" }));
+				}
+				if (rws && rws.readyState === WebSocket.OPEN) {
+					rws.send(JSON.stringify({ type: "heartbeat" }));
+				}
+			}, 30000); // 30초마다 하트비트 전송
 			loading();
 			/*if($data.PUBLIC && mobile) $("#ad").append($("<ins>").addClass("daum_ddn_area")
 				.css({ 'display': "none", 'margin-top': "10px", 'width': "100%" })
@@ -2045,7 +2056,8 @@ function route(func, a0, a1, a2, a3, a4){
 }
 function connectToRoom(chan, rid){
 	var url = $data.URL.replace(/:(\d+)/, function(v, p1){
-		return ":" + (Number(p1) + 30 + Number(chan) - 1); // WHY?????
+		// return ":" + (Number(p1) + 30 + Number(chan) - 1); // WHY?????
+		return ":" + $data.ROOM_PORT || (Number(p1) + 416 + Number(chan) - 1);
 	}) + "&" + chan + "&" + rid;
 	
 	if(rws) return;
@@ -2429,6 +2441,7 @@ function onMessage(data){
 			}
 			alert("[#" + data.code + "] " + L['error_'+data.code] + i);
 			break;
+		case 'heartbeat':
 		default:
 			break;
 	}

@@ -21,6 +21,7 @@ var Cluster = require("cluster");
 var Const = require('../const');
 var Lizard = require('../sub/lizard');
 var JLog = require('../sub/jjlog');
+const { set } = require("grunt");
 // 망할 셧다운제 var Ajae = require("../sub/ajae");
 var DB;
 var SHOP;
@@ -276,6 +277,12 @@ exports.Client = function(socket, profile, sid){
 			// process.send({ type: 'okg', id: my.id, time: time });
 		};
 	}
+	my._lastHeartbeat = Date.now(); // TNX to https://github.com/kitt3n69420/KKuTu
+	my._lastHeartbeat = setInterval(() => {
+		if (socket.readyState === 1) {
+			my.send('heartbeat', {});
+		}
+	}, 30000); // 30초마다 하트비트 전송
 	socket.on('close', function(code){
 		if(ROOM[my.place]) ROOM[my.place].go(my);
 		if(my.subPlace) my.pracRoom.go(my);

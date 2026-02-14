@@ -22,4 +22,26 @@ SyntaxError: Invalid regular expression: /^())./: Unmatched ')'
     at Client._handleReadyForQuery (/kkutu/Server/lib/node_modules/pg/lib/client.js:290:19)
     at Connection.emit (events.js:314:20)
     at /kkutu/Server/lib/node_modules/pg/lib/connection.js:114:12
-    at Parser.parse (/kkutu/Server/lib/node_modules/pg-protocol/dist/parser.js:40:17)
+    at Parser.parse (/kkutu/Server/lib/node_modules/pg-protocol/dist/parser.js:40:17):2083 [2/11/2026, 22:42:07] ERROR: ReferenceError: random is not defined
+ReferenceError: random is not defined
+    at exports.Room.exports.getTitle (/kkutu/Server/lib/Game/games/typing.js:54:3)
+    at exports.Room.my.route.my.routeSync (/kkutu/Server/lib/Game/kkutu.js:1353:13)
+    at exports.Room.my.getTitle (/kkutu/Server/lib/Game/kkutu.js:1341:13)
+    at exports.Room.my.start (/kkutu/Server/lib/Game/kkutu.js:1147:6)
+    at exports.Client.my.practice (/kkutu/Server/lib/Game/kkutu.js:715:15)
+    at Object.KKuTu.onClientMessage (/kkutu/Server/lib/Game/slave.js:311:7)
+    at WebSocket.<anonymous> (/kkutu/Server/lib/Game/kkutu.js:293:11)
+    at WebSocket.emit (events.js:314:20)
+    at Receiver._receiver.onmessage (/kkutu/Server/lib/node_modules/ws/lib/WebSocket.js:143:47)
+    at Receiver.dataMessage (/kkutu/Server/lib/node_modules/ws/lib/Receiver.js:389:14):2083 [2/11/2026, 22:43:03] ERROR: ReferenceError: random is not defined
+ReferenceError: random is not defined
+    at exports.Room.exports.getTitle (/kkutu/Server/lib/Game/games/typing.js:54:3)
+    at exports.Room.my.route.my.routeSync (/kkutu/Server/lib/Game/kkutu.js:1353:13)
+    at exports.Room.my.getTitle (/kkutu/Server/lib/Game/kkutu.js:1341:13)
+    at exports.Room.my.start (/kkutu/Server/lib/Game/kkutu.js:1147:6)
+    at exports.Client.my.practice (/kkutu/Server/lib/Game/kkutu.js:715:15)
+    at Object.KKuTu.onClientMessage (/kkutu/Server/lib/Game/slave.js:311:7)
+    at WebSocket.<anonymous> (/kkutu/Server/lib/Game/kkutu.js:293:11)
+    at WebSocket.emit (events.js:314:20)
+    at Receiver._receiver.onmessage (/kkutu/Server/lib/node_modules/ws/lib/WebSocket.js:143:47)
+    at Receiver.dataMessage (/kkutu/Server/lib/node_modules/ws/lib/Receiver.js:389:14)

@@ -236,7 +236,7 @@ exports.submit = function(client, text){
 		if(!my.game.chain) return;
 		var preChar = getChar.call(my, text);
 		var preSubChar = getSubChar.call(my, preChar);
-		var firstMove = my.game.chain.length < 1;
+		var firstMove = my.game.chain.length < 1; // my.game.chain.length는 체인 횟수인듯
 		
 		function preApproved(){
 			function approved(){
@@ -283,6 +283,7 @@ exports.submit = function(client, text){
 					if($doc) DB.kkutu[l].update([ '_id', text ]).set([ 'hit', $doc.hit + 1 ]).on();
 				}
 			}
+			// 첫턴 혹은 매너, 비사전 아님 lzb - 모를땐 기능이라 우기면 됨
 			if(firstMove || my.opts.manner) getAuto.call(my, preChar, preSubChar, 1).then(function(w){
 				if(w) approved();
 				else{
@@ -413,7 +414,7 @@ exports.readyRobot = function(robot){
 		}else denied();
 	});
 	function denied(){
-		if(my.opts.unknown && my.game.char){ // 비사전 단어 (그냥 잇기가 불가할때 랜덤 글자)
+		if(my.opts.unknown && my.game.char && !my.opts.manner){ // 비사전 단어 (그냥 잇기가 불가할때 랜덤 글자), 매너 해결 
 			var char = my.game.char;
 			var subChar = my.game.subChar;
 			// var len = 2 + Math.floor(Math.random() * 3);
@@ -492,7 +493,7 @@ exports.readyRobot = function(robot){
 			if(!my.game.chain) return;
 			$res.sort(function(a, b){ return a.length - b.length; });
 			
-			if(my.opts.manner || !my.game.chain.length){
+			if(my.opts.manner || !my.game.chain.length){ // 과연 이게 맞을까
 				while(res = $res.shift()) if(res.length) break;
 			}else res = $res.shift();
 			R.go(res ? res.char : null);

@@ -24,7 +24,7 @@ var Secure = require('../sub/secure');
 var Server;
 var HTTPS_Server
 
-if(Const.IS_SECURED) {
+if(Const.IS_SECURED || Const.WAF) {
 	const options = Secure();
 	HTTPS_Server = https.createServer(options)
 		.listen(global.test ? (Const.TEST_PORT + 30) : process.env['KKUTU_PORT']); // WHY?????
@@ -192,6 +192,9 @@ KKuTu.onClientMessage = function($c, msg){
 	if(!msg) return;
 	
 	switch(msg.type){
+		case 'heartbeat': // TNX to https://github.com/kitt3n69420/KKuTu
+			$c._lastHeartbeat = Date.now();
+			break;
 		case 'yell':
 			if(!msg.value) return;
 			if(!$c.admin) return;

@@ -4,3 +4,6 @@ sudo sh -c 'nohup node Server/lib/Web/cluster.js 1 > web.log 2>&1 &'
 # improved !
 
 sudo sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &'
+
+# for testing
+sudo sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 1 1 > game2.log>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 2 1 > game3.log 2>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 3 1 > game.log 3>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 4 1 > game4.log 2>&1 &' && sudo sh -c 'nohup node lib/Game/cluster.js 5 1 > game5.log 2>&1 &'

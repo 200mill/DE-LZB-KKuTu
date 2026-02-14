@@ -20,7 +20,7 @@ var GLOBAL = require("./sub/global.json");
 
 exports.KKUTU_MAX = 400; // 서버 최대 동시접속자 수
 exports.MAIN_PORTS = GLOBAL.MAIN_PORTS; // 운영 서버 포트
-exports.TEST_PORT = 2052; // 테스트 서버 포트
+exports.TEST_PORT = 4040; // 테스트 서버 포트
 exports.SPAM_CLEAR_DELAY = 1600; // 스팸 기록 삭제 시간 간격 (밀리초)
 exports.SPAM_ADD_DELAY = 750; // 스팸 기록 추가 시간 간격 (밀리초)
 exports.SPAM_LIMIT = 7; // 스팸으로 간주하는 입력 횟수
@@ -32,6 +32,8 @@ exports.TESTER = GLOBAL.ADMIN.concat([ // 서버 점검중 일때 접속 가능 
 	"discord-863626417479352340",
 	"discord-842559452825255946"
 ]);
+exports.WAF = GLOBAL.WAF; // 웹 방화벽 사용 여부
+exports.ROOM_PORTS = GLOBAL.ROOM_PORTS; // 게임 방 서버 포트
 exports.IS_SECURED = GLOBAL.IS_SECURED; // SSL 사용 여부
 exports.SSL_OPTIONS = GLOBAL.SSL_OPTIONS; // SSL 옵션
 exports.OPTIONS = {
@@ -45,6 +47,8 @@ exports.OPTIONS = {
 	'no2': { name: "No2" },
 	'unk': { name: "Unknown" },
 	'ezm': { name: "EasyMission" },
+	'low': { name: "LongWord" },
+	'hrd': { name: "Hard" },
 }; // 특수규칙 옵션
 exports.MOREMI_PART = [ 'back', 'eye', 'mouth', 'shoes', 'clothes', 'head', 'lhand', 'rhand', 'front' ];
 exports.CATEGORIES = [ "all", "spec", "skin", "badge", "head", "eye", "mouth", "clothes", "hs", "back" ];
@@ -124,7 +128,7 @@ exports.RULE = { // 규칙
 	},
 	'KTY': { lang: "ko",
 		rule: "Typing",
-		opts: [ "prv" ],
+		opts: [ "prv", "low", "hrd" ],
 		time: 1,
 		ai: false,
 		big: false,
@@ -132,7 +136,7 @@ exports.RULE = { // 규칙
 	},
 	'ETY': { lang: "en",
 		rule: "Typing",
-		opts: [ "prv" ],
+		opts: [ "prv", "low" ],
 		time: 1,
 		ai: false,
 		big: false,

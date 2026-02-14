@@ -66,12 +66,14 @@ Server.set('view engine', "pug");
 Server.use(Express.static(__dirname + "/public"));
 Server.use(Parser.urlencoded({ extended: true }));
 Server.use(Exession({
-	/* use only for redis-installed
 
+	// use only for redis-installed
 	store: new Redission({
 		client: Redis.createClient(),
 		ttl: 3600 * 12
-	}),*/
+	}),
+	// use only for redis-installed
+	
 	secret: 'kkutu',
 	resave: false,
 	saveUninitialized: true
@@ -84,9 +86,9 @@ Server.use((req, res, next) => {
 		delete req.session.passport;
 	}
 	next();
-});
+});	
 Server.use((req, res, next) => {
-	if(Const.IS_SECURED) {
+	if(Const.IS_SECURED || Const.WAF) {
 		if(req.protocol == 'http') {
 			let url = 'https://'+req.get('host')+req.path;
 			res.status(302).redirect(url);
@@ -146,26 +148,21 @@ DB.ready = function(){
 		}
 	});
 	Server.listen(80);
-	if(Const.IS_SECURED) {
+	if(Const.IS_SECURED || Const.WAF) {
 		const options = Secure();
 		https.createServer(options, Server).listen(443);
 	}
 };
 Const.MAIN_PORTS.forEach(function(v, i){
 	var KEY = process.env['WS_KEY'];
-	var protocol;
-	if(Const.IS_SECURED) {
-		protocol = 'wss';
-	} else {
-		protocol = 'ws';
-	}
+	var protocol = Const.IS_SECURED || Const.WAF ? 'wss' : 'ws';
 	gameServers[i] = new GameClient(KEY, `${protocol}://${GLOBAL.GAME_SERVER_HOST}:${v}/${KEY}`);
 });
 function GameClient(id, url){
 	var my = this;
 
 	my.id = id;
-	my.socket = new WS(url, { perMessageDeflate: false, rejectUnauthorized: false});
+	my.socket = new WS(url, { perMessageDeflate: false, rejectUnauthorized: false });
 	
 	my.send = function(type, data){
 		if(!data) data = {};
@@ -233,8 +230,9 @@ Server.get("/", function(req, res){
 			'_page': "kkutu",
 			'_id': id,
 			'PORT': Const.MAIN_PORTS[server],
+			'ROOM_PORT': Const.ROOM_PORTS[server],
 			'HOST': req.hostname,
-			'PROTOCOL': Const.IS_SECURED ? 'wss' : 'ws',
+			'PROTOCOL': Const.IS_SECURED || Const.WAF ? 'wss' : 'ws',
 			'TEST': req.query.test,
 			'MOREMI_PART': Const.MOREMI_PART,
 			'AVAIL_EQUIP': Const.AVAIL_EQUIP,
@@ -249,8 +247,8 @@ Server.get("/", function(req, res){
 			'KO_THEME': Const.KO_THEME,
 			'EN_THEME': Const.EN_THEME,
 			'IJP_EXCEPT': Const.IJP_EXCEPT,
-			'ogImage': "http://kkutu.kr/img/kkutu/logo.png",
-			'ogURL': "http://kkutu.kr/",
+			'ogImage': "http://delzb.app/img/kkutu/logo.png",
+			'ogURL': "http://delzb.app/",
 			'ogTitle': "글자로 놀자! 끄투 온라인",
 			'ogDescription': "끝말잇기가 이렇게 박진감 넘치는 게임이었다니!"
 		});

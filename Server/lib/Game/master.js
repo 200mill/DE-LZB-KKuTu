@@ -28,7 +28,10 @@ var Const = require("../const");
 var JLog = require('../sub/jjlog');
 var Secure = require('../sub/secure');
 var Recaptcha = require('../sub/recaptcha');
-
+// Discord Webhook [S]
+const { WebhookClient, EmbedBuilder } = require('discord.js');
+let UseDiscordWebhook = GLOBAL.USE_DISCORD_WEBHOOK && GLOBAL.DISCORD_WEBHOOK_URL && GLOBAL.DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/");
+// Discord Webhook [E]
 var MainDB;
 
 var Server;
@@ -170,6 +173,27 @@ function processAdmin(id, value){
 	}
 	return value;
 }
+// Discord Webhook [S]
+async function sendDiscordWebhookOnUserJoin(whurl, usernickname, userid, iseng) {
+	JLog.info(`${whurl} ${usernickname} ${userid} ${iseng}`);
+	const dcwhclient = new WebhookClient({ url: whurl });
+	const dcwhembed = new EmbedBuilder()
+		.setTitle(iseng ? "A new user has joined!" : "새로운 사용자가 접속했습니다!")
+		// .setThumbnail() // user avatar but how to??
+		.setDescription(`**${usernickname || userid}** (${userid})`)
+		.setColor(0x00AE86)
+		.setTimestamp();
+	try {
+		await dcwhclient.send({
+			username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',
+			avatarURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png', // default discord js avatar
+			embeds: [dcwhembed]
+		});
+	} catch (error) {
+		JLog.warn(`Failed to send Discord webhook: ${error}`);
+	}
+}
+// Discord Webhook [E]
 /* Enhanced User Block System [S] */
 function addDate(num){
 	if(isNaN(num)) return;
@@ -492,8 +516,14 @@ function joinNewUser($c) {
 		friends: $c.friends,
 		admin: $c.admin,
 		test: global.test,
-		caj: $c._checkAjae ? true : false
+		caj: $c._checkAjae ? true : false // 이건 셧다운제 물론 지금은 안씀
 	});
+	// Discord Webhook [S]
+	JLog.info(`USE_DISCORD_WEBHOOK: ${GLOBAL.USE_DISCORD_WEBHOOK}, ADMIN: ${$c.admin}, URL: ${GLOBAL.DISCORD_WEBHOOK_URL}`);
+	if (UseDiscordWebhook && !$c.admin) {
+		sendDiscordWebhookOnUserJoin(GLOBAL.DISCORD_WEBHOOK_URL, $c.nickname, $c.id, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
+	}
+	// Discord Webhook [E]
 	narrateFriends($c.id, $c.friends, "on");
 	KKuTu.publish('conn', {user: $c.getData()});
 	

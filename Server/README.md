@@ -15,6 +15,10 @@
 ```shell
 sudo sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &' && sudo sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &'
 ```
+nvm을 사용중 이라면
+```shell
+sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &' && sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &'
+```
 
 로그는 web.log, game.log에 저장 됩니다.
 
@@ -439,6 +443,8 @@ psql -U postgres kkutu < backup_users.sql
 - 언어팩을 수정하였다면 `'서버주소'/language/flush`로 접속하여 새로고침합니다.
 - 사기 봇을 제외한 봇은 최소 hit값이 있습니다. 따라서 정상적인 봇을 사용하려면 데이터베이스 kkutu_en/kkutu_ko 테이블안의 hit값을 수정해야 합니다.
 - 클라우드플레어 사용 시 서버와 유저가 통신하는 모든 포트는 [클라우드플레어가 지원하는 포트](https://developers.cloudflare.com/fundamentals/reference/network-ports/) 중 하나로 설정하셔야 합니다.
+- 새로운 기능 Discord Webhook 알림 기능이 추가 되었습니다. 사용할려면 global.json에서 `USE_DISCORD_WEBHOOK`을 true와 `DISCORD_WEBHOOK_URL`의 알맞는 값을 설정합니다.
+- Discord Webhook 알림 기능은 `node 24.13.1`에서 작동을 확인했습니다.
 
 
 # EN

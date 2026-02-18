@@ -31,3 +31,7 @@ Server/lib/Web/public/kkutu_notice.html
 
 # etc
 Server/lib/package-lock.json.bak
+Server/lib/Web/public/media/kkutu/LobbyBGM.mp3
+Server/lib/Web/public/media/kkutu/LobbyBGM.back.mp3
+Server/lib/Web/public/media/kkutu/Lobbylza.mp3
+Server/lib/Web/public/media/kkutu/LobbySeolBGM.mp3

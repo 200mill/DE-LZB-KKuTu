@@ -175,7 +175,7 @@ function processAdmin(id, value){
 }
 // Discord Webhook [S]
 async function sendDiscordWebhookOnUserJoin(whurl, usernickname, userid, iseng) {
-	JLog.info(`${whurl} ${usernickname} ${userid} ${iseng}`);
+	// JLog.info(`${whurl} ${usernickname} ${userid} ${iseng}`);
 	const dcwhclient = new WebhookClient({ url: whurl });
 	const dcwhembed = new EmbedBuilder()
 		.setTitle(iseng ? "A new user has joined!" : "새로운 사용자가 접속했습니다!")

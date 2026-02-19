@@ -34,5 +34,10 @@
 	"NICKNAME_LIMIT": {
 		"TERM": 0,
 		"REGEX": [ "[\\{\\}\\[\\]\\/?.,;:|\\)*~`!^\\-+<>@#$%&\\\\=\\(\\'\"]", "gi" ]
-	}
+	},
+	"USE_DISCORD_WEBHOOK": false,
+	"DISCORD_WEBHOOK_URL": "Your Discord Webhook URL Here",
+	"DISCORD_WEBHOOK_NICKNAME": "KKuTu Alert",
+	"DISCORD_AVATAR": "https://i.imgur.com/AfFp7pu.png",
+	"IS_DISCORD_WEBHOOK_ENGLISH": false
 }

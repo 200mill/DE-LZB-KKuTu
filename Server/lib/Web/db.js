@@ -39,16 +39,7 @@ const FAKE_REDIS = {
 };
 
 Pub.ready = function(isPub){
-	
-	let Redis;
-	if (GLOBAL.USE_REDIS_LOCAL) {
-		Redis = require("redis").createClient();
-	} else {
-		Redis = require("redis").createClient({
-			url: `redis://${GLOBAL.REDIS_ID}:${GLOBAL.REDIS_PASSWORD}@${GLOBAL.REDIS_HOST}:${GLOBAL.REDIS_PORT}`
-		});
-	}
-	
+	var Redis	 = require("redis").createClient();
     var Pg = new PgPool({
         user: GLOBAL.PG_USER,
         password: GLOBAL.PG_PASSWORD,

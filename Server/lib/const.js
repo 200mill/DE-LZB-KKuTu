@@ -49,6 +49,7 @@ exports.OPTIONS = {
 	'ezm': { name: "EasyMission" },
 	'low': { name: "LongWord" },
 	'hrd': { name: "Hard" },
+	'wcw': { name: "Morse" },
 }; // 특수규칙 옵션
 exports.MOREMI_PART = [ 'back', 'eye', 'mouth', 'shoes', 'clothes', 'head', 'lhand', 'rhand', 'front' ];
 exports.CATEGORIES = [ "all", "spec", "skin", "badge", "head", "eye", "mouth", "clothes", "hs", "back" ];
@@ -80,7 +81,7 @@ exports.RULE = { // 규칙
 */
 	'EKT': { lang: "en",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "unk" ],
+		opts: [ "man", "ext", "mis", "unk", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -88,7 +89,7 @@ exports.RULE = { // 규칙
 	},
 	'ESH': { lang: "en",
 		rule: "Classic",
-		opts: [ "ext", "mis", "unk" ],
+		opts: [ "ext", "mis", "unk", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,

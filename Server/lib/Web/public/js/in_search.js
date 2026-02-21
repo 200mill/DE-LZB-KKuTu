@@ -23,6 +23,9 @@
 const themeButtons = document.querySelector(".theme-buttons");
 const wordList = document.getElementById('word-list');
 const initialMessage = document.getElementById('initial-message');
+if (!themeButtons || !wordList || !initialMessage) {
+    console.error('검색기 DOM 요소를 찾지 못했습니다.');
+} else {
 themeButtons.addEventListener('click', async (event) => {
     if (event.target.classList.contains('theme-btn')) {
         const theme = event.target.dataset.theme;
@@ -35,14 +38,14 @@ themeButtons.addEventListener('click', async (event) => {
         wordList.innerHTML = '<li>불러오는 중...</li>';
                                                                   
         try {
-            const response = await fetch(`../words/words.${theme}.txt`); // Change it if you want
+            const response = await fetch(`/search/words?theme=${encodeURIComponent(theme)}`);
                                                                   
             if (!response.ok) {
-                throw new Error(`'words.${theme}.txt' 파일을 찾을 수 없습니다. (HTTP ${response.status})`);
+                throw new Error(`단어 목록을 불러올 수 없습니다. (HTTP ${response.status})`);
             }
                                                                                  
-            const text = await response.text();
-            const words = text.split(/\r?\n/).filter(word => word.trim() !== '');
+            const payload = await response.json();
+            const words = (payload.words || []).filter(word => (word || '').trim() !== '');
                                                             
             wordList.innerHTML = '';        
             if (words.length > 0) {
@@ -63,3 +66,4 @@ themeButtons.addEventListener('click', async (event) => {
         return;
     }
 });
+}

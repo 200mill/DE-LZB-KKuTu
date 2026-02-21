@@ -17,7 +17,8 @@ sudo sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &' && sudo sh -c 
 ```
 nvm을 사용중 이라면
 ```shell
-sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &' && sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &'
+sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &'
+sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &'
 ```
 
 로그는 web.log, game.log에 저장 됩니다.

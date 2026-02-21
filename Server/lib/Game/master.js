@@ -519,7 +519,7 @@ function joinNewUser($c) {
 		caj: $c._checkAjae ? true : false // 이건 셧다운제 물론 지금은 안씀
 	});
 	// Discord Webhook [S]
-	JLog.info(`USE_DISCORD_WEBHOOK: ${GLOBAL.USE_DISCORD_WEBHOOK}, ADMIN: ${$c.admin}, URL: ${GLOBAL.DISCORD_WEBHOOK_URL}`);
+	// JLog.info(`USE_DISCORD_WEBHOOK: ${GLOBAL.USE_DISCORD_WEBHOOK}, ADMIN: ${$c.admin}, URL: ${GLOBAL.DISCORD_WEBHOOK_URL}`);
 	if (UseDiscordWebhook && !$c.admin) {
 		sendDiscordWebhookOnUserJoin(GLOBAL.DISCORD_WEBHOOK_URL, $c.nickname, $c.id, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 	}

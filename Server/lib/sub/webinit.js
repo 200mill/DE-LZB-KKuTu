@@ -52,8 +52,8 @@ function getLanguage(locale, page, shop){
 	
 	for(i in L.GLOBAL) R[i] = L.GLOBAL[i];
 	if(shop) for(i in L.SHOP) R[i] = L.SHOP[i];
-	for(i in L[page]) R[i] = L[page][i];
-	if(page == "help") Object.assign(R, L.themes);
+	if(L[page]) for(i in L[page]) R[i] = L[page][i];
+	if(page == "help" || page == "search") Object.assign(R, L.themes);
 	if(R['title']) R['title'] = `[${process.env['KKT_SV_NAME']}] ${R['title']}`;
 	
 	return R;

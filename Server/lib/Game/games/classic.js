@@ -37,6 +37,8 @@ const ROBOT_LENGTH_RANGES = [
 const RIEUL_TO_NIEUN = [4449, 4450, 4457, 4460, 4462, 4467]; // ㄹ->ㄴ 변환 가능한 자음
 const RIEUL_TO_IEUNG = [4451, 4455, 4456, 4461, 4466, 4469]; // ㄹ->ㅇ 변환 가능한 자음
 const NIEUN_TO_IEUNG = [4455, 4461, 4466, 4469]; // ㄴ->ㅇ 변환 가능한 자음
+// const KO_MORSE = 
+const EN_MORSE = { ".-": "a", "-...": "b", "-.-.": "c", "-..": "d", ".": "e", "..-.": "f", "--.": "g", "....": "h", "..": "i", ".---": "j", "-.-": "k", ".-..": "l", "--": "m", "-.": "n", "---": "o", ".--.": "p", "--.-": "q", ".-.": "r", "...": "s", "-": "t", "..-": "u", "...-": "v", ".--": "w", "-..-": "x", "-.--": "y", "--..": "z" };
 
 exports.init = function(_DB, _DIC){
 	DB = _DB;
@@ -222,12 +224,19 @@ exports.submit = function(client, text){
 	var my = this;
 	var tv = (new Date()).getTime();
 	var mgt = my.game.seq[my.game.turn];
+	var originalText = text;
+	var morseDecoded;
 	
 	if(!mgt) return;
 	if(!mgt.robot) if(mgt != client.id) return;
 	if(!my.game.char) return;
+	if(my.rule.lang == "en" && my.opts.morse){ // LZB - Added Morse
+		morseDecoded = decodeMorseInput(text);
+		if(morseDecoded) text = morseDecoded;
+		else if(!client.robot) return client.publish('turnError', { code: 488, value: escapeHTML(originalText) }, true);
+	}
 	
-	if(!isChainable(text, my.mode, my.game.char, my.game.subChar)) return client.chat(escapeHTML(text));
+	if(!isChainable(text, my.mode, my.game.char, my.game.subChar)) return client.chat(escapeHTML(originalText));
 	if(my.game.chain.indexOf(text) != -1) return client.publish('turnError', { code: 409, value: escapeHTML(text) }, true);
 	
 	l = my.rule.lang;
@@ -635,6 +644,34 @@ function getAuto(char, subc, type){
 }
 function escapeRegExp(str) {
 	return (str || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+function decodeMorseInput(input){ // LZB - Added Morse
+	var normalized;
+	var tokens;
+	var output = "";
+	var i, token, parts, j, part, ch;
+
+	if(typeof input !== "string") return null;
+	normalized = input.trim();
+	if(!normalized) return null;
+	if(!/^[\.\-\s\/|]+$/.test(normalized)) return null;
+
+	normalized = normalized.replace(/\|/g, "/");
+	tokens = normalized.split(/\s+/);
+	for(i=0; i<tokens.length; i++){
+		token = tokens[i];
+		if(!token) continue;
+		parts = token.split("/");
+		for(j=0; j<parts.length; j++){
+			part = parts[j];
+			if(!part) continue;
+			ch = EN_MORSE[part];
+			if(!ch) return null;
+			output += ch;
+		}
+	}
+
+	return output || null;
 }
 function escapeHTML(str) {
     return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");

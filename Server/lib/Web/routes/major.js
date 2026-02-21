@@ -50,7 +50,21 @@ function consume($user, key, value, force){
 exports.run = function(Server, page){
 
 Server.get("/search", function(req, res){ // LZB - Added for word search
-	page(req, res, "search")
+	page(req, res, "search", {
+		'KO_INJEONG': Const.KO_INJEONG
+	});
+});
+Server.get("/search/words", function(req, res){
+	var theme = (req.query.theme || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+	var DB = MainDB.kkutu['ko'];
+	
+	if(!theme) return res.send({ error: 400, message: "theme is required" });
+	if(!DB || !DB.find) return res.send({ error: 500 });
+	
+	DB.find([ 'theme', new RegExp("(^|,)" + theme + "(,|$)") ]).limit([ '_id', true ]).on(function($docs){
+		if(!$docs) return res.send({ error: 404, words: [] });
+		res.send({ words: $docs.map(function(v){ return v._id; }) });
+	});
 });
 Server.get("/box", function(req, res){
 	if(req.session.profile){

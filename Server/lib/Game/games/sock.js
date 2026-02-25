@@ -28,6 +28,8 @@ const HANGUL_MEDIAL_COMBINE = { "ㅗㅏ":"ㅘ", "ㅗㅐ":"ㅙ", "ㅗㅣ":"ㅚ", 
 const HANGUL_FINAL_INDEX = { "":0, "ㄱ":1, "ㄲ":2, "ㄳ":3, "ㄴ":4, "ㄵ":5, "ㄶ":6, "ㄷ":7, "ㄹ":8, "ㄺ":9, "ㄻ":10, "ㄼ":11, "ㄽ":12, "ㄾ":13, "ㄿ":14, "ㅀ":15, "ㅁ":16, "ㅂ":17, "ㅄ":18, "ㅅ":19, "ㅆ":20, "ㅇ":21, "ㅈ":22, "ㅊ":23, "ㅋ":24, "ㅌ":25, "ㅍ":26, "ㅎ":27 };
 const HANGUL_FINAL_COMBINE = { "ㄱㅅ":"ㄳ", "ㄴㅈ":"ㄵ", "ㄴㅎ":"ㄶ", "ㄹㄱ":"ㄺ", "ㄹㅁ":"ㄻ", "ㄹㅂ":"ㄼ", "ㄹㅅ":"ㄽ", "ㄹㅌ":"ㄾ", "ㄹㅍ":"ㄿ", "ㄹㅎ":"ㅀ", "ㅂㅅ":"ㅄ" };
 
+const EN_PHONETIC = { "alpha":"a", "bravo":"b", "charlie":"c", "delta":"d", "echo":"e", "foxtrot":"f", "golf":"g", "hotel":"h", "india":"i", "juliett":"j", "kilo":"k", "lima":"l", "mike":"m", "november":"n", "oscar":"o", "papa":"p", "quebec":"q", "romeo":"r", "sierra":"s", "tango":"t", "uniform":"u", "victor":"v", "whiskey":"w", "x-ray":"x", "yankee":"y", "zulu":"z" };
+
 const LANG_STATS = { 'ko': {
 	reg: /^[가-힣]{2,5}$/,
 	add: [ 'type', Const.KOR_GROUP ],
@@ -110,6 +112,23 @@ exports.submit = function(client, text, data){
 	var morseMap;
 	var composedText;
 
+	if(!my.game.words) return;
+	if(!text) return;
+	if(!play) return client.chat(text);
+	if(text.length < (my.opts.no2 ? 3 : 2)){
+		return client.chat(text);
+	}
+	if(my.game.words.indexOf(text) != -1){
+		return client.chat(text);
+	}
+
+	// LZB - Added Phonetic
+	if(my.opts.phonetic && my.rule.lang == "en" && !my.opts.morse){
+		var phoneticDecoded = decodePhoneticInput(text);
+		if(phoneticDecoded) text = phoneticDecoded;
+		else if(!client.robot) return client.publish('turnError', { code: 459, value: escapeHTML(originalText) }, true);
+	}
+
 	if(my.opts.morse && (my.rule.lang == "ko" || my.rule.lang == "en")){ // LZB - Added Morse
 		morseMap = my.rule.lang == "ko" ? KO_MORSE : EN_MORSE;
 		morseDecoded = decodeMorseInput(text, morseMap);
@@ -128,15 +147,6 @@ exports.submit = function(client, text, data){
 		if(composedText) text = composedText;
 	}
 
-	if(!my.game.words) return;
-	if(!text) return;
-	if(!play) return client.chat(text);
-	if(text.length < (my.opts.no2 ? 3 : 2)){
-		return client.chat(text);
-	}
-	if(my.game.words.indexOf(text) != -1){
-		return client.chat(text);
-	}
 	DB.kkutu[my.rule.lang].findOne([ '_id', text ]).limit([ '_id', true ]).on(function($doc){
 		if(!my.game.board) return;
 		
@@ -225,6 +235,27 @@ function decodeMorseInput(input, morseMap){ // LZB - Added Morse
 			if(!ch) return null;
 			output += ch;
 		}
+	}
+
+	return output || null;
+}
+function decodePhoneticInput(input){ // LZB - Added Phonetic
+	var normalized;
+	var tokens;
+	var output = "";
+	var i, token, ch;
+	var map = EN_PHONETIC;
+
+	if(typeof input !== "string") return null;
+	normalized = input.trim().toLowerCase();
+	if(!normalized) return null;
+
+	tokens = normalized.split(/\s+/);
+	for(i=0; i<tokens.length; i++){
+		token = tokens[i];
+		ch = map[token];
+		if(!ch) return null;
+		output += ch;
 	}
 
 	return output || null;

@@ -56,8 +56,8 @@ sudo pkill node
 | tailroom |  추적할 방 번호   |   -   |                     1번의 방의 정보를 불러옵니다.                     |
 | tailuser |  추적할 유저 ID  |   -   |                    1번의 유저의 정보를 불러옵니다.                     |
 | dump     |      -      |   -   | 메모리 스냅샷을 /home/kkutu_memdump . . . .heapsnapshot으로 저장합니다. |
-| ban      |  밴할 유저 ID   | 밴 기한  |        1번의 유저의 서버출입을 2번까지 불허가 합니다. *2번은 필수가 아닙니다.*        |
-| ipban    |    밴할 IP    | 밴 기한  |        1번의 IP의 서버출입을 2번까지 불허가 합니다. *2번은 필수가 아닙니다.*        |
+| ban      |  밴할 유저 ID   | 밴 기한  |        1번의 유저의 서버출입을 2번의 일까지 불허가 합니다. *2번은 필수가 아닙니다.*        |
+| ipban    |    밴할 IP    | 밴 기한  |        1번의 IP의 서버출입을 2번의 일까지 불허가 합니다. *2번은 필수가 아닙니다.*        |
 | unban    | 밴 해제할 유저 ID |   -   |                    1번 유저의 서버출입을 허가합니다.                    |
 | ipunban  |  밴 해제할 IP   |   -   |                    1번 IP의 서버출입을 허가합니다                     |
 
@@ -436,7 +436,7 @@ psql -U postgres kkutu < backup_users.sql
 | /language/flush | get |       -       | GET /language/flush -> OK                                                                                                                                       |   -    | 
 | /ranking        | get |    p - 페이지    | GET /ranking?p=0 -> {"page":0,"data":[{"id":"discord-1234567","rank":0,"score":"161971"} . . . ]}                                                               |   -    |
 | /cf/"단어"        | get |       -       | GET /cf/사과 -> {"data":[{"key":"dictPage","value":1,"rate":1},{"key":"boxB4","value":1,"rate":0},{"key":"$WPC?","value":1,"rate":0.05555555555555555}],"cost":0} |   -    | 
-
+| /search/words | get | theme -단어 주제 | GET /search/words?theme=gsi -> {"words":["요요","사과","가연" . . .]} | - |
 ---
 
 ## 기타
@@ -444,7 +444,7 @@ psql -U postgres kkutu < backup_users.sql
 - 언어팩을 수정하였다면 `'서버주소'/language/flush`로 접속하여 새로고침합니다.
 - 사기 봇을 제외한 봇은 최소 hit값이 있습니다. 따라서 정상적인 봇을 사용하려면 데이터베이스 kkutu_en/kkutu_ko 테이블안의 hit값을 수정해야 합니다.
 - 클라우드플레어 사용 시 서버와 유저가 통신하는 모든 포트는 [클라우드플레어가 지원하는 포트](https://developers.cloudflare.com/fundamentals/reference/network-ports/) 중 하나로 설정하셔야 합니다.
-- 새로운 기능 Discord Webhook 알림 기능이 추가 되었습니다. 사용할려면 global.json에서 `USE_DISCORD_WEBHOOK`을 true와 `DISCORD_WEBHOOK_URL`의 알맞는 값을 설정합니다.
+- 새로운 기능 Discord Webhook 알림 기능이 추가 되었습니다. 사용시 global.json에서 `USE_DISCORD_WEBHOOK`을 true와 `DISCORD_WEBHOOK_URL`의 알맞는 값을 설정합니다.
 - Discord Webhook 알림 기능은 `node 24.13.1`에서 작동을 확인했습니다.
 
 

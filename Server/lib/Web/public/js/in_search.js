@@ -20,17 +20,20 @@
  * You can see this file in <https://github.com/minjun1177/DE-LZB-KKuTu>
  */
 
-const themeButtons = document.querySelector(".theme-buttons");
+const themeSelect = document.getElementById('theme-select');
+const searchBtn = document.getElementById('search-btn');
 const wordList = document.getElementById('word-list');
 const initialMessage = document.getElementById('initial-message');
-if (!themeButtons || !wordList || !initialMessage) {
+
+if (!themeSelect || !searchBtn || !wordList || !initialMessage) {
     console.error('검색기 DOM 요소를 찾지 못했습니다.');
 } else {
-themeButtons.addEventListener('click', async (event) => {
-    if (event.target.classList.contains('theme-btn')) {
-        const theme = event.target.dataset.theme;
+    const performSearch = async () => {
+        const theme = themeSelect.value;
 
         if (!theme) {
+            initialMessage.style.display = 'none';
+            wordList.innerHTML = '<li>주제를 선택해주세요.</li>';
             return;
         }
 
@@ -62,8 +65,14 @@ themeButtons.addEventListener('click', async (event) => {
             console.error('단어 목록 로딩 오류:', error);
             wordList.innerHTML = `<li>오류가 발생했습니다: ${error.message}</li>`;
         }
-    } else {
-        return;
-    }
-});
+    };
+
+    searchBtn.addEventListener('click', performSearch);
+
+    // Enter 키로도 검색 가능
+    themeSelect.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            performSearch();
+        }
+    });
 }

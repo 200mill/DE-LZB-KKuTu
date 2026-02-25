@@ -365,6 +365,8 @@
 		"explHard": "More difficult words will appear. Cannot be used with Special Rules \"Proverb\" or \"Long Word.\"",
 		"optMorse": "Morse Code",
 		"explMorse": "Input in Morse code.",
+		"optPhonetic": "Phonetic",
+		"explPhonetic": "Input using the NATO phonetic alphabet. Cannot be used with Special Rules \"Morse Code.\"",
 		"hidden": "(Hidden)",
 		"pickInjeong": "Select Topic",
 		"explInjPick": "Select topics to use in the game.",

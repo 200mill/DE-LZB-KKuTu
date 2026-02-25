@@ -980,7 +980,7 @@ $(document).ready(function(){
 
 // 웹소켓 연결
 	function connect(){
-		// var heartbeatInterval;
+		var heartbeatInterval;
 		ws = new _WebSocket($data.URL);
 		ws.onopen = function(e){
 			if (heartbeatInterval) clearInterval(heartbeatInterval);

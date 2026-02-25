@@ -211,7 +211,7 @@ KKuTu.onClientMessage = function($c, msg){
 				$c.send('error', { code: 401 });
 				return;
 			}
-			msg.value = msg.value.substr(0, 200);
+			msg.value = msg.value.substr(0, 500);
 			if(msg.relay){
 				if($c.subPlace) temp = $c.pracRoom;
 				else if(!(temp = ROOM[$c.place])) return;
@@ -388,7 +388,7 @@ KKuTu.onClientMessage = function($c, msg){
 				return;
 			}
 			
-			msg.value = msg.value.substr(0, 200);
+			msg.value = msg.value.substr(0, 500);
 			msg.value = msg.value.replace(/[^a-z가-힣]/g, "");
 			if(msg.value.length < 2) return;
 			break;

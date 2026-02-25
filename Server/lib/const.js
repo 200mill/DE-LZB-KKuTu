@@ -50,6 +50,7 @@ exports.OPTIONS = {
 	'low': { name: "LongWord" },
 	'hrd': { name: "Hard" },
 	'wcw': { name: "Morse" },
+	'wpn': { name: "Phonetic" },
 }; // 특수규칙 옵션
 exports.MOREMI_PART = [ 'back', 'eye', 'mouth', 'shoes', 'clothes', 'head', 'lhand', 'rhand', 'front' ];
 exports.CATEGORIES = [ "all", "spec", "skin", "badge", "head", "eye", "mouth", "clothes", "hs", "back" ];
@@ -89,7 +90,7 @@ exports.RULE = { // 규칙
 	},
 	'ESH': { lang: "en",
 		rule: "Classic",
-		opts: [ "ext", "mis", "unk", "wcw" ],
+		opts: [ "ext", "mis", "unk", "wcw", "wpn" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -129,7 +130,7 @@ exports.RULE = { // 규칙
 	},
 	'KTY': { lang: "ko",
 		rule: "Typing",
-		opts: [ "prv", "low", "hrd" ],
+		opts: [ "prv", "low", "hrd", "wcw" ],
 		time: 1,
 		ai: false,
 		big: false,
@@ -137,7 +138,7 @@ exports.RULE = { // 규칙
 	},
 	'ETY': { lang: "en",
 		rule: "Typing",
-		opts: [ "prv", "low" ],
+		opts: [ "prv", "low", "wcw" ],
 		time: 1,
 		ai: false,
 		big: false,
@@ -186,7 +187,7 @@ exports.RULE = { // 규칙
 	},
 	'ESS': { lang: "en",
 		rule: "Sock",
-		opts: [ "no2", "wcw" ],
+		opts: [ "no2", "wcw", "wpn" ],
 		time: 1,
 		ai: false,
 		big: true,

@@ -241,18 +241,31 @@ exports.submit = function(client, text){
 	if(!mgt.robot) if(mgt != client.id) return;
 	if(!my.game.char) return;
 
-	if(my.opts.phonetic && (my.rule.lang == "ko" || my.rule.lang == "en") && !my.opts.morse){ // LZB - Added Phonetic
+	// if(my.opts.phonetic && !my.opts.morse && !client.robot){ // LZB - Added Phonetic
+
+	// 	var phoneticDecoded = decodePhoneticInput(text, my.rule.lang == "ko" ? KO_PHONETIC : EN_PHONETIC);
+	// 	if(my.rule.lang == "ko") {
+	// 		var composed = composeHangulInput(phoneticDecoded);
+	// 		if(composed) text = composed;
+	// 		else text = phoneticDecoded;
+	// 	}
+	// 	 else if(phoneticDecoded) text = phoneticDecoded;
+	// 	 else if(!client.robot) return client.publish('turnError', { code: 459, value: escapeHTML(originalText) }, true);
+	// }
+	
+	if(my.opts.phonetic && !my.opts.morse && !client.robot){ // LZB - Added Phonetic
 		var phoneticDecoded = decodePhoneticInput(text, my.rule.lang == "ko" ? KO_PHONETIC : EN_PHONETIC);
+		if(!phoneticDecoded) return client.publish('turnError', { code: 459, value: escapeHTML(originalText) }, true);
 		if(my.rule.lang == "ko") {
 			var composed = composeHangulInput(phoneticDecoded);
 			if(composed) text = composed;
 			else text = phoneticDecoded;
 		}
-		 else if(phoneticDecoded) text = phoneticDecoded;
-		 else if(!client.robot) return client.publish('turnError', { code: 459, value: escapeHTML(originalText) }, true);
+		else if(phoneticDecoded) text = phoneticDecoded;
 	}
 
 	if(my.opts.morse && (my.rule.lang == "ko" || my.rule.lang == "en")){ // LZB - Added Morse
+
 		morseMap = my.rule.lang == "ko" ? KO_MORSE : EN_MORSE;
 		morseDecoded = decodeMorseInput(text, morseMap);
 		if(morseDecoded){

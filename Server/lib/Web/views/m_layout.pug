@@ -28,9 +28,12 @@ html
 			function getObject(v, i) {
 				Object.defineProperty(v, i, {value: v[i], writable: false});
 			}
-			getObject(window.WebSocket, "send");
-			getObject(window.WebSocket, "onmessage");
-			getObject(window, "WebSocket");
+			//- var WebSocket = window.WebSocket;
+			//- if (window.WebSocket) {
+			//- 	getObject(window.WebSocket, "send");
+			//- 	getObject(window.WebSocket, "onmessage");
+			//- 	getObject(window, "WebSocket");
+			//- } ? 과연 이게 맞을까
 
 		block Search
 			meta(name='description', content=LANG['meta_desc'] || L('META_DESC'))

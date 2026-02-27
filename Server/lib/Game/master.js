@@ -528,9 +528,9 @@ function joinNewUser($c) {
 	KKuTu.publish('conn', {user: $c.getData()});
 	
 	JLog.info("New user #" + $c.id);
-	if(GLOBAL.WAF) setInterval(() => {
-		$c.send('heartbeat');
-	}, 30000);
+	// if(GLOBAL.WAF) setInterval(() => {
+	// 	$c.send('heartbeat');
+	// }, 30000);
 }
 
 KKuTu.onClientMessage = function ($c, msg) {

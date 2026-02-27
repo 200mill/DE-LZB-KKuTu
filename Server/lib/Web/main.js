@@ -269,3 +269,20 @@ Server.get("/servers", function(req, res){
 Server.get("/legal/:page", function(req, res){
 	page(req, res, "legal/"+req.params.page);
 });
+
+Server.get("/debug", function(req, res){
+const debugInfo = {
+  'req.ip': req.ip, // Express의 IP (trust proxy 설정에 따라 달라짐)
+  'req.socket.remoteAddress': req.socket.remoteAddress, // Node.js에 직접 연결된 IP
+  'CF-Connecting-IP (from headers)': req.get('cf-connecting-ip'),
+  'X-Forwarded-For (from headers)': req.get('x-forwarded-for'),
+  'True-Client-IP (from headers)': req.get('true-client-ip'),
+  'All Headers': req.headers // 모든 HTTP 헤더를 확인
+};
+
+console.log('--- IP Debug Info ---');
+console.log(debugInfo);
+console.log('---------------------');
+
+res.json(debugInfo); // JSON 형태로 클라이언트에게도 응답
+});

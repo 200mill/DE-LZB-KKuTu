@@ -28,9 +28,7 @@ exports.BLOCKED_LENGTH = 10000; // 차단 단어 길이 제한
 exports.KICK_BY_SPAM = 9; // 스팸으로 간주하여 강제퇴장 입력 횟수
 exports.MAX_OBSERVER = 4; // 관전자 최대 인원
 exports.TESTER = GLOBAL.ADMIN.concat([ // 서버 점검중 일때 접속 가능 아이디?
-	"discord-740191615716425780",
-	"discord-863626417479352340",
-	"discord-842559452825255946"
+	"discord-740191615716425780"
 ]);
 exports.WAF = GLOBAL.WAF; // 웹 방화벽 사용 여부
 exports.ROOM_PORTS = GLOBAL.ROOM_PORTS; // 게임 방 서버 포트

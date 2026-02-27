@@ -54,7 +54,10 @@ function getLanguage(locale, page, shop){
 	if(shop) for(i in L.SHOP) R[i] = L.SHOP[i];
 	if(L[page]) for(i in L[page]) R[i] = L[page][i];
 	if(page == "help" || page == "search") Object.assign(R, L.themes);
-	if(R['title']) R['title'] = `[${process.env['KKT_SV_NAME']}] ${R['title']}`;
+	if(R['title']){
+		const serverName = (process.env['KKT_SV_NAME'] || '').trim();
+		if(serverName) R['title'] = `[${serverName}] ${R['title']}`;
+	}
 	
 	return R;
 }
@@ -68,6 +71,8 @@ function page(req, res, file, data){
 		req.session.createdAt = new Date();
 	}
 	var addr = req.ip || "";
+	var cloudIP = req.get('CF-Connecting-IP') || req.get('X-Forwarded-For');
+	if(cloudIP) addr = cloudIP;
 	var sid = req.session.id || "";
 	
 	data.published = global.isPublic;
@@ -96,7 +101,7 @@ function page(req, res, file, data){
 		data.page = file;
 	}
 	
-	JLog.log(`${addr.slice(7)}@${sid.slice(0, 10)} ${data.page}, ${JSON.stringify(req.params)}`);
+	JLog.log(`${addr}@${sid.slice(0, 10)} ${data.page}, ${JSON.stringify(req.params)}`);
 	res.render(data.page, data, function(err, html){
 		if(err) res.send(err.toString());
 		else res.send(html);

@@ -71,7 +71,7 @@ function page(req, res, file, data){
 		req.session.createdAt = new Date();
 	}
 
-	var addr = GLOBAL.WAF ? req.ip || "" : (req.get('CF-Connecting-IP') || req.get('X-Forwarded-For') || req.ip || "");
+	var addr = GLOBAL.WAF ? req.ip || "" : (req.get('CF-Connecting-IP') || "");
 	var sid = req.session.id || "";
 	
 	data.published = global.isPublic;

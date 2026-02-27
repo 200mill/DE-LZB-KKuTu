@@ -70,9 +70,8 @@ function page(req, res, file, data){
 	}else{
 		req.session.createdAt = new Date();
 	}
-	var addr = req.ip || "";
-	var cloudIP = req.get('CF-Connecting-IP') || req.get('X-Forwarded-For');
-	if(cloudIP) addr = cloudIP;
+
+	var addr = GLOBAL.WAF ? req.ip || "" : (req.get('CF-Connecting-IP') || req.get('X-Forwarded-For') || req.ip || "");
 	var sid = req.session.id || "";
 	
 	data.published = global.isPublic;

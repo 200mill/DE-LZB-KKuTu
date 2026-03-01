@@ -241,18 +241,6 @@ exports.submit = function(client, text){
 	if(!mgt) return;
 	if(!mgt.robot) if(mgt != client.id) return;
 	if(!my.game.char) return;
-
-	// if(my.opts.phonetic && !my.opts.morse && !client.robot){ // LZB - Added Phonetic
-
-	// 	var phoneticDecoded = decodePhoneticInput(text, my.rule.lang == "ko" ? KO_PHONETIC : EN_PHONETIC);
-	// 	if(my.rule.lang == "ko") {
-	// 		var composed = composeHangulInput(phoneticDecoded);
-	// 		if(composed) text = composed;
-	// 		else text = phoneticDecoded;
-	// 	}
-	// 	 else if(phoneticDecoded) text = phoneticDecoded;
-	// 	 else if(!client.robot) return client.publish('turnError', { code: 459, value: escapeHTML(originalText) }, true);
-	// }
 	
 	if(my.opts.phonetic && !my.opts.morse && !client.robot){ // LZB - Added Phonetic
 		var phoneticDecoded = decodePhoneticInput(text, my.rule.lang == "ko" ? KO_PHONETIC : EN_PHONETIC);

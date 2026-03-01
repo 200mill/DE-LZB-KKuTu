@@ -265,3 +265,7 @@ Server.get("/servers", function(req, res){
 });
 
 //볕뉘 수정 구문 삭제(274~353)
+
+Server.get("/legal/:page", function(req, res){
+	page(req, res, "legal/"+req.params.page);
+})

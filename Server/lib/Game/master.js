@@ -29,6 +29,7 @@ var JLog = require('../sub/jjlog');
 var Secure = require('../sub/secure');
 var Recaptcha = require('../sub/recaptcha');
 // Discord Webhook [S]
+var DCWH = require('../sub/dcwh');
 const { WebhookClient, EmbedBuilder } = require('discord.js');
 let UseDiscordWebhook = GLOBAL.USE_DISCORD_WEBHOOK && GLOBAL.DISCORD_WEBHOOK_URL && GLOBAL.DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/");
 // Discord Webhook [E]
@@ -243,6 +244,7 @@ function narrateFriends(id, friends, stat){
 }
 Cluster.on('message', function(worker, msg){
 	var temp;
+	var i;
 	
 	switch(msg.type){
 		case "admin":
@@ -286,6 +288,8 @@ Cluster.on('message', function(worker, msg){
 				worker.send({ type: "room-invalid", room: msg.room });
 			}else{
 				ROOM[msg.room.id] = new KKuTu.Room(msg.room, msg.room.channel);
+				KKuTu.publish('room-setting', { room: msg.room, created: true, target: msg.target });
+				for(i in WDIC) WDIC[i].send('room-setting', { room: msg.room, created: true, target: msg.target });
 			}
 			break;
 		case "room-come":
@@ -348,6 +352,24 @@ Cluster.on('message', function(worker, msg){
 			break;
 		case "room-invalid":
 			delete ROOM[msg.room.id];
+			// Discord Webhook [S]
+			try {
+				DCWH.SendWebhookOnDeleteRoom(msg.room.id, msg.room.channel);
+			} catch (error) {
+				JLog.warn(`Error on sending Discord webhook for room deletion: ${error}`);
+			}
+			break;
+		case "game-start": // TODO - 이거 구현
+		case "round-end":
+		case "game-end":
+		case "room-setting":
+		case "room-join":
+		case "room-leave":
+			// temp = msg.data || {};
+			// KKuTu.publish(msg.type, temp);
+			// for(i in WDIC) WDIC[i].send(msg.type, temp);
+		// Discord Webhook [S]
+		case "heartbeat":
 			break;
 		default:
 			JLog.warn(`Unhandled IPC message type: ${msg.type}`);

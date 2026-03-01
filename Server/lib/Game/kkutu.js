@@ -22,6 +22,11 @@ var Const = require('../const');
 var Lizard = require('../sub/lizard');
 var JLog = require('../sub/jjlog');
 const { set } = require("grunt");
+// Discord Webhook [S]
+var GLOBAL = require('../sub/global.json');
+var DCWH = require('../sub/dcwh');
+let UseDiscordWebhook = GLOBAL.USE_DISCORD_WEBHOOK && GLOBAL.DISCORD_WEBHOOK_URL && GLOBAL.DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/");
+// Discord Webhook [E]
 // 망할 셧다운제 var Ajae = require("../sub/ajae");
 var DB;
 var SHOP;
@@ -292,9 +297,23 @@ exports.Client = function(socket, profile, sid){
 		var data, room = ROOM[my.place];
 		if(!my) return;
 		if(!msg) return;
-		
-		JLog.log(`Chan @${channel} Msg #${my.id}: ${msg}`);
+		if(typeof msg !== "string") msg = String(msg);
 		try{ data = JSON.parse(msg); }catch(e){ data = { error: 400 }; }
+		if(data.type == "heartbeat") return;
+		JLog.log(`Chan @${channel} Msg #${my.id}: ${msg}`);
+		if(data.type == "talk" && !data.relay && UseDiscordWebhook && !my.admin){ // dcwh
+			try{
+				DCWH.SendWebhookOnTalk(my.profile, data.value, my.place, my.robot);
+			}catch(error){
+				JLog.warn(`Failed to send Discord webhook on talk: ${error}`);
+			}
+		} else if(data.type == "delete-room" && UseDiscordWebhook && !my.admin){
+			try{
+				DCWH.SendWebhookOnDeleteRoom(data.roomid);
+			}catch(error){
+				JLog.warn(`Failed to send Discord webhook on delete room: ${error}`);
+			}
+		}
 		if(Cluster.isWorker) process.send({ type: "tail-report", id: my.id, chan: channel, place: my.place, msg: data.error ? msg : data });
 		
 		exports.onClientMessage(my, data);
@@ -730,6 +749,21 @@ exports.Client = function(socket, profile, sid){
 				if($room.master == my.id){
 					$room.set(room);
 					exports.publish('room', { target: my.id, room: $room.getData(), modify: true }, room.password);
+					// if(Cluster.isWorker) process.send({
+					// 	type: "room-setting",
+					// 	data: { target: my.id, room: $room.getData(), modify: true }
+					// });
+					// if(UseDiscordWebhook && !my.admin){ // dcwh
+					// 	try{
+					// 		DCWH.SendWebhookOnRoomsetting($room.id, JSON.stringify({
+					// 			mode: my.mode,
+					// 			opts: my.opts
+					// 		}));
+					// 		my.getData()
+					// 	}catch(error){
+					// 		JLog.warn(`Failed to send Discord webhook on room-setting: ${error}`);
+					// 	}
+					// } // 현재 모드, 특수규칙 JSON확인 안됨, 보류
 				}else{
 					my.sendError(400);
 				}
@@ -929,7 +963,17 @@ exports.Room = function(room, channel){
 			client.cameWhenGaming = false;
 			client.form = "J";
 			
-			if(!my.practice) process.send({ type: "room-come", target: client.id, id: my.id });
+			if(!my.practice){
+				process.send({ type: "room-come", target: client.id, id: my.id });
+				// process.send({ type: "room-join", data: { id: my.id, target: client.id, spectate: false } });
+				if(UseDiscordWebhook && !client.admin){ // dcwh
+					try{
+						DCWH.SendWebhookOnRoomJoin(my.id, client.id, false);
+					}catch(error){
+						JLog.warn(`Failed to send Discord webhook on room-join: ${error}`);
+					}
+				}
+			} 
 			my.export(client.id);
 		}
 	};
@@ -944,12 +988,21 @@ exports.Room = function(room, channel){
 			client.form = (len > my.limit) ? "O" : "S";
 			
 			process.send({ type: "room-spectate", target: client.id, id: my.id, pw: password });
+			process.send({ type: "room-join", data: { id: my.id, target: client.id, spectate: true } });
+			if(UseDiscordWebhook && !client.admin){ // dcwh
+				try{
+					DCWH.SendWebhookOnRoomJoin(my.id, client.id, true);
+				}catch(error){
+					JLog.warn(`Failed to send Discord webhook on room-join (spectate): ${error}`);
+				}
+			}
 			my.export(client.id, false, true);
 		}
 	};
 	my.go = function(client, kickVote){
 		var x = my.players.indexOf(client.id);
 		var me;
+		var prevPlace = client.place;
 		
 		if(x == -1){
 			client.place = 0;
@@ -1002,8 +1055,24 @@ exports.Room = function(room, channel){
 		
 		if(Cluster.isWorker){
 			if(!my.practice){
+				var isRoomRemoved = !ROOM.hasOwnProperty(my.id);
 				client.socket.close();
-				process.send({ type: "room-go", target: client.id, id: my.id, removed: !ROOM.hasOwnProperty(my.id) });
+				process.send({ type: "room-go", target: client.id, id: my.id, removed: isRoomRemoved });
+				// process.send({ type: "room-leave", data: { id: my.id, target: client.id, removed: isRoomRemoved } });
+				if(UseDiscordWebhook && !client.admin){ // dcwh
+					try{
+						DCWH.SendWebhookOnRoomLeave(my.id, client.id, isRoomRemoved);
+					}catch(error){
+						JLog.warn(`Failed to send Discord webhook on room-leave: ${error}`);
+					}
+				}
+				if(isRoomRemoved && UseDiscordWebhook && !client.admin){
+					try{
+						DCWH.SendWebhookOnDeleteRoom(my.id, prevPlace);
+					}catch(error){
+						JLog.warn(`Failed to send Discord webhook on delete room: ${error}`);
+					}
+				}
 			}
 			my.export(client.id, kickVote);
 		}
@@ -1157,11 +1226,33 @@ exports.Room = function(room, channel){
 			setTimeout(my.roundReady, 2000);
 		});
 		my.byMaster('starting', { target: my.id });
+		// if(Cluster.isWorker) process.send({ type: "game-start", data: { id: my.id, room: my.getData() } });
+		if(UseDiscordWebhook){ // dcwh
+			try{
+				// roomid, round, gamespecialrule_rawjson
+				DCWH.SendWebhookOnGameStart(my.id, my.round, JSON.stringify({
+					mode: my.mode,
+					opts: my.opts
+				}));
+			}catch(error){
+				JLog.warn(`Failed to send Discord webhook on game-start: ${error}`);
+			}
+		}
 		delete my._avTeam;
 		delete my._teams;
 	};
 	my.roundReady = function(){
 		if(!my.gaming) return;
+		if(Cluster.isWorker && my.game.round > 0){
+			// process.send({ type: "round-end", data: { id: my.id, round: my.game.round, room: my.getData() } });
+			if(UseDiscordWebhook){ // dcwh
+				try{
+					DCWH.SendWebhookOnRoundEnd(my.id, my.game.round); // TODO - my.id -> 1100고치기 - ...? 간헐적으로 된다?
+				}catch(error){
+					JLog.warn(`Failed to send Discord webhook on round-end: ${error}`);
+				}
+			}
+		}
 		
 		return my.route("roundReady");
 	};
@@ -1259,6 +1350,17 @@ exports.Room = function(room, channel){
 					o[ranks[i].target].list = ranks[i].data;
 				}
 				my.byMaster('roundEnd', { result: res, users: users, ranks: o, data: data }, true);
+				if(Cluster.isWorker){
+					// process.send({ type: "game-end", data: { id: my.id, result: res, users: users, ranks: o, data: data } });
+					if(UseDiscordWebhook){ // dcwh
+						try{
+							// roomid, 순위, player count
+							DCWH.SendWebhookOnGameEnd(my.id, res.map(function(item){ return item.id; }), res.length); // TODO - my.id -> 1100고치기 - ...? 간헐적으로 된다?
+						}catch(error){
+							JLog.warn(`Failed to send Discord webhook on game-end: ${error}`);
+						}
+					}
+				}
 			});
 		});
 		my.gaming = false;

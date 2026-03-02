@@ -1,3 +1,6 @@
+# Rule the words! DE LZB KKuTu
+# You can see this file in <https://github.com/minjun1177/DE-LZB-KKuTu>
+
 #!/usr/bin/env bash
 export KKT_SV_NAME='DE LZB KKuTu'
 echo "KKT_SV_NAME=${KKT_SV_NAME}"

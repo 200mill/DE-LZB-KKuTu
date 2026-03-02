@@ -1,3 +1,8 @@
+/**
+ * Rule the words! DE LZB KKuTu
+ * You can see this file in <https://github.com/minjun1177/DE-LZB-KKuTu>
+ */
+
 var JLog = require('./jjlog');
 var GLOBAL = require('./global.json');
 const { WebhookClient, EmbedBuilder } = require('discord.js');
@@ -6,14 +11,16 @@ let UseDiscordWebhook = GLOBAL.USE_DISCORD_WEBHOOK && GLOBAL.DISCORD_WEBHOOK_URL
 exports.SendWebhookOnTalk = function(profile, msg, place, isrobot) {
     var prefix = isrobot ? (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "[Robot]" : "[로봇]") : "";
     var nickname = (profile && (profile.nickname || profile.title || profile.name || profile.id)) || "Unknown";
-    var placeText = String(place == null ? "-" : place);
+    
+    nickname = String(nickname).slice(0, 100); // 닉네임은 100자로 제한
+    var placeText = String(place == null ? "-" : place).slice(0, 100);
     var msgText = String(msg == null ? "" : msg);
 
-    if(msgText.length > 1024) msgText = msgText.slice(0, 1021) + "...";
+    if(msgText.length > 1020) msgText = msgText.slice(0, 1017) + "...";
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
-        .setTitle(`${prefix ? prefix + " " : ""}${nickname}님이 채팅을 입력하셨습니다.`)
+        .setTitle(`${prefix ? prefix + " " : ""}${nickname}님이 채팅을 입력하셨습니다.`.slice(0, 256))
         .addFields(
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Place" : "장소", value: placeText },
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Message" : "내용", value: `\`\`\`${msgText || "(empty)"}\`\`\`` }
@@ -31,12 +38,14 @@ exports.SendWebhookOnTalk = function(profile, msg, place, isrobot) {
 }
 exports.SendWebhookOnDeleteRoom = function(roomid) {
     if (!UseDiscordWebhook) return;
+    
+    var roomidText = String(roomid || "").slice(0, 1020);
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
         .setTitle(GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room Deleted" : "방 삭제됨")
         .addFields(
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: String(roomid) }
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: roomidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") }
         )
         .setColor(0xE74C3C)
         .setTimestamp();
@@ -79,15 +88,32 @@ exports.SendWebhookOnDeleteRoom = function(roomid) {
 //         JLog.error(`Error on sending Discord webhook: ${error}`);
 //     });
 // }
-exports.SendWebhookOnRoomsetting = function(roomid, modify) { // TODO - modify에 JSON정보 확인안됨, 보류
+exports.SendWebhookOnRoomsetting = function(roomid, passwd, mode, opts) { // TODO - modify에 JSON정보 확인안됨 - 해결
     if (!UseDiscordWebhook) return;
+
+    // 필드 값 길이 제한 (Discord embed field max 1024 chars)
+    var roomidText = String(roomid || "").slice(0, 1020);
+    var passwdText = String(passwd || "").slice(0, 1020);
+    var modeText = String(mode || "").slice(0, 1020);
+    var optsText = "";
+    
+    if (opts) {
+        try {
+            optsText = JSON.stringify(opts);
+            if (optsText.length > 1020) optsText = optsText.slice(0, 1017) + "...";
+        } catch(e) {
+            optsText = "[Invalid Options]";
+        }
+    }
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
         .setTitle(GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room Setting Changed" : "방 설정 변경됨")
         .addFields(
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: String(roomid) },
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Modified" : "수정된 내용", value: modify ? `\`\`\`${JSON.stringify(modify)}\`\`\`` : (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") }
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: roomidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Password" : "비밀번호", value: passwdText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Mode" : "모드", value: modeText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Options" : "옵션", value: optsText ? `\`\`\`${optsText}\`\`\`` : (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") }
         )
         .setColor(0x2ECC71)
         .setTimestamp();
@@ -100,17 +126,20 @@ exports.SendWebhookOnRoomsetting = function(roomid, modify) { // TODO - modify�
         JLog.error(`Error on sending Discord webhook: ${error}`);
     });
 }
-exports.SendWebhookOnRoomJoin = function(roomid, targetid, spectate) {
+exports.SendWebhookOnRoomJoin = function(roomid, targetid, passwd) {
     if (!UseDiscordWebhook) return;
-    var spectateText = spectate ? (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Spectating" : "관전") : (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Playing" : "플레이");
+    
+    var roomidText = String(roomid || "").slice(0, 1020);
+    var targetidText = String(targetid || "").slice(0, 1020);
+    var passwdText = String(passwd || "").slice(0, 1020);
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
         .setTitle(GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room Joined" : "방 입장됨")
         .addFields(
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: String(roomid) },
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Target ID" : "대상 ID", value: String(targetid) },
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Mode" : "모드", value: spectateText }
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: roomidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Target ID" : "대상 ID", value: targetidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Password" : "비밀번호", value: passwdText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") }
         )
         .setColor(0x9B59B6)
         .setTimestamp();
@@ -125,15 +154,17 @@ exports.SendWebhookOnRoomJoin = function(roomid, targetid, spectate) {
 }
 exports.SendWebhookOnGameStart = function(roomid, round, mode) {
     if (!UseDiscordWebhook) return;
-    var modeText = String(mode == null ? "unknown" : mode);
+    
+    var roomidText = String(roomid || "").slice(0, 1020);
+    var modeText = String(mode || "").slice(0, 1020);
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
         .setTitle(GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Game Started" : "게임 시작됨")
         .addFields(
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: String(roomid) },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: roomidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Round" : "라운드", value: String(round + 1) },
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Mode" : "모드", value: `\`\`\`${modeText}\`\`\`` }
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Mode" : "모드", value: `\`\`\`${modeText || "unknown"}\`\`\`` }
         )
         .setColor(0x1ABC9C)
         .setTimestamp();
@@ -148,13 +179,16 @@ exports.SendWebhookOnGameStart = function(roomid, round, mode) {
 }
 exports.SendWebhookOnGameEnd = function(roomid, resultCount, userCount) {
     if (!UseDiscordWebhook) return;
+    
+    var roomidText = String(roomid || "").slice(0, 1020);
+    var resultCountText = String(resultCount || "").slice(0, 1020);
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
         .setTitle(GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Game Ended" : "게임 종료됨")
         .addFields(
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: String(roomid) },
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Result Count" : "결과", value: String(resultCount) },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: roomidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Result Count" : "결과", value: resultCountText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "User Count" : "유저 수", value: String(userCount) }
         )
         .setColor(0x34495E)
@@ -170,12 +204,14 @@ exports.SendWebhookOnGameEnd = function(roomid, resultCount, userCount) {
 }
 exports.SendWebhookOnRoundEnd = function(roomid, round) {
     if (!UseDiscordWebhook) return;
+    
+    var roomidText = String(roomid || "").slice(0, 1020);
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
         .setTitle(GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Round Ended" : "라운드 종료됨")
         .addFields(
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: String(roomid) },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: roomidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Round" : "라운드", value: String(round) }
         )
         .setColor(0x8E44AD)
@@ -191,14 +227,17 @@ exports.SendWebhookOnRoundEnd = function(roomid, round) {
 }
 exports.SendWebhookOnRoomLeave = function(roomid, targetid, removed) {
     if (!UseDiscordWebhook) return;
+    
+    var roomidText = String(roomid || "").slice(0, 1020);
+    var targetidText = String(targetid || "").slice(0, 1020);
     var removedText = removed ? (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Yes" : "예") : (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "No" : "아니오");
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
         .setTitle(GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room Left" : "방 퇴장됨")
         .addFields(
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: String(roomid) },
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Target ID" : "대상 ID", value: String(targetid) },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Room ID" : "방 ID", value: roomidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Target ID" : "대상 ID", value: targetidText || (GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "None" : "없음") },
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Removed" : "방 제거됨", value: removedText }
         )
         .setColor(0xE67E22)

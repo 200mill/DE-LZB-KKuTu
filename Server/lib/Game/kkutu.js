@@ -753,17 +753,13 @@ exports.Client = function(socket, profile, sid){
 					// 	type: "room-setting",
 					// 	data: { target: my.id, room: $room.getData(), modify: true }
 					// });
-					// if(UseDiscordWebhook && !my.admin){ // dcwh
-					// 	try{
-					// 		DCWH.SendWebhookOnRoomsetting($room.id, JSON.stringify({
-					// 			mode: my.mode,
-					// 			opts: my.opts
-					// 		}));
-					// 		my.getData()
-					// 	}catch(error){
-					// 		JLog.warn(`Failed to send Discord webhook on room-setting: ${error}`);
-					// 	}
-					// } // 현재 모드, 특수규칙 JSON확인 안됨, 보류
+					if(UseDiscordWebhook && !my.admin){ // dcwh
+						try{
+							DCWH.SendWebhookOnRoomsetting($room.id, $room.password, $room.mode, $room.opts);
+						}catch(error){
+							JLog.warn(`Failed to send Discord webhook on room-setting: ${error}`);
+						}
+					} // 현재 모드, 특수규칙 JSON확인 안됨 - 해결
 				}else{
 					my.sendError(400);
 				}
@@ -968,7 +964,7 @@ exports.Room = function(room, channel){
 				// process.send({ type: "room-join", data: { id: my.id, target: client.id, spectate: false } });
 				if(UseDiscordWebhook && !client.admin){ // dcwh
 					try{
-						DCWH.SendWebhookOnRoomJoin(my.id, client.id, false);
+						DCWH.SendWebhookOnRoomJoin(my.id, client.id, my.password);
 					}catch(error){
 						JLog.warn(`Failed to send Discord webhook on room-join: ${error}`);
 					}
@@ -991,7 +987,7 @@ exports.Room = function(room, channel){
 			process.send({ type: "room-join", data: { id: my.id, target: client.id, spectate: true } });
 			if(UseDiscordWebhook && !client.admin){ // dcwh
 				try{
-					DCWH.SendWebhookOnRoomJoin(my.id, client.id, true);
+					DCWH.SendWebhookOnRoomJoin(my.id, client.id, my.password);
 				}catch(error){
 					JLog.warn(`Failed to send Discord webhook on room-join (spectate): ${error}`);
 				}

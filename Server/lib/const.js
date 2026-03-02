@@ -28,9 +28,7 @@ exports.BLOCKED_LENGTH = 10000; // 차단 단어 길이 제한
 exports.KICK_BY_SPAM = 9; // 스팸으로 간주하여 강제퇴장 입력 횟수
 exports.MAX_OBSERVER = 4; // 관전자 최대 인원
 exports.TESTER = GLOBAL.ADMIN.concat([ // 서버 점검중 일때 접속 가능 아이디?
-	"discord-740191615716425780",
-	"discord-863626417479352340",
-	"discord-842559452825255946"
+	"discord-740191615716425780"
 ]);
 exports.WAF = GLOBAL.WAF; // 웹 방화벽 사용 여부
 exports.ROOM_PORTS = GLOBAL.ROOM_PORTS; // 게임 방 서버 포트
@@ -49,6 +47,8 @@ exports.OPTIONS = {
 	'ezm': { name: "EasyMission" },
 	'low': { name: "LongWord" },
 	'hrd': { name: "Hard" },
+	'wcw': { name: "Morse" },
+	'wpn': { name: "Phonetic" },
 }; // 특수규칙 옵션
 exports.MOREMI_PART = [ 'back', 'eye', 'mouth', 'shoes', 'clothes', 'head', 'lhand', 'rhand', 'front' ];
 exports.CATEGORIES = [ "all", "spec", "skin", "badge", "head", "eye", "mouth", "clothes", "hs", "back" ];
@@ -80,7 +80,7 @@ exports.RULE = { // 규칙
 */
 	'EKT': { lang: "en",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "unk" ],
+		opts: [ "man", "ext", "mis", "unk", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -88,7 +88,7 @@ exports.RULE = { // 규칙
 	},
 	'ESH': { lang: "en",
 		rule: "Classic",
-		opts: [ "ext", "mis", "unk" ],
+		opts: [ "ext", "mis", "unk", "wcw", "wpn" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -96,7 +96,7 @@ exports.RULE = { // 규칙
 	},
 	'KKT': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "k32", "unk", "ezm" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "k32", "unk", "ezm", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -104,7 +104,7 @@ exports.RULE = { // 규칙
 	},
 	'KSH': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm", "wcw", "wpn" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -112,7 +112,7 @@ exports.RULE = { // 규칙
 	},
 	'CSQ': { lang: "ko",
 		rule: "Jaqwi",
-		opts: [ "ijp" ],
+		opts: [ "ijp", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -120,7 +120,7 @@ exports.RULE = { // 규칙
 	},
 	'KCW': { lang: "ko",
 		rule: "Crossword",
-		opts: [],
+		opts: ["wcw"],
 		time: 2,
 		ai: false,
 		big: true,
@@ -128,7 +128,7 @@ exports.RULE = { // 규칙
 	},
 	'KTY': { lang: "ko",
 		rule: "Typing",
-		opts: [ "prv", "low", "hrd" ],
+		opts: [ "prv", "low", "hrd", "wcw" ],
 		time: 1,
 		ai: false,
 		big: false,
@@ -136,7 +136,7 @@ exports.RULE = { // 규칙
 	},
 	'ETY': { lang: "en",
 		rule: "Typing",
-		opts: [ "prv", "low" ],
+		opts: [ "prv", "low", "wcw" ],
 		time: 1,
 		ai: false,
 		big: false,
@@ -144,16 +144,16 @@ exports.RULE = { // 규칙
 	},
 	'KAP': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,
-		_back: true,
+		_back: true, // ?
 		ewq: true
 	},
 	'HUN': { lang: "ko",
 		rule: "Hunmin",
-		opts: [ "ext", "mis", "loa", "str" ],
+		opts: [ "ext", "mis", "loa", "str", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -161,7 +161,7 @@ exports.RULE = { // 규칙
 	},
 	'KDA': { lang: "ko",
 		rule: "Daneo",
-		opts: [ "ijp", "mis", "ezm" ],
+		opts: [ "ijp", "mis", "ezm", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -169,7 +169,7 @@ exports.RULE = { // 규칙
 	},
 	'EDA': { lang: "en",
 		rule: "Daneo",
-		opts: [ "ijp", "mis" ],
+		opts: [ "ijp", "mis", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -177,7 +177,7 @@ exports.RULE = { // 규칙
 	},
 	'KSS': { lang: "ko",
 		rule: "Sock",
-		opts: [ "no2" ],
+		opts: [ "no2", "wcw", "wpn" ],
 		time: 1,
 		ai: false,
 		big: true,
@@ -185,7 +185,7 @@ exports.RULE = { // 규칙
 	},
 	'ESS': { lang: "en",
 		rule: "Sock",
-		opts: [ "no2" ],
+		opts: [ "no2", "wcw", "wpn" ],
 		time: 1,
 		ai: false,
 		big: true,

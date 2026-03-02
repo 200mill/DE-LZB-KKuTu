@@ -29,6 +29,7 @@ var JLog = require('../sub/jjlog');
 var Secure = require('../sub/secure');
 var Recaptcha = require('../sub/recaptcha');
 // Discord Webhook [S]
+var DCWH = require('../sub/dcwh');
 const { WebhookClient, EmbedBuilder } = require('discord.js');
 let UseDiscordWebhook = GLOBAL.USE_DISCORD_WEBHOOK && GLOBAL.DISCORD_WEBHOOK_URL && GLOBAL.DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/");
 // Discord Webhook [E]
@@ -243,6 +244,7 @@ function narrateFriends(id, friends, stat){
 }
 Cluster.on('message', function(worker, msg){
 	var temp;
+	var i;
 	
 	switch(msg.type){
 		case "admin":
@@ -286,6 +288,8 @@ Cluster.on('message', function(worker, msg){
 				worker.send({ type: "room-invalid", room: msg.room });
 			}else{
 				ROOM[msg.room.id] = new KKuTu.Room(msg.room, msg.room.channel);
+				KKuTu.publish('room-setting', { room: msg.room, created: true, target: msg.target });
+				for(i in WDIC) WDIC[i].send('room-setting', { room: msg.room, created: true, target: msg.target });
 			}
 			break;
 		case "room-come":
@@ -348,6 +352,24 @@ Cluster.on('message', function(worker, msg){
 			break;
 		case "room-invalid":
 			delete ROOM[msg.room.id];
+			// Discord Webhook [S]
+			try {
+				DCWH.SendWebhookOnDeleteRoom(msg.room.id, msg.room.channel);
+			} catch (error) {
+				JLog.warn(`Error on sending Discord webhook for room deletion: ${error}`);
+			}
+			break;
+		case "game-start": // TODO - 이거 구현
+		case "round-end":
+		case "game-end":
+		case "room-setting":
+		case "room-join":
+		case "room-leave":
+			// temp = msg.data || {};
+			// KKuTu.publish(msg.type, temp);
+			// for(i in WDIC) WDIC[i].send(msg.type, temp);
+		// Discord Webhook [S]
+		case "heartbeat":
 			break;
 		default:
 			JLog.warn(`Unhandled IPC message type: ${msg.type}`);
@@ -519,7 +541,7 @@ function joinNewUser($c) {
 		caj: $c._checkAjae ? true : false // 이건 셧다운제 물론 지금은 안씀
 	});
 	// Discord Webhook [S]
-	JLog.info(`USE_DISCORD_WEBHOOK: ${GLOBAL.USE_DISCORD_WEBHOOK}, ADMIN: ${$c.admin}, URL: ${GLOBAL.DISCORD_WEBHOOK_URL}`);
+	// JLog.info(`USE_DISCORD_WEBHOOK: ${GLOBAL.USE_DISCORD_WEBHOOK}, ADMIN: ${$c.admin}, URL: ${GLOBAL.DISCORD_WEBHOOK_URL}`);
 	if (UseDiscordWebhook && !$c.admin) {
 		sendDiscordWebhookOnUserJoin(GLOBAL.DISCORD_WEBHOOK_URL, $c.nickname, $c.id, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 	}
@@ -528,9 +550,9 @@ function joinNewUser($c) {
 	KKuTu.publish('conn', {user: $c.getData()});
 	
 	JLog.info("New user #" + $c.id);
-	if(GLOBAL.WAF) setInterval(() => {
-		$c.send('heartbeat');
-	}, 30000);
+	// if(GLOBAL.WAF) setInterval(() => {
+	// 	$c.send('heartbeat');
+	// }, 30000);
 }
 
 KKuTu.onClientMessage = function ($c, msg) {
@@ -593,7 +615,7 @@ function processClientRequest($c, msg) {
 				$c.send('error', {code: 401});
 				return;
 			}
-			msg.value = msg.value.substr(0, 200);
+			msg.value = msg.value.substr(0, 500); // what if...?
 			if ($c.admin) {
 				if (!processAdmin($c.id, msg.value)) break;
 			}

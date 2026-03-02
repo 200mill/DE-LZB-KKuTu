@@ -44,4 +44,37 @@ ReferenceError: random is not defined
     at WebSocket.<anonymous> (/kkutu/Server/lib/Game/kkutu.js:293:11)
     at WebSocket.emit (events.js:314:20)
     at Receiver._receiver.onmessage (/kkutu/Server/lib/node_modules/ws/lib/WebSocket.js:143:47)
-    at Receiver.dataMessage (/kkutu/Server/lib/node_modules/ws/lib/Receiver.js:389:14)
+    at Receiver.dataMessage (/kkutu/Server/lib/node_modules/ws/lib/Receiver.js:389:14):2083 [23/02/2026, 15:32:09] ERROR: ReferenceError: EN_MORSE is not defined
+ReferenceError: EN_MORSE is not defined
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/sock.js:109:48)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1360:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1329:13)
+    at KKuTu.onClientMessage (/DE-LZB-KKuTu/Server/lib/Game/slave.js:222:11)
+    at WebSocket.<anonymous> (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:300:11)
+    at WebSocket.emit (node:events:508:28)
+    at _receiver.onmessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/WebSocket.js:141:47)
+    at Receiver.dataMessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:389:14)
+    at Receiver.getData (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:330:12)
+    at Receiver.startLoop (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:165:16):2083 [23/02/2026, 15:33:12] ERROR: ReferenceError: EN_MORSE is not defined
+ReferenceError: EN_MORSE is not defined
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/sock.js:109:48)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1360:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1329:13)
+    at KKuTu.onClientMessage (/DE-LZB-KKuTu/Server/lib/Game/slave.js:222:11)
+    at WebSocket.<anonymous> (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:300:11)
+    at WebSocket.emit (node:events:508:28)
+    at _receiver.onmessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/WebSocket.js:141:47)
+    at Receiver.dataMessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:389:14)
+    at Receiver.getData (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:330:12)
+    at Receiver.startLoop (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:165:16):2083 [23/02/2026, 15:35:21] ERROR: ReferenceError: escapeHTML is not defined
+ReferenceError: escapeHTML is not defined
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/sock.js:124:81)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1360:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1329:13)
+    at KKuTu.onClientMessage (/DE-LZB-KKuTu/Server/lib/Game/slave.js:222:11)
+    at WebSocket.<anonymous> (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:300:11)
+    at WebSocket.emit (node:events:508:28)
+    at _receiver.onmessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/WebSocket.js:141:47)
+    at Receiver.dataMessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:389:14)
+    at Receiver.getData (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:330:12)
+    at Receiver.startLoop (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:165:16)

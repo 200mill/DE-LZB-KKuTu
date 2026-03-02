@@ -247,8 +247,8 @@ Server.get("/", function(req, res){
 			'KO_THEME': Const.KO_THEME,
 			'EN_THEME': Const.EN_THEME,
 			'IJP_EXCEPT': Const.IJP_EXCEPT,
-			'ogImage': "http://delzb.app/img/kkutu/logo.png",
-			'ogURL': "http://delzb.app/",
+			'ogImage': "https://delzb.app/img/kkutu/logo.png",
+			'ogURL': "https://delzb.app",
 			'ogTitle': "글자로 놀자! 끄투 온라인",
 			'ogDescription': "끝말잇기가 이렇게 박진감 넘치는 게임이었다니!"
 		});
@@ -268,4 +268,4 @@ Server.get("/servers", function(req, res){
 
 Server.get("/legal/:page", function(req, res){
 	page(req, res, "legal/"+req.params.page);
-});
+})

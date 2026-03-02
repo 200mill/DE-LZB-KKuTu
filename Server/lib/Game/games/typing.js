@@ -31,6 +31,14 @@ var LIST_LENGTH = 200;
 var DOUBLE_VOWELS = [ 9, 10, 11, 14, 15, 16, 19 ];
 var DOUBLE_TAILS = [ 3, 5, 6, 9, 10, 11, 12, 13, 14, 15, 18 ];
 
+// const KO_MORSE = {".-..":"ㄱ", "..-.":"ㄴ", "-...":"ㄷ", "...-":"ㄹ", "--":"ㅁ", ".--":"ㅂ", "--.":"ㅅ", "-.-":"ㅇ", ".--.":"ㅈ", "-.-.":"ㅊ", "-..-":"ㅋ", "--..":"ㅌ", "---":"ㅍ", ".---":"ㅎ", ".":"ㅏ", "..":"ㅑ", "-":"ㅓ", "...":"ㅕ", ".-":"ㅗ", "-.":"ㅛ", "....":"ㅜ", ".-.":"ㅠ", "-..":"ㅡ", "..-":"ㅣ", "--.-":"ㅐ", "-.--":"ㅔ" };
+// const EN_MORSE = { ".-": "a", "-...": "b", "-.-.": "c", "-..": "d", ".": "e", "..-.": "f", "--.": "g", "....": "h", "..": "i", ".---": "j", "-.-": "k", ".-..": "l", "--": "m", "-.": "n", "---": "o", ".--.": "p", "--.-": "q", ".-.": "r", "...": "s", "-": "t", "..-": "u", "...-": "v", ".--": "w", "-..-": "x", "-.--": "y", "--..": "z" };
+// const HANGUL_INITIAL_INDEX = { "ㄱ":0, "ㄲ":1, "ㄴ":2, "ㄷ":3, "ㄸ":4, "ㄹ":5, "ㅁ":6, "ㅂ":7, "ㅃ":8, "ㅅ":9, "ㅆ":10, "ㅇ":11, "ㅈ":12, "ㅉ":13, "ㅊ":14, "ㅋ":15, "ㅌ":16, "ㅍ":17, "ㅎ":18 };
+// const HANGUL_MEDIAL_INDEX = { "ㅏ":0, "ㅐ":1, "ㅑ":2, "ㅒ":3, "ㅓ":4, "ㅔ":5, "ㅕ":6, "ㅖ":7, "ㅗ":8, "ㅘ":9, "ㅙ":10, "ㅚ":11, "ㅛ":12, "ㅜ":13, "ㅝ":14, "ㅞ":15, "ㅟ":16, "ㅠ":17, "ㅡ":18, "ㅢ":19, "ㅣ":20 };
+// const HANGUL_MEDIAL_COMBINE = { "ㅗㅏ":"ㅘ", "ㅗㅐ":"ㅙ", "ㅗㅣ":"ㅚ", "ㅜㅓ":"ㅝ", "ㅜㅔ":"ㅞ", "ㅜㅣ":"ㅟ", "ㅡㅣ":"ㅢ" };
+// const HANGUL_FINAL_INDEX = { "":0, "ㄱ":1, "ㄲ":2, "ㄳ":3, "ㄴ":4, "ㄵ":5, "ㄶ":6, "ㄷ":7, "ㄹ":8, "ㄺ":9, "ㄻ":10, "ㄼ":11, "ㄽ":12, "ㄾ":13, "ㄿ":14, "ㅀ":15, "ㅁ":16, "ㅂ":17, "ㅄ":18, "ㅅ":19, "ㅆ":20, "ㅇ":21, "ㅈ":22, "ㅊ":23, "ㅋ":24, "ㅌ":25, "ㅍ":26, "ㅎ":27 };
+// const HANGUL_FINAL_COMBINE = { "ㄱㅅ":"ㄳ", "ㄴㅈ":"ㄵ", "ㄴㅎ":"ㄶ", "ㄹㄱ":"ㄺ", "ㄹㅁ":"ㄻ", "ㄹㅂ":"ㄼ", "ㄹㅅ":"ㄽ", "ㄹㅌ":"ㄾ", "ㄹㅍ":"ㄿ", "ㄹㅎ":"ㅀ", "ㅂㅅ":"ㅄ" };
+
 function traverse(func){
 	var my = this;
 	var i, o;
@@ -174,9 +182,29 @@ exports.turnEnd = function(){
 exports.submit = function(client, text){
 	var my = this;
 	var score;
-	
+	// var originalText = text;
+	// var morseDecoded;
+	// var morseMap;
+	// var composedText;
+
 	if(!client.game) return;
-	
+	// if(my.opts.morse && (my.rule.lang == "ko" || my.rule.lang == "en")){ // LZB - Added Morse
+	// 	morseMap = my.rule.lang == "ko" ? KO_MORSE : EN_MORSE;
+	// 	morseDecoded = decodeMorseInput(text, morseMap);
+	// 	if(morseDecoded){
+	// 		if(my.rule.lang == "ko"){
+	// 			composedText = composeHangulInput(morseDecoded);
+	// 			text = composedText || morseDecoded;
+	// 		}else{
+	// 			text = morseDecoded;
+	// 		}
+	// 	}
+	// 	else if(!client.robot) return client.publish('turnError', { code: 488, value: originalText }, true);
+	// }else if(my.rule.lang == "ko"){
+	// 	composedText = composeHangulInput(text);
+	// 	if(composedText) text = composedText;
+	// }
+
 	if(my.game.clist[client.game.index] == text){
 		score = my.getScore(text);
 		
@@ -218,3 +246,99 @@ exports.getScore = function(text){
 		default: return r;
 	}
 };
+// function decodeMorseInput(input, morseMap){ // LZB - Added Morse
+// 	var normalized;
+// 	var tokens;
+// 	var output = "";
+// 	var i, token, parts, j, part, ch;
+// 	var map = morseMap || EN_MORSE;
+//
+// 	if(typeof input !== "string") return null;
+// 	normalized = input.trim();
+// 	if(!normalized) return null;
+// 	if(!/^[\.\-\s\/|]+$/.test(normalized)) return null;
+//
+// 	normalized = normalized.replace(/\|/g, "/");
+// 	tokens = normalized.split(/\s+/);
+// 	for(i=0; i<tokens.length; i++){
+// 		token = tokens[i];
+// 		if(!token) continue;
+// 		parts = token.split("/");
+// 		for(j=0; j<parts.length; j++){
+// 			part = parts[j];
+// 			if(!part) continue;
+// 			ch = map[part];
+// 			if(!ch) return null;
+// 			output += ch;
+// 		}
+// 	}
+//
+// 	return output || null;
+// }
+// function composeHangulInput(input){
+// 	var chars;
+// 	var out = "";
+// 	var i = 0;
+// 	var initial, medialRes, finalRes;
+// 	var lead, vowel, tail;
+//
+// 	if(typeof input !== "string") return input;
+// 	chars = Array.from(input);
+//
+// 	while(i < chars.length){
+// 		lead = chars[i];
+// 		initial = HANGUL_INITIAL_INDEX[lead];
+// 		if(initial === undefined){
+// 			out += lead;
+// 			i++;
+// 			continue;
+// 		}
+//
+// 		medialRes = readMedial(chars, i + 1);
+// 		if(!medialRes){
+// 			out += lead;
+// 			i++;
+// 			continue;
+// 		}
+//
+// 		vowel = medialRes.medial;
+// 		finalRes = readFinal(chars, medialRes.next);
+// 		tail = finalRes ? finalRes.final : "";
+// 		out += String.fromCharCode(0xAC00 + (initial * 21 + HANGUL_MEDIAL_INDEX[vowel]) * 28 + HANGUL_FINAL_INDEX[tail]);
+// 		i = finalRes ? finalRes.next : medialRes.next;
+// 	}
+//
+// 	return out;
+// }
+// function readMedial(chars, index){
+// 	var first = chars[index];
+// 	var second = chars[index + 1];
+// 	var combined;
+//
+// 	if(first == null) return null;
+// 	if(HANGUL_MEDIAL_INDEX[first] === undefined) return null;
+//
+// 	if(second != null){
+// 		combined = HANGUL_MEDIAL_COMBINE[first + second];
+// 		if(combined) return { medial: combined, next: index + 2 };
+// 	}
+// 	return { medial: first, next: index + 1 };
+// }
+// function readFinal(chars, index){
+// 	var first = chars[index];
+// 	var second = chars[index + 1];
+// 	var cluster;
+//
+// 	if(first == null) return null;
+// 	if(HANGUL_FINAL_INDEX[first] === undefined || HANGUL_FINAL_INDEX[first] === 0) return null;
+//
+// 	if(second != null){
+// 		cluster = HANGUL_FINAL_COMBINE[first + second];
+// 		if(cluster && HANGUL_MEDIAL_INDEX[chars[index + 2]] === undefined){
+// 			return { final: cluster, next: index + 2 };
+// 		}
+// 	}
+//
+// 	if(HANGUL_MEDIAL_INDEX[second] !== undefined) return null;
+// 	return { final: first, next: index + 1 };
+// }

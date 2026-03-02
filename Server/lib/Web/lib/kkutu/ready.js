@@ -980,15 +980,16 @@ $(document).ready(function(){
 
 // 웹소켓 연결
 	function connect(){
-		// var heartbeatInterval;
+		var heartbeatInterval;
+		var openState = (_WebSocket && typeof _WebSocket.OPEN !== 'undefined') ? _WebSocket.OPEN : 1;
 		ws = new _WebSocket($data.URL);
 		ws.onopen = function(e){
 			if (heartbeatInterval) clearInterval(heartbeatInterval);
 			heartbeatInterval = _setInterval(function(){ // TNX to https://github.com/kitt3n69420/KKuTu
-				if(ws && ws.readyState === WebSocket.OPEN){
+				if(ws && ws.readyState === openState){
 					ws.send(JSON.stringify({ type: "heartbeat" }));
 				}
-				if (rws && rws.readyState === WebSocket.OPEN) {
+				if (rws && rws.readyState === openState) {
 					rws.send(JSON.stringify({ type: "heartbeat" }));
 				}
 			}, 30000); // 30초마다 하트비트 전송

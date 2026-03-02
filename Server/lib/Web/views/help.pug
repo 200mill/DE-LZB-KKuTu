@@ -75,6 +75,8 @@ block Middle
 					li: label 쉬운 미션
 					li: label 긴 단어
 					li: label 어려운 단어
+					li: label 모스부호
+					li: label 포네틱
 			li
 				label 사용자 정보
 				ul
@@ -339,7 +341,7 @@ block Middle
 				| 게임 유형 [한국어 솎솎], [영어 솎솎]에서 두 글자 단어의 사용을 막습니다.
 		div.page-body#box-c4p10
 			p
-				| 게임유형 [한국어 끝말잇기], [영어 끝말잇기], [한국어 쿵쿵따], [한국어 앞말잇기]에서 사전에 등재되지 않은 단어의 사용을 허용합니다.
+				| 게임유형 [한국어 끝말잇기], [영어 끝말잇기], [한국어 쿵쿵따], [한국어 앞말잇기], [영어 끄투]에서 사전에 등재되지 않은 단어의 사용을 허용합니다.
 		div.page-body#box-c4p11 
 			p
 				| 게임유형 [한국어 끝말잇기], [한국어 쿵쿵따], [한국어 앞말잇기], [한국어 단어대결]에서 더 쉬운 미션 글자가 주어집니다.
@@ -351,9 +353,56 @@ block Middle
 		div.page-body#box-c4p13
 			p
 				| 게임 유형 [한국어 타자대결]에서 더 어려운 단어가 제시됩니다.
+		div.page-body#box-c4p14
+			p
+				| 모든 게임 유형에서 "-"혹은 "."으로 입력합니다. 단 게임 유형 [한국어 타자대결], [영어 타자대결]에서는 "/"로 띄어 씁니다.
+				| 예를 들어 제시된 글자가 <word>t</word>이라면
+			blockquote
+				| <word>- . .- --</word> → <word>-- .. -.- .</word> → <word>. -. --. .-.. .. ... ....</word>
+			p
+				| 등으로 차례를 넘길 수 있습니다.
+				| 이 정도는 할 수 있겠죠?
+		div.page-body#box-c4p15
+			p
+				| 게임유형 [영어 끝말잇기]에서 NATO가 제정한 포네틱 알파벳을 이용하여 차례를 넘깁니다.
+				| 예를 들어 제시된 글자가 <word>t</word>이라면
+			blockquote
+				| <word>tango alpha x-ray</word>
+			p 등으로 차례를 넘길 수 있습니다. 
+				| 포네틱 알파벳은 다음과 같습니다.
+				ul#box-phonetic-list
+					li A : Alfa
+					li B : Bravo
+					li C : Charlie
+					li D : Delta
+					li E : Echo
+					li F : Foxtrot
+					li G : Golf
+					li H : Hotel
+					li I : India
+					li J : Juliet
+					li K : Kilo
+					li L : Lima
+					li M : Mike
+					li N : November
+					li O : Oscar
+					li P : Papa
+					li Q : Quebec
+					li R : Romeo
+					li S : Sierra
+					li T : Tango
+					li U : Uniform
+					li V : Victor
+					li W : Whiskey
+					li X : X-ray
+					li Y : Yankee
+					li Z : Zulu
+		div.page-body#box-c5
+			p
+				| 이 장에서는 끄투 서버에 로그인한 이용자들이 이용할 수 있는 여러 가지 기능과 시스템에 대해 설명하고 있습니다.
 		div.page-body#box-c5p1
 			p
-				| JJO.KR 서버에 로그인하지 않고 끄투 서버에 접속하는 경우 <b>손님 계정</b>으로 간주합니다.
+				| 끄투 서버에 로그인하지 않고 끄투 서버에 접속하는 경우 <b>손님 계정</b>으로 간주합니다.
 				| 손님 계정은 저장이 필요한 콘텐츠들을 이용할 수 없으니 양해 바랍니다.
 			h4 저장이 필요한 콘텐츠:
 			ul

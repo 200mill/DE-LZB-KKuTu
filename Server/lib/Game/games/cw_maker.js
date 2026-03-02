@@ -16,11 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-﻿var Prompt = require('prompt');
+// ﻿var Prompt = require('prompt');
+var Prompt = require('prompt');
 var DB = require('../../Web/db');
 var Const = require('../../const');
 var Lizard = require('../../sub/lizard');
 var LANG = 'ko';
+var CW_MAX_TRIES_ENABLED = false;
+var CW_MAX_TRIES = CW_MAX_TRIES_ENABLED ? (parseInt(process.env.CW_MAX_TRIES, 10) || 1) : Infinity;
+console.log(`CW_MAX_TRIES: ${CW_MAX_TRIES_ENABLED ? CW_MAX_TRIES : 'infinity'}`);
 
 Prompt.start();
 DB.ready = function(){
@@ -47,6 +51,12 @@ DB.ready = function(){
 		getBoard(LANG).then(function(data){
 			var j, o, s, t;
 			var res = [];
+
+			if(data.aborted){
+				console.log(`[ABORT] ${data.map.name} 맵 생성 중단 (시도 ${data.tries}/${data.limit})`);
+				setTimeout(doMining, 500);
+				return;
+			}
 			
 			console.log(data.map.name, "\n  0 1 2 3 4 5 6 7");
 			for(i=0; i<8; i++){
@@ -60,7 +70,7 @@ DB.ready = function(){
 				}
 				console.log(s);
 			}
-			console.log("\007");
+			console.log("\x07");
 			for(i in data.map.queue){
 				s = data.map.queue[i];
 				t = data.board[`${s[0]},${s[1]}`];
@@ -212,6 +222,11 @@ function getBoard(lang){
 	var map = getMap();
 	var queue = map.queue.slice(0);
 	var regCache = {};
+	var tries = 0;
+	
+	function scheduleProcess(){
+		setImmediate(process);
+	}
 	
 	function process(){
 		var i, m = queue.shift();
@@ -219,6 +234,11 @@ function getBoard(lang){
 		var reg = "";
 		var p, k;
 		var mapLen = queue.length;
+
+		if(++tries > CW_MAX_TRIES){
+			R.go({ map: map, board: board, aborted: true, tries: tries - 1, limit: CW_MAX_TRIES });
+			return;
+		}
 		
 		console.log("[PROCESS] QUEUE: " + mapLen);
 		if(!m){
@@ -286,9 +306,9 @@ function getBoard(lang){
 					}
 				}
 			}
-			process();
+			scheduleProcess();
 		}
 	}
-	process();
+	scheduleProcess();
 	return R;
 }

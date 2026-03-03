@@ -20,7 +20,7 @@ exports.SendWebhookOnTalk = function(profile, msg, place, isrobot) {
 
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
-        .setTitle(`${prefix ? prefix + " " : ""}${nickname}님이 채팅을 입력하셨습니다.`.slice(0, 256))
+        .setTitle( GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? `${prefix ? prefix + " " : ""}${nickname} send a chat.`.slice(0,256) :`${prefix ? prefix + " " : ""}${nickname}님이 채팅을 입력하셨습니다.`.slice(0, 256))
         .addFields(
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Place" : "장소", value: placeText },
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Message" : "내용", value: `\`\`\`${msgText || "(empty)"}\`\`\`` }

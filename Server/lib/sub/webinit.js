@@ -71,7 +71,7 @@ function page(req, res, file, data){
 		req.session.createdAt = new Date();
 	}
 
-	var addr = GLOBAL.WAF ? req.ip || "" : (req.get('X-Forwarded-For') || "");
+	var addr = GLOBAL.WAF ? req.ip || "" : (req.get('CF-Connecting-IP') || "");
 	var sid = req.session.id || "";
 	
 	data.published = global.isPublic;
@@ -101,6 +101,7 @@ function page(req, res, file, data){
 	}
 	
 	JLog.log(`${addr}@${sid.slice(0, 10)} ${data.page}, ${JSON.stringify(req.params)}`);
+	JLog.log(req.get('X-Forwarded-For'));
 	res.render(data.page, data, function(err, html){
 		if(err) res.send(err.toString());
 		else res.send(html);

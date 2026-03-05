@@ -24,9 +24,10 @@ exports.SendWebhookOnTalk = function(profile, msg, place, isrobot) {
         .addFields(
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Place" : "장소", value: placeText },
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Message" : "내용", value: `\`\`\`${msgText || "(empty)"}\`\`\`` },
-	    { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH? "Time" : "시간", value: Date() }
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Time" : "시간", value: new Date().toLocaleString() }
         )
         .setColor(0xF1C40F)
+        .setFooter({ text: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert', iconURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png' })
         .setTimestamp();
 
     webhookClient.send({
@@ -251,4 +252,21 @@ exports.SendWebhookOnRoomLeave = function(roomid, targetid, removed) {
     }).catch(function(error){
         JLog.error(`Error on sending Discord webhook: ${error}`);
     });
+}
+exports.sendDiscordWebhookOnUserJoin = function(whurl, usernickname, userid, iseng) {
+    // JLog.info(`${whurl} ${usernickname} ${userid} ${iseng}`);
+    const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
+    const embed = new EmbedBuilder()
+        .setTitle(iseng ? "A new user has joined!" : "새로운 사용자가 접속했습니다!")
+        // .setThumbnail() // user avatar but how to??
+        .setDescription(`**${usernickname || userid}** (${userid})`)
+        .setColor(0x00AE86)
+        .setTimestamp();
+    webhookClient.send({
+            username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',
+            avatarURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png',
+            embeds: [embed]
+        }).catch(function(error){
+            JLog.error(`Error on sending Discord webhook: ${error}`);
+        });
 }

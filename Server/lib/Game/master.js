@@ -359,15 +359,6 @@ Cluster.on('message', function(worker, msg){
 				JLog.warn(`Error on sending Discord webhook for room deletion: ${error}`);
 			}
 			break;
-		case "game-start": // TODO - 이거 구현
-		case "round-end":
-		case "game-end":
-		case "room-setting":
-		case "room-join":
-		case "room-leave":
-			// temp = msg.data || {};
-			// KKuTu.publish(msg.type, temp);
-			// for(i in WDIC) WDIC[i].send(msg.type, temp);
 		// Discord Webhook [S]
 		case "heartbeat":
 			break;
@@ -543,7 +534,7 @@ function joinNewUser($c) {
 	// Discord Webhook [S]
 	// JLog.info(`USE_DISCORD_WEBHOOK: ${GLOBAL.USE_DISCORD_WEBHOOK}, ADMIN: ${$c.admin}, URL: ${GLOBAL.DISCORD_WEBHOOK_URL}`);
 	if (UseDiscordWebhook && !$c.admin) {
-		sendDiscordWebhookOnUserJoin(GLOBAL.DISCORD_WEBHOOK_URL, $c.nickname, $c.id, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
+		sendDiscordWebhookOnUserJoin(GLOBAL.DISCORD_WEBHOOK_URL, $c.nickname, $c.id, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH); // dfdfdf
 	}
 	// Discord Webhook [E]
 	narrateFriends($c.id, $c.friends, "on");

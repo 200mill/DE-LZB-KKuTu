@@ -49,6 +49,7 @@ exports.OPTIONS = {
 	'hrd': { name: "Hard" },
 	'wcw': { name: "Morse" },
 	'wpn': { name: "Phonetic" },
+	'onl': { name: "Onlylong" },
 }; // 특수규칙 옵션
 exports.MOREMI_PART = [ 'back', 'eye', 'mouth', 'shoes', 'clothes', 'head', 'lhand', 'rhand', 'front' ];
 exports.CATEGORIES = [ "all", "spec", "skin", "badge", "head", "eye", "mouth", "clothes", "hs", "back" ];
@@ -104,7 +105,7 @@ exports.RULE = { // 규칙
 	},
 	'KSH': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm", "wcw", "wpn" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm", "wcw", "wpn", "onl" ],
 		time: 1,
 		ai: true,
 		big: false,

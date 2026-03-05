@@ -227,33 +227,33 @@ Server.get("/", function(req, res){
 			delete req.session.profile;
 		}
 		page(req, res, Const.MAIN_PORTS[server] ? "kkutu" : "portal", {
-			'_page': "kkutu",
-			'_id': id,
-			'PORT': Const.MAIN_PORTS[server],
-			'ROOM_PORT': Const.ROOM_PORTS[server],
-			'HOST': req.hostname,
-			'PROTOCOL': Const.IS_SECURED || Const.WAF ? 'wss' : 'ws',
-			'TEST': req.query.test,
-			'MOREMI_PART': Const.MOREMI_PART,
-			'AVAIL_EQUIP': Const.AVAIL_EQUIP,
-			'CATEGORIES': Const.CATEGORIES,
-			'GROUPS': Const.GROUPS,
-			'MODE': Const.GAME_TYPE,
-			'RULE': Const.RULE,
-			'OPTIONS': Const.OPTIONS,
-			'NICKNAME_LIMIT': GLOBAL.NICKNAME_LIMIT,
-			'KO_INJEONG': Const.KO_INJEONG,
-			'EN_INJEONG': Const.EN_INJEONG,
-			'KO_THEME': Const.KO_THEME,
-			'EN_THEME': Const.EN_THEME,
-			'IJP_EXCEPT': Const.IJP_EXCEPT,
-			'ogImage': "https://delzb.app/img/kkutu/logo.png",
-			'ogURL': "https://delzb.app",
-			'ogTitle': "글자로 놀자! 끄투 온라인",
-			'ogDescription': "끝말잇기가 이렇게 박진감 넘치는 게임이었다니!"
+			_page: "kkutu",
+    		_id: id,
+    		PORT: Const.MAIN_PORTS[server],
+    		ROOM_PORT: Const.ROOM_PORTS[server],
+    		HOST: req.hostname,
+    		PROTOCOL: Const.IS_SECURED || Const.WAF ? "wss" : "ws",
+    		TEST: req.query.test,
+    		MOREMI_PART: Const.MOREMI_PART,
+    		AVAIL_EQUIP: Const.AVAIL_EQUIP,
+    		CATEGORIES: Const.CATEGORIES,
+    		GROUPS: Const.GROUPS,
+    		MODE: Const.GAME_TYPE,
+    		RULE: Const.RULE,
+    		OPTIONS: Const.OPTIONS,
+    		NICKNAME_LIMIT: GLOBAL.NICKNAME_LIMIT,
+    		KO_INJEONG: Const.KO_INJEONG,
+    		EN_INJEONG: Const.EN_INJEONG,
+    		KO_THEME: Const.KO_THEME,
+    		EN_THEME: Const.EN_THEME,
+    		IJP_EXCEPT: Const.IJP_EXCEPT,
+    		ogImage: "https://delzb.app/img/kkutu/logo.png",
+    		ogURL: "https://delzb.app/",
+    		ogTitle: "글자로 놀자! 끄투 온라인",
+			ogDescription: "끝말잇기가 이렇게 박진감 넘치는 게임이었다니!"
+				});
+			}
 		});
-	}
-});
 
 Server.get("/servers", function(req, res){
 	var list = [];

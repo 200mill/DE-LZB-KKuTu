@@ -77,4 +77,47 @@ ReferenceError: escapeHTML is not defined
     at _receiver.onmessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/WebSocket.js:141:47)
     at Receiver.dataMessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:389:14)
     at Receiver.getData (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:330:12)
-    at Receiver.startLoop (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:165:16)
+    at Receiver.startLoop (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:165:16):2083 [04/03/2026, 15:12:08] ERROR: SyntaxError: Unexpected token '<'
+/DE-LZB-KKuTu/Server/lib/Game/games/classic.js:276
+	if(opts.my.onl) if(text.length() =< ONLYLONG_MIN) return client.publish('turnError', { code: 410, value: escapeHTML(originalText) }, true); // onlylong
+	                                  ^
+
+SyntaxError: Unexpected token '<'
+    at wrapSafe (node:internal/modules/cjs/loader:1735:18)
+    at Module._compile (node:internal/modules/cjs/loader:1778:20)
+    at Object..js (node:internal/modules/cjs/loader:1936:10)
+    at Module.load (node:internal/modules/cjs/loader:1525:32)
+    at Module._load (node:internal/modules/cjs/loader:1327:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.require (node:internal/modules/cjs/loader:1548:12)
+    at require (node:internal/modules/helpers:152:16)
+    at exports.init (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:67:13):2083 [04/03/2026, 15:12:19] ERROR: SyntaxError: Unexpected token '<':2083 [04/03/2026, 15:24:48] ERROR: ReferenceError: opts is not defined
+ReferenceError: opts is not defined
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/classic.js:276:2)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1458:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1427:13)
+    at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1413:6)
+    at listOnTimeout (node:internal/timers:607:11)
+    at process.processTimers (node:internal/timers:541:7):2083 [04/03/2026, 15:26:02] ERROR: ReferenceError: opts is not defined
+ReferenceError: opts is not defined
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/classic.js:276:2)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1458:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1427:13)
+    at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1413:6)
+    at listOnTimeout (node:internal/timers:607:11)
+    at process.processTimers (node:internal/timers:541:7):2083 [04/03/2026, 15:31:58] ERROR: TypeError: text.length is not a function
+TypeError: text.length is not a function
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/classic.js:276:31)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1458:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1427:13)
+    at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1413:6)
+    at listOnTimeout (node:internal/timers:607:11)
+    at process.processTimers (node:internal/timers:541:7):2083 [04/03/2026, 15:33:18] ERROR: ReferenceError: length is not defined
+ReferenceError: length is not defined
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/classic.js:276:23)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1458:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1427:13)
+    at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1413:6)
+    at listOnTimeout (node:internal/timers:607:11)
+    at process.processTimers (node:internal/timers:541:7)

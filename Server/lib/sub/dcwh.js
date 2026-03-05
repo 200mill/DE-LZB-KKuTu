@@ -23,7 +23,8 @@ exports.SendWebhookOnTalk = function(profile, msg, place, isrobot) {
         .setTitle( GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? `${prefix ? prefix + " " : ""}${nickname} send a chat.`.slice(0,256) :`${prefix ? prefix + " " : ""}${nickname}님이 채팅을 입력하셨습니다.`.slice(0, 256))
         .addFields(
             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Place" : "장소", value: placeText },
-            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Message" : "내용", value: `\`\`\`${msgText || "(empty)"}\`\`\`` }
+            { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Message" : "내용", value: `\`\`\`${msgText || "(empty)"}\`\`\`` },
+	    { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH? "Time" : "시간", value: Date() }
         )
         .setColor(0xF1C40F)
         .setTimestamp();

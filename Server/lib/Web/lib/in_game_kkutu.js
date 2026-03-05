@@ -2549,21 +2549,45 @@ function sendWhisper(target, text){
 	}
 }
 function toggleWhisperBlock(target){
-	if($data._wblock.hasOwnProperty(target)){
-		delete $data._wblock[target];
-		notice(target + L['wnblocked']);
-	}else{
-		$data._wblock[target] = true;
-		notice(target + L['wblocked']);
+	var localeMatch = location.href.match(/[?&]locale=([^&]+)/);
+	$data.locale = localeMatch ? localeMatch[1] : 'ko_KR'; // 기본값: ko_KR
+	if($data.locale.startsWith('en')){
+		if($data._wblock.hasOwnProperty(target)){
+			delete $data._wblock[target];
+			notice(L['wnblocked'] + target);
+		}else{
+			$data._wblock[target] = true;
+			notice(L['wblocked'] + target);
+		}
+	} else {
+		if($data._wblock.hasOwnProperty(target)){
+			delete $data._wblock[target];
+			notice(target + L['wnblocked']);
+		}else{
+			$data._wblock[target] = true;
+			notice(target + L['wblocked']);
+		}
 	}
 }
 function toggleShutBlock(target){
-	if($data._shut.hasOwnProperty(target)){
-		delete $data._shut[target];
-		notice(target + L['userNShut']);
-	}else{
-		$data._shut[target] = true;
-		notice(target + L['userShut']);
+	var localeMatch = location.href.match(/[?&]locale=([^&]+)/);
+	$data.locale = localeMatch ? localeMatch[1] : 'ko_KR'; // 기본값: ko_KR
+	if($data.locale.startsWith('en')){
+		if($data._shut.hasOwnProperty(target)){
+			delete $data._shut[target];
+			notice(L['userNShut'] + target);
+		}else{
+			$data._shut[target] = true;
+			notice(L['userShut'] + target);
+		}
+	} else {
+		if($data._shut.hasOwnProperty(target)){
+			delete $data._shut[target];
+			notice(target + L['userNShut']);
+		}else{
+			$data._shut[target] = true;
+			notice(target + L['userShut']);
+		}
 	}
 }
 function tryDict(text, callback){

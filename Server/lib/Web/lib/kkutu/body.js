@@ -161,7 +161,9 @@ function connectToRoom(chan, rid){
 	rws.onopen = function(e){
 		console.log("room-conn", chan, rid);
 	};
-	rws.onmessage = _onMessage;
+	rws.onmessage = function(e){
+		onMessage(JSON.parse(e.data), rws);
+	};
 	rws.onclose = function(e){
 		console.log("room-disc", chan, rid);
 		rws = undefined;
@@ -206,7 +208,7 @@ function checkAge(){
 		}
 	}
 }
-function onMessage(data){
+function onMessage(data, sourceSocket){
 	var i;
 	var $target;
 
@@ -532,6 +534,14 @@ function onMessage(data){
 			alert("[#" + data.code + "] " + L['error_'+data.code] + i);
 			break;
 		case 'heartbeat':
+			if (typeof data.rtt === 'number' && isFinite(data.rtt)) {
+				$data._pingLatency = Math.max(0, Math.round(data.rtt));
+				if ($data.id && $data.users && $data.users[$data.id]) updateMe();
+			}
+			if (data.req && sourceSocket && sourceSocket.readyState === 1 && typeof data.t === 'number' && isFinite(data.t)) {
+				sourceSocket.send(JSON.stringify({ type: "heartbeat", ack: 1, t: data.t }));
+			}
+			break;
 		default:
 			break;
 	}
@@ -940,6 +950,8 @@ function updateMe(){
 	var expPercent = span > 0 && isFinite(span) ? (my.data.score - prev) / span * 100 : 100;
 	var remainText = isFinite(remainExp) ? commify(Math.round(remainExp)) : "MAX";
 	var percentText = isFinite(expPercent) ? Math.max(0, Math.min(100, expPercent)).toFixed(1) + "%" : "100.0%";
+	var pingText = (typeof $data._pingLatency === 'number' && isFinite($data._pingLatency)) ? Math.max(0, Math.round($data._pingLatency)) : "-";
+	if(pingText == "-") pingText = L['latencywait'];
 	$(".my-stat-record").html(L['globalWin'] + " " + gw + L['W']);
 	$(".my-stat-ping").html(commify(my.money) + L['ping']);
 	$(".my-okg .graph-bar").width(($data._playTime % 600000) / 6000 + "%");
@@ -947,7 +959,7 @@ function updateMe(){
 	$(".my-level").html(L['LEVEL'] + " " + lv);
 	$(".my-gauge .graph-bar").width((my.data.score-prev)/(goal-prev)*190);
 	$(".my-gauge-text").html(commify(my.data.score) + " / " + commify(goal));
-	$("#my-gauge-expl").html(L['LEVEL'] + " : " + lv + "<br>" + L['LEVEL_NEXT'] + " : " + remainText + "<br>" + L['CURRENT_EXP'] + " : " + percentText);
+	$("#my-gauge-expl").html(L['latency'] + " : " + pingText + "ms <br>" + L['LEVEL'] + " : " + lv + "<br>" + L['LEVEL_NEXT'] + " : " + remainText + "<br>" + L['CURRENT_EXP'] + " : " + percentText);
 }
 function prettyTime(time){
 	var min = Math.floor(time / 60000) % 60, sec = Math.floor(time * 0.001) % 60;

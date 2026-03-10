@@ -283,10 +283,14 @@ exports.Client = function(socket, profile, sid){
 		};
 	}
 	my._lastHeartbeat = Date.now(); // TNX to https://github.com/kitt3n69420/KKuTu
-	my._lastHeartbeat = setInterval(() => {
+	function sendHeartbeatReq(){
 		if (socket.readyState === 1) {
-			my.send('heartbeat', {});
+			socket.send(JSON.stringify({ type: 'heartbeat', req: 1, t: Date.now(), rtt: my._pingLatency }));
 		}
+	}
+	sendHeartbeatReq();
+	my._lastHeartbeat = setInterval(() => {
+		sendHeartbeatReq();
 	}, 30000); // 30초마다 하트비트 전송
 	socket.on('close', function(code){
 		if(ROOM[my.place]) ROOM[my.place].go(my);
@@ -299,7 +303,10 @@ exports.Client = function(socket, profile, sid){
 		if(!msg) return;
 		if(typeof msg !== "string") msg = String(msg);
 		try{ data = JSON.parse(msg); }catch(e){ data = { error: 400 }; }
-		if(data.type == "heartbeat") return;
+		if(data.type == "heartbeat"){
+			exports.onClientMessage(my, data);
+			return;
+		}
 		JLog.log(`Chan @${channel} Msg #${my.id}: ${msg}`);
 		if(data.type == "talk" && !data.relay && UseDiscordWebhook && !my.admin){ // dcwh
 			try{

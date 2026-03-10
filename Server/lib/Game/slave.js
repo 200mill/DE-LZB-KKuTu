@@ -194,6 +194,10 @@ KKuTu.onClientMessage = function($c, msg){
 	switch(msg.type){
 		case 'heartbeat': // TNX to https://github.com/kitt3n69420/KKuTu
 			$c._lastHeartbeat = Date.now();
+			if (msg.ack && typeof msg.t === 'number' && isFinite(msg.t)) {
+				$c._pingLatency = Math.max(0, Date.now() - msg.t);
+				$c.send('heartbeat', { rtt: $c._pingLatency });
+			}
 			break;
 		case 'yell':
 			if(!msg.value) return;

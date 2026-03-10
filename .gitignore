@@ -26,6 +26,8 @@ Server/private.key
 # log
 Server/web.log
 Server/game.log
+web.log
+game.log
 
 # notice
 Server/lib/Web/public/global_notice.html

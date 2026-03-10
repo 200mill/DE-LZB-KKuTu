@@ -541,9 +541,6 @@ function joinNewUser($c) {
 	KKuTu.publish('conn', {user: $c.getData()});
 	
 	JLog.info("New user #" + $c.id);
-	// if(GLOBAL.WAF) setInterval(() => {
-	// 	$c.send('heartbeat');
-	// }, 30000);
 }
 
 KKuTu.onClientMessage = function ($c, msg) {
@@ -551,6 +548,10 @@ KKuTu.onClientMessage = function ($c, msg) {
 
 	if (msg.type === 'heartbeat') { // TNX to https://github.com/kitt3n69420/KKuTu
 		$c._lastHeartbeat = Date.now();
+		if (msg.ack && typeof msg.t === 'number' && isFinite(msg.t)) {
+			$c._pingLatency = Math.max(0, Date.now() - msg.t);
+			$c.send('heartbeat', { rtt: $c._pingLatency });
+		}
 		return;
 	}
 	

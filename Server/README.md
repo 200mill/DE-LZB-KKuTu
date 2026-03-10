@@ -322,6 +322,7 @@ sudo pkill node
 - `practice`: 연습
 - `invite`: 방 초대
 - `inviteRes`: 방 초대 결과
+- `heartbeat`: 클라우드플레어 타임아웃 방지
 
 #### 주요 이벤트 (서버 → 클라이언트)
 - `roundReady`: 라운드 준비
@@ -333,6 +334,8 @@ sudo pkill node
 - `kickVote`: 방 추방 투표 진행
 - `kickDeny`: 방 추방 투표 부결
 - `heartbeat`: 클라우드플레어 타임아웃 방지
+
+자세한 이벤트는 [여기](https://github.com/horyu1234/KKuTu-Protocol-Docs)를 참고하세요.
 
 ---
 

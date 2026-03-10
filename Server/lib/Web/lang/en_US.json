@@ -553,6 +553,8 @@
 		"bonusFrom_k": "Buff Effect",
 		"lvUp": "Level Up!",
 		"ping": "Ping",
+		"latency": "Latency",
+		"latencywait": "Waiting",
 		"making": "Under Construction! T.T",
 		"robot": "KKuTu Bot",
 		"null": "(No Info)",

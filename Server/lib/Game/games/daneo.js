@@ -33,6 +33,9 @@ const HANGUL_MEDIAL_INDEX = { "ㅏ":0, "ㅐ":1, "ㅑ":2, "ㅒ":3, "ㅓ":4, "ㅔ"
 const HANGUL_MEDIAL_COMBINE = { "ㅗㅏ":"ㅘ", "ㅗㅐ":"ㅙ", "ㅗㅣ":"ㅚ", "ㅜㅓ":"ㅝ", "ㅜㅔ":"ㅞ", "ㅜㅣ":"ㅟ", "ㅡㅣ":"ㅢ" };
 const HANGUL_FINAL_INDEX = { "":0, "ㄱ":1, "ㄲ":2, "ㄳ":3, "ㄴ":4, "ㄵ":5, "ㄶ":6, "ㄷ":7, "ㄹ":8, "ㄺ":9, "ㄻ":10, "ㄼ":11, "ㄽ":12, "ㄾ":13, "ㄿ":14, "ㅀ":15, "ㅁ":16, "ㅂ":17, "ㅄ":18, "ㅅ":19, "ㅆ":20, "ㅇ":21, "ㅈ":22, "ㅊ":23, "ㅋ":24, "ㅌ":25, "ㅍ":26, "ㅎ":27 };
 const HANGUL_FINAL_COMBINE = { "ㄱㅅ":"ㄳ", "ㄴㅈ":"ㄵ", "ㄴㅎ":"ㄶ", "ㄹㄱ":"ㄺ", "ㄹㅁ":"ㄻ", "ㄹㅂ":"ㄼ", "ㄹㅅ":"ㄽ", "ㄹㅌ":"ㄾ", "ㄹㅍ":"ㄿ", "ㄹㅎ":"ㅀ", "ㅂㅅ":"ㅄ" };
+
+var ONLYLONG_MIN = 7 // onlylong
+
 exports.init = function(_DB, _DIC){
 	DB = _DB;
 	DIC = _DIC;
@@ -150,6 +153,10 @@ exports.submit = function(client, text, data){
 		if(composedText) text = composedText;
 	}
 
+	var textlength = text.length
+
+	if(my.opts.onlylong) if(textlength < ONLYLONG_MIN && !client.robot) return client.publish('turnError', { code: 410, value: escapeHTML(originalText) }, true); // onlylong
+
 	if(my.game.chain.indexOf(text) == -1){ // 사용된 단어?
 		l = my.rule.lang;
 		my.game.loading = true;
@@ -247,6 +254,9 @@ exports.readyRobot = function(robot){
 		setTimeout(my.turnRobot, delay, robot, text);
 	}
 };
+function escapeHTML(str) {
+    return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 function decodeMorseInput(input, morseMap){ // LZB - Added Morse
 	var normalized;
 	var tokens;

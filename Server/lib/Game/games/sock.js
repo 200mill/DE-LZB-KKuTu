@@ -32,6 +32,8 @@ const HANGUL_FINAL_COMBINE = { "ㄱㅅ":"ㄳ", "ㄴㅈ":"ㄵ", "ㄴㅎ":"ㄶ", "
 const EN_PHONETIC = { "alpha":"a", "bravo":"b", "charlie":"c", "delta":"d", "echo":"e", "foxtrot":"f", "golf":"g", "hotel":"h", "india":"i", "juliett":"j", "kilo":"k", "lima":"l", "mike":"m", "november":"n", "oscar":"o", "papa":"p", "quebec":"q", "romeo":"r", "sierra":"s", "tango":"t", "uniform":"u", "victor":"v", "whiskey":"w", "x-ray":"x", "yankee":"y", "zulu":"z" };
 const KO_PHONETIC = { "기러기":"ㄱ", "나포리":"ㄴ", "도라지":"ㄷ", "로오마":"ㄹ", "미나리":"ㅁ", "바가지":"ㅂ", "서울":"ㅅ", "잉어":"ㅇ", "지게":"ㅈ", "치마":"ㅊ", "키다리":"ㅋ", "통신":"ㅌ", "파고다":"ㅍ", "한강":"ㅎ", "아버지":"ㅏ", "야자수":"ㅑ", "어머니":"ㅓ", "연못":"ㅕ", "오징어":"ㅗ", "요지경":"ㅛ", "우편":"ㅜ", "유달산":"ㅠ", "은방울":"ㅡ", "이순신":"ㅣ", "앵무새":"ㅐ", "엑스레이":"ㅔ" };
 
+var ONLYLONG_MIN = 7 // onlylong
+
 const LANG_STATS = { 'ko': {
 	reg: /^[가-힣]{2,5}$/,
 	add: [ 'type', Const.KOR_GROUP ],
@@ -153,6 +155,10 @@ exports.submit = function(client, text, data){
 		if(composedText) text = composedText;
 	}
 
+	var textlength = text.length
+
+	if(my.opts.onlylong) if(textlength < ONLYLONG_MIN && !client.robot) return client.chat(escapeHTML(text)); // onlylong
+
 	DB.kkutu[my.rule.lang].findOne([ '_id', text ]).limit([ '_id', true ]).on(function($doc){
 		if(!my.game.board) return;
 		
@@ -208,6 +214,9 @@ exports.getScore = function(text, delay){
 
 	return Math.round(Math.pow(text.length - 1, 1.6) * 8);
 };
+function escapeHTML(str) {
+    return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 function getBoard(words, len){
 	var str = words.join("").split("");
 	var sl = str.length;

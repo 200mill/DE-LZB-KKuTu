@@ -77,6 +77,8 @@
 		"NO": "Cancel",
 		"ITEM_FROM": "Material Item",
 		"PRE_SEASON": "Pre-season",
+		"LEVEL_NEXT": "Next Level",
+		"CURRENT_EXP": "Current Experience",
 
 		"ITEM_TERM": "Limited Time Item",
 		"ITEM_TERMED": "Available until",
@@ -137,7 +139,7 @@
 	},
 	"kkutu": {
 		"title": "Rule the words! KKuTu Online",
-		"version": "2.5.3",
+		"version": "2.5.4",
 		
 		"meta_desc": "Online Word Chain, Shiritori, Initial Quiz, Crossword, Typing Battle! Be the master of vocabulary in KKuTu.",
 		"meta_keys": "kkutu,shiritori,online,web,kungkungtta,english shiritori,typing,word game",

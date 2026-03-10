@@ -246,6 +246,9 @@ exports.getScore = function(text){
 		default: return r;
 	}
 };
+function escapeHTML(str) {
+    return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 // function decodeMorseInput(input, morseMap){ // LZB - Added Morse
 // 	var normalized;
 // 	var tokens;

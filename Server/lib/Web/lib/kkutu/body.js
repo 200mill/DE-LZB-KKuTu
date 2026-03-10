@@ -935,6 +935,11 @@ function updateMe(){
 	// $(".my-image").css('background-image', "url('"+my.profile.image+"')");
 	$(".my-stat-level").replaceWith(getLevelImage(my.data.score).addClass("my-stat-level"));
 	$(".my-stat-name").html(getDisplayName(my));
+	var span = goal - prev;
+	var remainExp = Math.max(0, goal - my.data.score);
+	var expPercent = span > 0 && isFinite(span) ? (my.data.score - prev) / span * 100 : 100;
+	var remainText = isFinite(remainExp) ? commify(Math.round(remainExp)) : "MAX";
+	var percentText = isFinite(expPercent) ? Math.max(0, Math.min(100, expPercent)).toFixed(1) + "%" : "100.0%";
 	$(".my-stat-record").html(L['globalWin'] + " " + gw + L['W']);
 	$(".my-stat-ping").html(commify(my.money) + L['ping']);
 	$(".my-okg .graph-bar").width(($data._playTime % 600000) / 6000 + "%");
@@ -942,6 +947,7 @@ function updateMe(){
 	$(".my-level").html(L['LEVEL'] + " " + lv);
 	$(".my-gauge .graph-bar").width((my.data.score-prev)/(goal-prev)*190);
 	$(".my-gauge-text").html(commify(my.data.score) + " / " + commify(goal));
+	$("#my-gauge-expl").html(L['LEVEL'] + " : " + lv + "<br>" + L['LEVEL_NEXT'] + " : " + remainText + "<br>" + L['CURRENT_EXP'] + " : " + percentText);
 }
 function prettyTime(time){
 	var min = Math.floor(time / 60000) % 60, sec = Math.floor(time * 0.001) % 60;

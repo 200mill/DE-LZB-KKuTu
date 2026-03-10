@@ -275,7 +275,7 @@ exports.submit = function(client, text){
 
 	var textlength = text.length;
 
-	if(my.opts.onlylong) if(textlength <= ONLYLONG_MIN && !client.robot) return client.publish('turnError', { code: 410, value: escapeHTML(originalText) }, true); // onlylong
+	if(my.opts.onlylong) if(textlength < ONLYLONG_MIN && !client.robot) return client.publish('turnError', { code: 410, value: escapeHTML(originalText) }, true); // onlylong
 	
 	if(!isChainable(text, my.mode, my.game.char, my.game.subChar)) return client.chat(escapeHTML(originalText));
 	if(my.game.chain.indexOf(text) != -1) return client.publish('turnError', { code: 409, value: escapeHTML(text) }, true);

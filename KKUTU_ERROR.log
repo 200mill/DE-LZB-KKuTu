@@ -120,4 +120,26 @@ ReferenceError: length is not defined
     at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1427:13)
     at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1413:6)
     at listOnTimeout (node:internal/timers:607:11)
-    at process.processTimers (node:internal/timers:541:7)
+    at process.processTimers (node:internal/timers:541:7):2083 [10/03/2026, 16:14:00] ERROR: ReferenceError: textlength is not defined
+ReferenceError: textlength is not defined
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/sock.js:158:23)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1458:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1427:13)
+    at KKuTu.onClientMessage (/DE-LZB-KKuTu/Server/lib/Game/slave.js:222:11)
+    at WebSocket.<anonymous> (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:319:11)
+    at WebSocket.emit (node:events:508:28)
+    at _receiver.onmessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/WebSocket.js:141:47)
+    at Receiver.dataMessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:389:14)
+    at Receiver.getData (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:330:12)
+    at Receiver.startLoop (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:165:16):2083 [10/03/2026, 16:16:04] ERROR: ReferenceError: escapeHTML is not defined
+ReferenceError: escapeHTML is not defined
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/sock.js:160:125)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1458:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1427:13)
+    at KKuTu.onClientMessage (/DE-LZB-KKuTu/Server/lib/Game/slave.js:222:11)
+    at WebSocket.<anonymous> (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:319:11)
+    at WebSocket.emit (node:events:508:28)
+    at _receiver.onmessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/WebSocket.js:141:47)
+    at Receiver.dataMessage (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:389:14)
+    at Receiver.getData (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:330:12)
+    at Receiver.startLoop (/DE-LZB-KKuTu/Server/lib/node_modules/ws/lib/Receiver.js:165:16)

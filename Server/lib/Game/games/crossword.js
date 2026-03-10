@@ -262,6 +262,9 @@ exports.getScore = function(text, delay){
 		robot._board = Math.floor(Math.random() * my.game.boards.length);
 	}
 };*/
+function escapeHTML(str) {
+    return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 function decodeMorseInput(input, morseMap){ // LZB - Added Morse
 	var normalized;
 	var tokens;

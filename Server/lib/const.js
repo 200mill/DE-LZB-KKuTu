@@ -97,7 +97,7 @@ exports.RULE = { // 규칙
 	},
 	'KKT': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "k32", "unk", "ezm", "wcw", "onl" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "k32", "unk", "ezm", "wcw" ],
 		time: 1,
 		ai: true,
 		big: false,

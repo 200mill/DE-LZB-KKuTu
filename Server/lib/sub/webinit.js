@@ -113,7 +113,7 @@ exports.init = function(Server, shop){
 		var lang = req.params.lang;
 		
 		if(page.substr(0, 2) == "m/") page = page.slice(2);
-		if(page == "portal") page = "kkutu";
+			if(page == "portal" || page == "v2") page = "kkutu";
 		res.send("window.L = "+JSON.stringify(getLanguage(lang, page, shop))+";");
 	});
 	Server.get("/language/flush", function(req, res){

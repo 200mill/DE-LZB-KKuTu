@@ -25,15 +25,17 @@ const { WebhookClient, EmbedBuilder } = require('discord.js');
 let UseDiscordWebhook = GLOBAL.USE_DISCORD_WEBHOOK && GLOBAL.DISCORD_WEBHOOK_URL && GLOBAL.DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/");
 let SEND_WEBHOOK_AT_JLOG = false
 var JLog_wh_nickname = 'JLog Alert';
-
+var MENTION_ON_ERROR = true;
 async function sendDiscordWebhookOnJLog(whurl, type, message, color) {
-	if(!SEND_WEBHOOK_AT_JLOG && UseDiscordWebhook) return;
+	const shouldSendWebhook = UseDiscordWebhook && (SEND_WEBHOOK_AT_JLOG || (type === "Error" && MENTION_ON_ERROR));
+	if (!shouldSendWebhook) return;
+	const shouldMentionHere = type === "Error" && MENTION_ON_ERROR;
 	const dcwhclient = new WebhookClient({ url: whurl });
 	const dcwhembed = new EmbedBuilder()
 		.setTitle("JLog Alert")
 		.addFields(
 			{ name: "Type", value: type },
-			{ name: "Message", value: `\`\`\`${message}\`\`\`` },
+			{ name: "Message", value: `\`\`\`${message}\`\`\` ${shouldMentionHere ? "@here" : ""}` },
 			{ name: "Time", value: new Date().toLocaleString() }
 		)
 		.setColor(color)

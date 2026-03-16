@@ -2860,6 +2860,7 @@ function updateMe(){
 	$(".my-level").html(L['LEVEL'] + " " + lv);
 	$(".my-gauge .graph-bar").width((my.data.score-prev)/(goal-prev)*190);
 	$(".my-gauge-text").html(commify(my.data.score) + " / " + commify(goal));
+	$("#Middle > div.ChatBox.Product > h5").html(L['Chat'].replace(/FA\{([^}]+)\}/g, "<i class='fa fa-$1'></i>") + " | " + L['latency'] + " : " + pingText + "ms");
 	$("#my-gauge-expl").html(L['latency'] + " : " + pingText + "ms <br>" + L['LEVEL'] + " : " + lv + "<br>" + L['LEVEL_NEXT'] + " : " + remainText + "<br>" + L['CURRENT_EXP'] + " : " + percentText);
 }
 function prettyTime(time){

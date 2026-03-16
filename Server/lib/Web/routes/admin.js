@@ -30,6 +30,12 @@ Server.get("/gwalli", function(req, res){
 	req.session.admin = true;
 	page(req, res, "gwalli");
 });
+Server.get("/gwalliv2", function(req, res){
+	if(!checkAdmin(req, res)) return;
+	
+	req.session.admin = true;
+	page(req, res, "gwalliv2");
+});
 Server.get("/gwalli/injeong", function(req, res){
 	if(!checkAdmin(req, res)) return;
 	

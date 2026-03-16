@@ -261,7 +261,7 @@ Server.get("/servers", function(req, res){
 	gameServers.forEach(function(v, i){
 		list[i] = v.seek;
 	});
-	res.send({ list: list, max: Const.KKUTU_MAX });
+	res.send({ list: list, max: Const.KKUTU_MAX, ports: Const.MAIN_PORTS });
 });
 
 //볕뉘 수정 구문 삭제(274~353)

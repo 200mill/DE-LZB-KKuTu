@@ -10,6 +10,7 @@ Server/lib/Web/public/js/**
 Server/lib/sub/auth.json
 Server/lib/sub/global.json
 .vscode
+.vscodes
 
 # db search
 # but html is not used
@@ -26,6 +27,8 @@ Server/private.key
 # log
 Server/web.log
 Server/game.log
+Server/game0.log
+Server/game1.log
 web.log
 game.log
 

@@ -3,6 +3,10 @@
 
 #!/usr/bin/env bash
 export KKT_SV_NAME='DE LZB KKuTu'
-echo "KKT_SV_NAME=${KKT_SV_NAME}"
-sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &' && sleep 1
+KKT_SV_NUMS=2
+echo "KKT_SV_NAME=${KKT_SV_NAME}, KKT_SV_NUMS=${KKT_SV_NUMS}"
+for ((i=0; i<${KKT_SV_NUMS}; i++)); do
+	sh -c "nohup node lib/Game/cluster.js ${i} 1 > game${i}.log 2>&1 &" && sleep 1
+	echo "Started game cluster ${i}"
+done
 sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &'

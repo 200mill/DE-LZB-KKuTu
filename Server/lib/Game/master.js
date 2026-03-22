@@ -21,7 +21,12 @@ var File = require('fs');
 var WebSocket = require('ws');
 var https = require('https');
 var HTTPS_Server;
-// var Heapdump = require("heapdump");
+var Heapdump = null;
+try {
+	Heapdump = require("heapdump");
+} catch (e) {
+	// heapdump is optional; #dump command will be disabled when unavailable.
+}
 var KKuTu = require('./kkutu');
 var GLOBAL = require("../sub/global.json");
 var Const = require("../const");
@@ -110,16 +115,38 @@ function processAdmin(id, value){
 			}
 			return null;
 		case "dump":
-			if(DIC[id]) DIC[id].send('yell', { value: "This feature is not supported..." });
-			/*Heapdump.writeSnapshot("/home/kkutu_memdump_" + Date.now() + ".heapsnapshot", function(err){
+			if(!Heapdump || typeof Heapdump.writeSnapshot !== "function"){
+				if(DIC[id]) DIC[id].send('yell', { value: "Heap dump module is not available on this server." });
+				JLog.warn("Heap dump requested, but heapdump module is not installed.");
+				return null;
+			}
+			if(DIC[id]) DIC[id].send('yell', { value: "Generating heap snapshot..." });
+			Heapdump.writeSnapshot("/home/kkutu_memdump_" + Date.now() + ".heapsnapshot", function(err){
 				if(err){
 					JLog.error("Error when dumping!");
+					if(DIC[id]) DIC[id].send('yell', { value: "Dump failed." });
 					return JLog.error(err.toString());
 				}
 				if(DIC[id]) DIC[id].send('yell', { value: "DUMP OK" });
 				JLog.success("Dumping success.");
-			});*/ // 왜 주석임
+			}); // 왜 주석임
 			return null;
+		case "roommsg":
+			temp = value.match(/^(\d+)\s+(.+)$/);
+			if (temp && ROOM[Number(temp[1])]) {
+			  var rid = Number(temp[1]);
+			  var message = temp[2];
+			var r = JSON.stringify({ type: "yell", value: message });
+			  for (var k in DIC) {
+			    if (DIC[k].place == rid && DIC[k].socket && DIC[k].socket.readyState == 1) {
+			      DIC[k].socket.send(r);
+			    }
+			  }
+			  JLog.info(`Sent message to room #${rid}: ${message}`);
+			} else {
+			  if (DIC[id]) DIC[id].send("yell", { value: "Room not found." });
+			}
+    		return null;
 		/* Enhanced User Block System [S] */
 		case 'ban':
 			try {
@@ -534,7 +561,7 @@ function joinNewUser($c) {
 	// Discord Webhook [S]
 	// JLog.info(`USE_DISCORD_WEBHOOK: ${GLOBAL.USE_DISCORD_WEBHOOK}, ADMIN: ${$c.admin}, URL: ${GLOBAL.DISCORD_WEBHOOK_URL}`);
 	if (UseDiscordWebhook && !$c.admin) {
-		sendDiscordWebhookOnUserJoin(GLOBAL.DISCORD_WEBHOOK_URL, $c.nickname, $c.id, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH); // dfdfdf
+		sendDiscordWebhookOnUserJoin(GLOBAL.DISCORD_WEBHOOK_URL, $c.nickname, $c.id, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 	}
 	// Discord Webhook [E]
 	narrateFriends($c.id, $c.friends, "on");

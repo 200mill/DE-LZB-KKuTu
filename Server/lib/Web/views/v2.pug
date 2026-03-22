@@ -1,3 +1,6 @@
+//- ui v2... 프론트를 과연 건들여도 될까...?
+//- 나중에 차차 개선예정
+
 extends layout
 
 block Subject
@@ -58,7 +61,6 @@ block CSS
 		}
 
 block Middle
-	- var pageTitle = L('title').replace(/\[.+?\]/g, '')
 	div(class='mx-auto max-w-7xl px-4 pb-14 pt-8 sm:px-6 lg:px-8')
 		div(class='relative overflow-hidden rounded-[32px] border border-white/10 shadow-glow')
 			div(class='absolute inset-0 bg-gradient-to-br from-cyan/20 via-transparent to-signal/10')
@@ -66,11 +68,13 @@ block Middle
 			div(class='relative grid gap-6 px-6 py-6 lg:grid-cols-[minmax(0,1.15fr)_420px] lg:px-10 lg:py-10')
 				section(class='flex flex-col justify-between gap-6')
 					div(class='space-y-5')
-						//- div(class='inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-cyan')
-						//- 	span Live Lobby
-						//- 	span(class='h-1 w-1 rounded-full bg-cyan')
-						//- 	span Tailwind UI v2
-						h1(class='max-w-3xl text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl') 글자로 놀자!
+						div(class='inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-cyan') 현재 이 페이지는 업데이트가 불확실성 합니다. 언제든 이 페이지가 폭파할 수 있습니다.
+							span Live Lobby
+							span(class='h-1 w-1 rounded-full bg-cyan')
+							span Tailwind UI v2
+						h1(class='max-w-3xl text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl')
+							| 글자로 놀자!
+							br
 							| 끄투 온라인
 						p(class='max-w-2xl text-sm leading-7 text-slate-300 sm:text-base')
 							| 포털 화면을 다시 정리했습니다. 서버 상태를 실시간으로 확인하고, 여유 있는 서버로 바로 입장할 수 있습니다.

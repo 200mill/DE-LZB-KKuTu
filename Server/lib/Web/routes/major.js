@@ -23,6 +23,11 @@ var GLOBAL	 = require("../../sub/global.json");
 var Const	 = require("../../const");
 var DB		 = require("../db");
 
+var ENHANCE_COST = 160; // 강화할때 드는 돈
+var ENHANCE_SUCCESS_RATE = 0.06; // 6% 누군가가 0.6%를 제안했는데 그렇게 낮출 필요는 없어 보인다, 하지만 어느 게임에서는 서서히 낮아지고 심지어는 파괴가 된다고는 하는데 일단 고정
+var ENHANCE_STEP_G = 0.2; // gEXP, gMNY는 30씩 올라간다 너무 크거나 작지 않을까
+var ENHANCE_STEP_H = 0.13; // hEXP, gEXP는 20씩 올라간다 
+
 function obtain($user, key, value, term, addValue){
 	var now = (new Date()).getTime();
 	
@@ -46,6 +51,17 @@ function consume($user, key, value, force){
 	}else{
 		if(($user.box[key] -= value) <= 0) delete $user.box[key];
 	}
+}
+function getEnhanceableOptions(options){
+	var key;
+	var list = [];
+	
+	if(!options) return list;
+	for(key in options){
+		if(key == "gif") continue;
+		if(key == "gEXP" || key == "hEXP" || key == "gMNY" || key == "hMNY") list.push(key);
+	}
+	return list;
 }
 
 exports.run = function(Server, page){
@@ -313,6 +329,71 @@ Server.post("/payback/:id", function(req, res){
 			$user.money = Number($user.money) + Math.round(0.2 * Number($item.cost));
 			MainDB.users.update([ '_id', uid ]).set([ 'money', $user.money ], [ 'box', $user.box ]).on(function($res){
 				res.send({ result: 200, box: $user.box, money: $user.money });
+			});
+		});
+	});
+});
+Server.post("/enhance/:id", function(req, res){
+	if(!req.session.profile) return res.json({ error: 400 });
+	var uid = req.session.profile.id;
+	var gid = req.params.id;
+	var isDyn = gid.charAt() == '$';
+	
+	MainDB.users.findOne([ '_id', uid ]).limit([ 'money', true ], [ 'box', true ], [ 'equip', true ], [ 'kkutu', true ]).on(function($user){
+		if(!$user) return res.json({ error: 400 });
+		if(!$user.box) $user.box = {};
+		if(!$user.equip) $user.equip = {};
+		if(!$user.kkutu) $user.kkutu = {};
+		if(!$user.kkutu.enhance) $user.kkutu.enhance = {};
+		var enhance = $user.kkutu.enhance;
+		var q = $user.box[gid];
+		
+		if(!q) return res.json({ error: 430 });
+		MainDB.kkutu_shop.findOne([ '_id', isDyn ? gid.slice(0, 4) : gid ]).limit([ 'group', true ], [ 'options', true ]).on(function($item){
+			var part;
+			var opts;
+			var chance;
+			var picked = null;
+			var step = 0;
+			var success;
+			
+			if(!$item) return res.json({ error: 430 });
+			part = $item.group;
+			if(part.substr(0, 3) == "BDG") part = "BDG";
+			if(part == "Mhand"){
+				if($user.equip['Mlhand'] == gid || $user.equip['Mrhand'] == gid) return res.json({ error: 426 });
+			}else{
+				if($user.equip[part] == gid) return res.json({ error: 426 });
+			}
+			opts = getEnhanceableOptions($item.options);
+			if(!opts.length) return res.json({ error: 400 });
+			if(Number($user.money) < ENHANCE_COST) return res.json({ error: 407 });
+			
+			$user.money = Number($user.money) - ENHANCE_COST;
+			chance = Math.random();
+			success = chance < ENHANCE_SUCCESS_RATE;
+			if(success){
+				picked = opts[Math.floor(Math.random() * opts.length)];
+				step = (picked.charAt(0) == 'g') ? ENHANCE_STEP_G : ENHANCE_STEP_H;
+				if(!enhance[gid]) enhance[gid] = {};
+				enhance[gid][picked] = Number(enhance[gid][picked] || 0) + step;
+			}
+			MainDB.users.update([ '_id', uid ]).set(
+				[ 'money', $user.money ],
+				[ 'kkutu', $user.kkutu ]
+			).on(function($res){
+				res.send({
+					result: 200,
+					success: success,
+					option: picked,
+					optionType: picked ? picked.charAt(0) : null,
+					total: picked ? Number(enhance[gid][picked] || 0) : 0,
+					cost: ENHANCE_COST,
+					chance: ENHANCE_SUCCESS_RATE,
+					box: $user.box,
+					money: $user.money,
+					enhance: enhance
+				});
 			});
 		});
 	});

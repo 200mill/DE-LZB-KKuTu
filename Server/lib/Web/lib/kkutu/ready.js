@@ -124,6 +124,9 @@ $(document).ready(function(){
 				lbPrev: $("#lb-prev"),
 			dress: $("#DressDiag"),
 				dressOK: $("#dress-ok"),
+			enhance: $("#EnhanceDiag"),
+				enhanceDo: $("#enhance-do"),
+				enhanceClose: $("#enhance-close"),
 			charFactory: $("#CharFactoryDiag"),
 				cfCompose: $("#cf-compose"),
 			injPick: $("#InjPickDiag"),
@@ -785,6 +788,7 @@ $(document).ready(function(){
 		// alert(L['error_555']);
 		if($data.guest) return fail(421);
 		if($data._gaming) return fail(438);
+		$data._enhance = (($data.users[$data.id] || {}).data || {}).enhance || $data._enhance || {};
 		if(showDialog($stage.dialog.dress)) $.get("/box", function(res){
 			if(res.error) return fail(res.error);
 			
@@ -829,6 +833,56 @@ $(document).ready(function(){
 		$target.addClass("selected");
 		
 		drawMyGoods(type == 'all' || $target.attr('value'));
+	});
+	$("#dress-enhance").on('click', function(e){
+		if($data._gaming) return fail(438);
+		$data._enhance = (($data.users[$data.id] || {}).data || {}).enhance || $data._enhance || {};
+		if(showDialog($stage.dialog.enhance, true)) drawEnhanceGoods();
+	});
+	$stage.dialog.enhanceClose.on('click', function(e){
+		$stage.dialog.enhance.hide();
+	});
+	$stage.dialog.enhanceDo.on('click', function(e){
+		var $target = $(e.currentTarget);
+		var id = $data._enhTarget;
+		
+		if(!id) return alert(L['enhanceNeedSelect']);
+		if($target.is(':disabled')) return;
+		if(!confirm(L['enhanceConfirm'])) return;
+		$target.attr('disabled', true);
+		$.post('/enhance/' + id, function(res){
+			var opt;
+			var txt;
+			
+			$target.attr('disabled', false);
+			if(res.error) return fail(res.error);
+			$data.box = res.box;
+			$data._enhance = res.enhance || {};
+			if(!$data.users[$data.id].data) $data.users[$data.id].data = {};
+			$data.users[$data.id].data.enhance = $data._enhance;
+			$data.users[$data.id].money = res.money;
+			if(res.success && $data._gaming){
+				send('updateEnhance', { enhance: res.enhance });
+			}
+			send('refresh');
+			drawMyDress($data._avGroup);
+			drawEnhanceGoods();
+			updateUI(false);
+			if(res.success){
+				opt = L['OPTS_' + res.option] || res.option;
+				txt = (res.optionType == 'g')
+					? ("+" + (Number(res.total) * 100).toFixed(2) + "%p")
+					: ("+" + Number(res.total).toFixed(2));
+				alert(
+					L['enhanceSuccess']
+						.replace('{V1}', iName(id))
+						.replace('{V2}', opt)
+						.replace('{V3}', txt)
+				);
+			}else{
+				alert(L['enhanceFail']);
+			}
+		});
 	});
 	$("#dress-cf").on('click', function(e){
 		if($data._gaming) return fail(438);

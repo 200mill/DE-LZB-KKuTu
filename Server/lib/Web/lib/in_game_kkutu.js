@@ -179,6 +179,9 @@ $(document).ready(function(){
 				lbPrev: $("#lb-prev"),
 			dress: $("#DressDiag"),
 				dressOK: $("#dress-ok"),
+			enhance: $("#EnhanceDiag"),
+				enhanceDo: $("#enhance-do"),
+				enhanceClose: $("#enhance-close"),
 			charFactory: $("#CharFactoryDiag"),
 				cfCompose: $("#cf-compose"),
 			injPick: $("#InjPickDiag"),
@@ -840,6 +843,7 @@ $(document).ready(function(){
 		// alert(L['error_555']);
 		if($data.guest) return fail(421);
 		if($data._gaming) return fail(438);
+		$data._enhance = (($data.users[$data.id] || {}).data || {}).enhance || $data._enhance || {};
 		if(showDialog($stage.dialog.dress)) $.get("/box", function(res){
 			if(res.error) return fail(res.error);
 			
@@ -884,6 +888,56 @@ $(document).ready(function(){
 		$target.addClass("selected");
 		
 		drawMyGoods(type == 'all' || $target.attr('value'));
+	});
+	$("#dress-enhance").on('click', function(e){
+		if($data._gaming) return fail(438);
+		$data._enhance = (($data.users[$data.id] || {}).data || {}).enhance || $data._enhance || {};
+		if(showDialog($stage.dialog.enhance, true)) drawEnhanceGoods();
+	});
+	$stage.dialog.enhanceClose.on('click', function(e){
+		$stage.dialog.enhance.hide();
+	});
+	$stage.dialog.enhanceDo.on('click', function(e){
+		var $target = $(e.currentTarget);
+		var id = $data._enhTarget;
+		
+		if(!id) return alert(L['enhanceNeedSelect']);
+		if($target.is(':disabled')) return;
+		if(!confirm(L['enhanceConfirm'])) return;
+		$target.attr('disabled', true);
+		$.post('/enhance/' + id, function(res){
+			var opt;
+			var txt;
+			
+			$target.attr('disabled', false);
+			if(res.error) return fail(res.error);
+			$data.box = res.box;
+			$data._enhance = res.enhance || {};
+			if(!$data.users[$data.id].data) $data.users[$data.id].data = {};
+			$data.users[$data.id].data.enhance = $data._enhance;
+			$data.users[$data.id].money = res.money;
+			if(res.success && $data._gaming){
+				send('updateEnhance', { enhance: res.enhance });
+			}
+			send('refresh');
+			drawMyDress($data._avGroup);
+			drawEnhanceGoods();
+			updateUI(false);
+			if(res.success){
+				opt = L['OPTS_' + res.option] || res.option;
+				txt = (res.optionType == 'g')
+					? ("+" + (Number(res.total) * 100).toFixed(2) + "%p")
+					: ("+" + Number(res.total).toFixed(2));
+				alert(
+					L['enhanceSuccess']
+						.replace('{V1}', iName(id))
+						.replace('{V2}', opt)
+						.replace('{V3}', txt)
+				);
+			}else{
+				alert(L['enhanceFail']);
+			}
+		});
 	});
 	$("#dress-cf").on('click', function(e){
 		if($data._gaming) return fail(438);
@@ -2168,7 +2222,10 @@ function onMessage(data, sourceSocket){
 			$data.setUser(data.user.id, data.user);
 			$target = $data.usersR[data.user.id] = data.user;
 			
-			if($target.id == $data.id) loading();
+			if($target.id == $data.id){
+				$data._enhance = ($target.data && $target.data.enhance) || {};
+				loading();
+			}
 			else notice(getDisplayName($target) + L['hasJoined']);
 			updateUserList();
 			break;
@@ -3208,12 +3265,23 @@ function drawMyDress(avGroup){
 	$("#dress-exordial").val(my.exordial);
 	drawMyGoods(avGroup || true);
 }
+function getMyEnhanceMap(){
+	var me = $data.users[$data.id] || {};
+	var fromData = ((me.data || {}).enhance) || {};
+	var fromCache = $data._enhance || {};
+	var merged = $.extend({}, fromData, fromCache);
+	$data._enhance = merged;
+	if(me.data) me.data.enhance = merged;
+	return merged;
+}
 function renderGoods($target, preId, filter, equip, onClick){
 	var $item;
 	var list = [];
 	var obj, q, g, equipped;
+	var enhanceMap = getMyEnhanceMap();
+	var key, options, exOpt, viewObj;
 	var isAll = filter === true;
-	var i;
+	var i, j;
 	
 	$target.empty();
 	if(!equip) equip = {};
@@ -3227,18 +3295,26 @@ function renderGoods($target, preId, filter, equip, onClick){
 	for(i in list){
 		obj = list[i].obj;
 		q = list[i].value;
+		key = list[i].key;
 		g = obj.group;
 		if(g.substr(0, 3) == "BDG") g = "BDG";
-		equipped = (g == "Mhand") ? (equip['Mlhand'] == list[i].key || equip['Mrhand'] == list[i].key) : (equip[g] == list[i].key);
+		equipped = (g == "Mhand") ? (equip['Mlhand'] == key || equip['Mrhand'] == key) : (equip[g] == key);
+		options = obj.options || {};
+		exOpt = (enhanceMap[key]) || {};
 		
 		if(typeof q == "number") q = {
 			value: q
 		};
 		if(!q.hasOwnProperty("value") && !equipped) continue;
 		if(!isAll) if(filter.indexOf(obj.group) == -1) continue;
+		viewObj = $.extend({}, obj, { options: $.extend({}, options) });
+		for(j in exOpt){
+			if(!viewObj.options.hasOwnProperty(j)) continue;
+			viewObj.options[j] = Number(viewObj.options[j] || 0) + Number(exOpt[j] || 0);
+		}
 		$target.append($item = $("<div>").addClass("dress-item")
 			.append(getImage(obj.image).addClass("dress-item-image").html("x" + q.value))
-			.append(explainGoods(obj, equipped, q.expire))
+			.append(explainGoods(viewObj, equipped, q.expire))
 		);
 		$item.attr('id', preId + "-" + obj._id).on('click', onClick);
 		if(equipped) $item.addClass("dress-equipped");
@@ -3292,6 +3368,72 @@ function drawMyGoods(avGroup){
 			});
 		}
 	});
+}
+function drawEnhanceGoods(){
+	var equip = $data.users[$data.id].equip || {};
+	var $target = $("#enhance-goods");
+	var $item;
+	var list = [];
+	var obj, q, g, equipped;
+	var enhanceMap = getMyEnhanceMap();
+	var i, j;
+	var hasOption;
+	
+	$data._enhTarget = null;
+	$("#enhance-selected").html("-");
+	$target.empty();
+	for(i in equip){
+		if(!$data.box.hasOwnProperty(equip[i])) $data.box[equip[i]] = { value: 0 };
+	}
+	for(i in $data.box) list.push({ key: i, obj: iGoods(i), value: $data.box[i] });
+	list.sort(function(a, b){
+		return (a.obj.name < b.obj.name) ? -1 : 1;
+	});
+	for(i in list){
+		obj = list[i].obj;
+		q = list[i].value;
+		var key = list[i].key;
+		g = obj.group;
+		var options = obj.options || {};
+		var exOpt = (enhanceMap[key]) || {};
+		var viewObj;
+		if(g.substr(0, 3) == "BDG") g = "BDG";
+		equipped = (g == "Mhand")
+			? (equip['Mlhand'] == key || equip['Mrhand'] == key)
+			: (equip[g] == key);
+		
+		if(equipped) continue;
+		if(typeof q == "number") q = { value: q };
+		if(!q.hasOwnProperty("value")) continue;
+		hasOption = false;
+		for(j in options){
+			if(j == 'gif') continue;
+			hasOption = true;
+			break;
+		}
+		if(!hasOption) continue;
+		viewObj = $.extend({}, obj, { options: $.extend({}, options) });
+		for(j in exOpt){
+			if(!viewObj.options.hasOwnProperty(j)) continue;
+			viewObj.options[j] = Number(viewObj.options[j] || 0) + Number(exOpt[j] || 0);
+		}
+		$target.append($item = $("<div>").addClass("dress-item")
+			.append(getImage(obj.image).addClass("dress-item-image").html("x" + q.value))
+			.append(explainGoods(viewObj, false, q.expire))
+		);
+		$item.attr('id', "enhance-" + obj._id).on('click', function(e){
+			var $o = $(e.currentTarget);
+			
+			$("#enhance-goods .dress-item").css('outline', "");
+			$o.css('outline', "2px solid #FFB861");
+			$data._enhTarget = $o.attr('id').slice(8);
+			$("#enhance-selected").html(iName($data._enhTarget));
+		});
+	}
+	if(!$target.children().length){
+		$target.append($("<h4>").css('width', "100%").css('padding-top', "12px").html(L['enhanceNoItem']));
+	}
+	global.expl($target);
 }
 function requestEquip(id, isLeft){
 	var my = $data.users[$data.id];

@@ -43,7 +43,7 @@ block Subject
 	//- title= "[DE LZB KKuTu] 글자로 놀자! 끄투 온라인"
 
 block JS
-	script(type='text/javascript', src='/js/in_game_kkutu.min.js')
+	script(type='text/javascript', src='/lib/in_game_kkutu.js')
 	script(src='https://www.google.com/recaptcha/api.js')
 
 block CSS
@@ -408,6 +408,23 @@ block Middle
 			button#dress-ok= L('OK')
 			button#dress-cf= L('charFactory')
 			button(onclick=`alert("${L("paybackHelp")}");`)= L('payback')
+			button#dress-enhance= L('enhance')
+	+Dialog('EnhanceDiag', 520, 360, L('enhance'))
+		div.dialog-bar
+			h4(style='width: 100%;')= L('enhanceHelp')
+		div.dialog-bar
+			h4= L('enhanceCost')
+			h4.dialog-bar-value#enhance-cost= L('enhanceCostValue')
+			h4= L('enhanceChance')
+			h4.dialog-bar-value#enhance-chance= L('enhanceChanceValue')
+		div.dialog-bar
+			h4= L('enhanceSelected')
+			h4.dialog-bar-value#enhance-selected -
+		div.dialog-bar(style='height: 170px;')
+			div#enhance-goods.goods-box(style='width: 100%; height: 170px;')
+		div.dialog-bar.tail-button
+			button#enhance-close= L('OK')
+			button#enhance-do= L('enhanceTry')
 	+Dialog('CharFactoryDiag', 500, 410, L('charFactory'))
 		div.dialog-bar(style='width: 300px;')
 			div#cf-tray

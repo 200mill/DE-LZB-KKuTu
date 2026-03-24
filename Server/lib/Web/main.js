@@ -64,6 +64,7 @@ JLog.info("<< KKuTu Web >>");
 Server.set('views', __dirname + "/views");
 Server.set('view engine', "pug");
 Server.use(Express.static(__dirname + "/public"));
+Server.use("/lib", Express.static(__dirname + "/lib"));
 Server.use(Parser.urlencoded({ extended: true }));
 Server.use(Exession({
 

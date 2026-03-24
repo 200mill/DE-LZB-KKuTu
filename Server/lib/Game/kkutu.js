@@ -179,6 +179,7 @@ exports.Data = function(data){
 	this.score = data.score || 0;
 	this.playTime = data.playTime || 0;
 	this.connectDate = data.connectDate || 0;
+	this.enhance = data.enhance || {};
 	this.record = {};
 	for(i in Const.GAME_TYPE){
 		this.record[j = Const.GAME_TYPE[i]] = data.record ? (data.record[Const.GAME_TYPE[i]] || [0, 0, 0, 0]) : [0, 0, 0, 0];
@@ -445,7 +446,9 @@ exports.Client = function(socket, profile, sid){
 		
 		if(my.guest){
 			my.equip = {};
+			my.enhance = {};
 			my.data = new exports.Data();
+			my.data.enhance = {};
 			my.money = 0;
 			my.friends = {};
 			
@@ -483,6 +486,7 @@ exports.Client = function(socket, profile, sid){
 			my.equip = $user.equip || {};
 			my.box = $user.box || {};
 			my.data = new exports.Data($user.kkutu);
+			my.enhance = my.data.enhance || {};
 			my.money = Number($user.money);
 			my.friends = $user.friends || {};
 			if(first){
@@ -514,6 +518,7 @@ exports.Client = function(socket, profile, sid){
 			R.go({ id: my.id, prev: 0 });
 			return R;
 		}
+		if(my.data && my.enhance !== my.data.enhance) my.data.enhance = my.enhance;
 		DB.users.upsert([ '_id', my.id ]).set(
 			!isNaN(my.money) ? [ 'money', my.money ] : undefined,
 			(my.data && !isNaN(my.data.score)) ? [ 'kkutu', my.data ] : undefined,
@@ -786,15 +791,19 @@ exports.Client = function(socket, profile, sid){
 		my.checkExpire();
 		for(i in my.equip){
 			$obj = SHOP[my.equip[i]];
+			var exOpt = ((my.enhance || {})[my.equip[i]]) || {};
+			var optValue;
 			if(!$obj) continue;
 			if(!$obj.options) continue;
 			for(j in $obj.options){
-				if(j == "gEXP") rw.score += rw._score * $obj.options[j];
-				else if(j == "hEXP") rw.score += $obj.options[j] * pm;
-				else if(j == "gMNY") rw.money += rw._money * $obj.options[j];
-				else if(j == "hMNY") rw.money += $obj.options[j] * pm;
+				if(j == "gif") continue;
+				optValue = Number($obj.options[j] || 0) + Number(exOpt[j] || 0);
+				if(j == "gEXP") rw.score += rw._score * optValue;
+				else if(j == "hEXP") rw.score += optValue * pm;
+				else if(j == "gMNY") rw.money += rw._money * optValue;
+				else if(j == "hMNY") rw.money += optValue * pm;
 				else continue;
-				rw._blog.push("q" + j + $obj.options[j]);
+				rw._blog.push("q" + j + optValue);
 			}
 		}
 		if(rw.together && my.okgCount > 0){

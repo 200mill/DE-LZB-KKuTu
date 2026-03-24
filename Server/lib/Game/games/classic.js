@@ -757,9 +757,14 @@ function decodePhoneticInput(input, map){ // LZB - Added Phonetic
 	normalized = input.trim().toLowerCase();
 	if(!normalized) return null;
 
+	normalized = normalized.replace(/[|/]/g, " / ");
 	tokens = normalized.split(/\s+/);
 	for(i=0; i<tokens.length; i++){
 		token = tokens[i];
+		if(token == "/"){
+			if(output && output.charAt(output.length - 1) != "/") output += "/";
+			continue;
+		}
 		ch = map[token];
 		if(!ch) return null;
 		output += ch;
@@ -768,13 +773,23 @@ function decodePhoneticInput(input, map){ // LZB - Added Phonetic
 	return output || null;
 }
 function composeHangulInput(input){
+	var parts;
+	var out = "";
+	var i;
+
+	if(typeof input !== "string") return input;
+	parts = input.split("/");
+	for(i=0; i<parts.length; i++) out += composeHangulChunk(parts[i].trim());
+
+	return out;
+}
+function composeHangulChunk(input){
 	var chars;
 	var out = "";
 	var i = 0;
 	var initial, medialRes, finalRes;
 	var lead, leadPair, leadStep, vowel, tail;
 
-	if(typeof input !== "string") return input;
 	chars = Array.from(input);
 
 	while(i < chars.length){

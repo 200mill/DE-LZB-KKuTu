@@ -58,7 +58,7 @@ cat /sys/kernel/debug/pwm | grep cooling_fan
 # is kkutu alive
 if pgrep -f "Server/lib/Game/cluster.js" >/dev/null; then
         printf "\nKKuTu Game ${GRE}●${NOC}\n"
-        tail -n 7 game.log
+        tail -n 7 game0.log
 else
         printf "\nKKuTu Game ${RED}●${NOC}\n"
 fi

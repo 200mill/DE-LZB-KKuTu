@@ -33,6 +33,7 @@ const EN_PHONETIC = { "alpha":"a", "bravo":"b", "charlie":"c", "delta":"d", "ech
 const KO_PHONETIC = { "기러기":"ㄱ", "나포리":"ㄴ", "도라지":"ㄷ", "로오마":"ㄹ", "미나리":"ㅁ", "바가지":"ㅂ", "서울":"ㅅ", "잉어":"ㅇ", "지게":"ㅈ", "치마":"ㅊ", "키다리":"ㅋ", "통신":"ㅌ", "파고다":"ㅍ", "한강":"ㅎ", "아버지":"ㅏ", "야자수":"ㅑ", "어머니":"ㅓ", "연못":"ㅕ", "오징어":"ㅗ", "요지경":"ㅛ", "우편":"ㅜ", "유달산":"ㅠ", "은방울":"ㅡ", "이순신":"ㅣ", "앵무새":"ㅐ", "엑스레이":"ㅔ" };
 
 var ONLYLONG_MIN = 7 // onlylong
+var ONLYSHORT_MAX = 5 // onlyshort
 
 const LANG_STATS = { 'ko': {
 	reg: /^[가-힣]{2,5}$/,
@@ -158,6 +159,8 @@ exports.submit = function(client, text, data){
 	var textlength = text.length
 
 	if(my.opts.onlylong) if(textlength < ONLYLONG_MIN && !client.robot) return client.chat(escapeHTML(text)); // onlylong
+	if(my.opts.onlyshort && !my.opts.onlylong) if(textlength > ONLYSHORT_MAX && !client.robot) return client.publish('turnError', { code: 411, value: escapeHTML(originalText) }, true); // onlyshort
+
 
 	DB.kkutu[my.rule.lang].findOne([ '_id', text ]).limit([ '_id', true ]).on(function($doc){
 		if(!my.game.board) return;
@@ -254,20 +257,25 @@ function decodeMorseInput(input, morseMap){ // LZB - Added Morse
 
 	return output || null;
 }
-function decodePhoneticInput(input){ // LZB - Added Phonetic
+function decodePhoneticInput(input, map){ // LZB - Added Phonetic
 	var normalized;
 	var tokens;
 	var output = "";
 	var i, token, ch;
-	var map = EN_PHONETIC;
+	var map = map || EN_PHONETIC;
 
 	if(typeof input !== "string") return null;
 	normalized = input.trim().toLowerCase();
 	if(!normalized) return null;
 
+	normalized = normalized.replace(/[|/]/g, " / ");
 	tokens = normalized.split(/\s+/);
 	for(i=0; i<tokens.length; i++){
 		token = tokens[i];
+		if(token == "/"){
+			if(output && output.charAt(output.length - 1) != "/") output += "/";
+			continue;
+		}
 		ch = map[token];
 		if(!ch) return null;
 		output += ch;
@@ -276,13 +284,23 @@ function decodePhoneticInput(input){ // LZB - Added Phonetic
 	return output || null;
 }
 function composeHangulInput(input){
+	var parts;
+	var out = "";
+	var i;
+
+	if(typeof input !== "string") return input;
+	parts = input.split("/");
+	for(i=0; i<parts.length; i++) out += composeHangulChunk(parts[i].trim());
+
+	return out;
+}
+function composeHangulChunk(input){
 	var chars;
 	var out = "";
 	var i = 0;
 	var initial, medialRes, finalRes;
 	var lead, leadPair, leadStep, vowel, tail;
 
-	if(typeof input !== "string") return input;
 	chars = Array.from(input);
 
 	while(i < chars.length){

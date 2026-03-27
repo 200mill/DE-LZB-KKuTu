@@ -370,11 +370,15 @@ exports.submit = function(client, text){
 				denied(406);
 			} else if (my.opts.loanword && ($doc.flag & Const.KOR_FLAG.LOANWORD)) {
 				denied(405);
+			} else if (my.opts.nonoinjeong && !($doc.flag & Const.KOR_FLAG.INJEONG)) {
+				denied(412);
 			} else {
 				preApproved();
 			}
 		}else{
-			if(my.opts.unknown){
+			if(my.opts.nonoinjeong){
+				denied(412);
+			}else if(my.opts.unknown){
 				if(text.length < 2){
 					denied();
 				}else{
@@ -466,7 +470,7 @@ exports.readyRobot = function(robot){
 		}else denied();
 	});
 	function denied(){
-		if(my.opts.unknown && my.game.char && !my.opts.manner){ // 비사전 단어 (그냥 잇기가 불가할때 랜덤 글자), 매너 해결 
+		if(my.opts.unknown && !my.opts.nonoinjeong && my.game.char && !my.opts.manner){ // 비사전 단어 (그냥 잇기가 불가할때 랜덤 글자), 매너 해결 
 			var char = my.game.char;
 			var subChar = my.game.subChar;
 			// var len = 2 + Math.floor(Math.random() * 3);
@@ -668,7 +672,9 @@ function getAuto(char, subc, type){
 		
 		// if(!my.opts.injeong) aqs.push([ 'flag', { '$nand': Const.KOR_FLAG.INJEONG } ]);
 		if(my.rule.lang == "ko"){
-			if(my.opts.injeong) {
+			if(my.opts.nonoinjeong) {
+				aqs.push([ 'flag', { '$not': { '$nand': Const.KOR_FLAG.INJEONG } } ]);
+			} else if(my.opts.injeong) {
                 aqs.push(['flag', { '$gte': 0}]);
             } else {
                 aqs.push(['flag', { '$nand': Const.KOR_FLAG.INJEONG } ]);

@@ -206,6 +206,7 @@ exports.submit = function(client, text, data){
 				}
 				if($doc){
 					if(!my.opts.injeong && ($doc.flag & Const.KOR_FLAG.INJEONG)) denied();
+					else if(my.opts.nonoinjeong && !($doc.flag & Const.KOR_FLAG.INJEONG)) denied(412);
 					else if(my.opts.strict && (!$doc.type.match(Const.KOR_STRICT) || $doc.flag >= 4)) denied(406);
 					else if(my.opts.loanword && ($doc.flag & Const.KOR_FLAG.LOANWORD)) denied(405);
 					else preApproved();
@@ -441,7 +442,8 @@ function getAuto(theme, type){
 	var raiser;
 	var lst = false;
 	
-	if(!my.opts.injeong) aqs.push([ 'flag', { '$nand': Const.KOR_FLAG.INJEONG } ]);
+	if(my.opts.nonoinjeong) aqs.push([ 'flag', { '$not': { '$nand': Const.KOR_FLAG.INJEONG } } ]);
+	else if(!my.opts.injeong) aqs.push([ 'flag', { '$nand': Const.KOR_FLAG.INJEONG } ]);
 	if(my.opts.loanword) aqs.push([ 'flag', { '$nand': Const.KOR_FLAG.LOANWORD } ]);
 	if(my.opts.strict) aqs.push([ 'type', Const.KOR_STRICT ], [ 'flag', { $lte: 3 } ]);
 	else aqs.push([ 'type', Const.KOR_GROUP ]);

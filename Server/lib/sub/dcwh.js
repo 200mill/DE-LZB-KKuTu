@@ -253,7 +253,7 @@ exports.SendWebhookOnRoomLeave = function(roomid, targetid, removed) {
         JLog.error(`Error on sending Discord webhook: ${error}`);
     });
 }
-exports.sendDiscordWebhookOnUserJoin = function(whurl, usernickname, userid, iseng) {
+exports.sendDiscordWebhookOnUserJoin = function(usernickname, userid, iseng) {
     // JLog.info(`${whurl} ${usernickname} ${userid} ${iseng}`);
     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
     const embed = new EmbedBuilder()
@@ -261,6 +261,66 @@ exports.sendDiscordWebhookOnUserJoin = function(whurl, usernickname, userid, ise
         // .setThumbnail() // user avatar but how to??
         .setDescription(`**${usernickname || userid}** (${userid})`)
         .setColor(0x00AE86)
+        .setTimestamp();
+    webhookClient.send({
+            username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',
+            avatarURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png',
+            embeds: [embed]
+        }).catch(function(error){
+            JLog.error(`Error on sending Discord webhook: ${error}`);
+        });
+}
+exports.sendDiscordWebhookOnUserBan = function(userid, reason, day, iseng) {
+    const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
+    const embed = new EmbedBuilder()
+        .setTitle(iseng ? "A user has been banned." : "사용자가 차단되었습니다.")
+        .setDescription(iseng ? `**${userid}**\nReason: ${reason}\nDuration: ${day} day(s)` : `**${userid}**\n사유: ${reason}\n기간: ${day}일`)
+        .setColor(0xFF0000)
+        .setTimestamp();
+    webhookClient.send({
+            username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',
+            avatarURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png',
+            embeds: [embed]
+        }).catch(function(error){
+            JLog.error(`Error on sending Discord webhook: ${error}`);
+        });
+}
+exports.sendDiscordWebhookOnIPBan = function(ipAddr, reason, day, iseng) {
+    const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
+    const embed = new EmbedBuilder()
+        .setTitle(iseng ? "An IP address has been banned." : "IP 주소가 차단되었습니다.")
+        .setDescription(iseng ? `**${ipAddr}**\nReason: ${reason}\nDuration: ${day} day(s)` : `**${ipAddr}**\n사유: ${reason}\n기간: ${day}일`)
+        .setColor(0xFF0000)
+        .setTimestamp();
+    webhookClient.send({
+            username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',
+            avatarURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png',
+            embeds: [embed]
+        }).catch(function(error){
+            JLog.error(`Error on sending Discord webhook: ${error}`);
+        });
+}
+exports.sendDiscordWebhookOnUserUnban = function(userid, iseng) {
+    const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
+    const embed = new EmbedBuilder()
+        .setTitle(iseng ? "A user has been unbanned." : "사용자 차단이 해제되었습니다.")
+        .setDescription(`**${userid}**`)
+        .setColor(0x00FF00)
+        .setTimestamp();
+    webhookClient.send({
+            username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',
+            avatarURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png',
+            embeds: [embed]
+        }).catch(function(error){
+            JLog.error(`Error on sending Discord webhook: ${error}`);
+        });
+}
+exports.sendDiscordWebhookOnIPUnban = function(ipAddr, iseng) {
+    const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
+    const embed = new EmbedBuilder()
+        .setTitle(iseng ? "An IP address has been unbanned." : "IP 주소 차단이 해제되었습니다.")
+        .setDescription(`**${ipAddr}**`)
+        .setColor(0x00FF00)
         .setTimestamp();
     webhookClient.send({
             username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',

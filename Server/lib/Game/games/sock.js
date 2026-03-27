@@ -170,6 +170,10 @@ exports.submit = function(client, text, data){
 		var wl;
 		
 		if($doc){
+			if(my.opts.nonoinjeong && !($doc.flag & Const.KOR_FLAG.INJEONG)){
+				client.publish('turnError', { code: 412, value: escapeHTML(text) }, true);
+				return;
+			}
 			wl = $doc._id.split('');
 			for(i in wl){
 				newBoard = newBoard.replace(wl[i], "");

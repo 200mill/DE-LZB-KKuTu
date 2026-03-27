@@ -26,7 +26,7 @@ var DB		 = require("../db");
 var ENHANCE_COST = 160; // 강화할때 드는 돈
 var ENHANCE_SUCCESS_RATE = 0.06; // 6% 누군가가 0.6%를 제안했는데 그렇게 낮출 필요는 없어 보인다, 하지만 어느 게임에서는 서서히 낮아지고 심지어는 파괴가 된다고는 하는데 일단 고정
 var ENHANCE_STEP_G = 0.2; // gEXP, gMNY는 30씩 올라간다 너무 크거나 작지 않을까
-var ENHANCE_STEP_H = 0.13; // hEXP, gEXP는 20씩 올라간다 
+var ENHANCE_STEP_H = 150; // hEXP, gEXP는 150씩 올라간다 
 
 function obtain($user, key, value, term, addValue){
 	var now = (new Date()).getTime();

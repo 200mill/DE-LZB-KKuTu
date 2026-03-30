@@ -153,4 +153,51 @@ TypeError: Cannot read properties of null (reading '_id')
     at Client._handleReadyForQuery (/DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/client.js:361:19)
     at Connection.emit (node:events:508:28)
     at /DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/connection.js:115:12
+    at Parser.parse (/DE-LZB-KKuTu/Server/lib/node_modules/pg-protocol/dist/parser.js:38:17):2083 [28/03/2026, 09:37:37] ERROR: ReferenceError: HANGUL_INITIAL_COMBINE is not defined
+ReferenceError: HANGUL_INITIAL_COMBINE is not defined
+    at composeHangulChunk (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:351:3)
+    at composeHangulInput (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:336:39)
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:165:18)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1474:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1443:13)
+    at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1429:6)
+    at listOnTimeout (node:internal/timers:607:11)
+    at process.processTimers (node:internal/timers:541:7):2083 [28/03/2026, 09:38:23] ERROR: ReferenceError: HANGUL_INITIAL_COMBINE is not defined
+ReferenceError: HANGUL_INITIAL_COMBINE is not defined
+    at composeHangulChunk (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:351:3)
+    at composeHangulInput (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:336:39)
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:165:18)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1474:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1443:13)
+    at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1429:6)
+    at listOnTimeout (node:internal/timers:607:11)
+    at process.processTimers (node:internal/timers:541:7):2083 [28/03/2026, 09:39:42] ERROR: ReferenceError: HANGUL_INITIAL_COMBINE is not defined
+ReferenceError: HANGUL_INITIAL_COMBINE is not defined
+    at composeHangulChunk (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:351:3)
+    at composeHangulInput (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:336:39)
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:165:18)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1474:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1443:13)
+    at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1429:6)
+    at listOnTimeout (node:internal/timers:607:11)
+    at process.processTimers (node:internal/timers:541:7):2083 [28/03/2026, 15:51:25] ERROR: ReferenceError: HANGUL_INITIAL_COMBINE is not defined
+ReferenceError: HANGUL_INITIAL_COMBINE is not defined
+    at composeHangulChunk (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:351:3)
+    at composeHangulInput (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:336:39)
+    at exports.submit (/DE-LZB-KKuTu/Server/lib/Game/games/daneo.js:165:18)
+    at my.route.my.routeSync (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1474:13)
+    at my.submit (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1443:13)
+    at my.turnRobot [as _onTimeout] (/DE-LZB-KKuTu/Server/lib/Game/kkutu.js:1429:6)
+    at listOnTimeout (node:internal/timers:607:11)
+    at process.processTimers (node:internal/timers:541:7):2083 [28/03/2026, 18:07:51] ERROR: TypeError: Cannot read properties of null (reading '_id')
+TypeError: Cannot read properties of null (reading '_id')
+    at /DE-LZB-KKuTu/Server/lib/Game/games/jaqwi.js:72:27
+    at exports.Tail.go (/DE-LZB-KKuTu/Server/lib/sub/lizard.js:43:16)
+    at /DE-LZB-KKuTu/Server/lib/Game/games/jaqwi.js:428:21
+    at callback (/DE-LZB-KKuTu/Server/lib/sub/collection.js:316:13)
+    at Query.preCB (/DE-LZB-KKuTu/Server/lib/sub/collection.js:298:6)
+    at Query.handleReadyForQuery (/DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/query.js:142:14)
+    at Client._handleReadyForQuery (/DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/client.js:361:19)
+    at Connection.emit (node:events:508:28)
+    at /DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/connection.js:115:12
     at Parser.parse (/DE-LZB-KKuTu/Server/lib/node_modules/pg-protocol/dist/parser.js:38:17)

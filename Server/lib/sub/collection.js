@@ -125,24 +125,31 @@ function sqlSelect(q){
 }
 function sqlWhere(q){
 	if(!Object.keys(q).length) return "TRUE";
+
+	function whereKey(key){
+		// Support SQL function expressions such as length(_id) in query keys.
+		if(typeof key == 'string' && key.indexOf('(') !== -1 && key.indexOf(')') !== -1) return key;
+		return Escape("%K", key);
+	}
 	
 	function wSearch(item){
 		var c;
+		var k = whereKey(item[0]);
 		
 		if((c = item[1]['$not']) !== undefined) return Escape("NOT (%s)", wSearch([ item[0], c ]));
-		if((c = item[1]['$nand']) !== undefined) return Escape("%K & %V = 0", item[0], c);
-		if((c = item[1]['$lte']) !== undefined) return Escape("%K<=%V", item[0], c);
-		if((c = item[1]['$gte']) !== undefined) return Escape("%K>=%V", item[0], c);
+		if((c = item[1]['$nand']) !== undefined) return Escape("%s & %V = 0", k, c);
+		if((c = item[1]['$lte']) !== undefined) return Escape("%s<=%V", k, c);
+		if((c = item[1]['$gte']) !== undefined) return Escape("%s>=%V", k, c);
 		if((c = item[1]['$in']) !== undefined){
 			if(!c.length) return "FALSE";
-			return Escape("%I IN (%s)", item[0], c.map(function(i){ return Escape("%V", i); }).join(','));
+			return Escape("%s IN (%s)", k, c.map(function(i){ return Escape("%V", i); }).join(','));
 		}
 		if((c = item[1]['$nin']) !== undefined){
 			if(!c.length) return "TRUE";
-			return Escape("%I NOT IN (%s)", item[0], c.map(function(i){ return Escape("%V", i); }).join(','));
+			return Escape("%s NOT IN (%s)", k, c.map(function(i){ return Escape("%V", i); }).join(','));
 		}
-		if(item[1] instanceof RegExp) return Escape("%K ~ %L", item[0], item[1].source);
-		return Escape("%K=%V", item[0], item[1]);
+		if(item[1] instanceof RegExp) return Escape("%s ~ %L", k, item[1].source);
+		return Escape("%s=%V", k, item[1]);
 	}
 	return q.map(wSearch).join(' AND ');
 }

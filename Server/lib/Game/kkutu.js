@@ -21,6 +21,7 @@ var Cluster = require("cluster");
 var Const = require('../const');
 var Lizard = require('../sub/lizard');
 var JLog = require('../sub/jjlog');
+const DiffMatchPatch = require("diff-match-patch");
 const { set } = require("grunt");
 // Discord Webhook [S]
 var GLOBAL = require('../sub/global.json');
@@ -38,6 +39,7 @@ var guestProfiles = [];
 var CHAN;
 var channel = process.env['CHANNEL'] || 0;
 
+const differ = new DiffMatchPatch();
 const NUM_SLAVES = 4;
 const GUEST_IMAGE = "/img/kkutu/guest.png";
 const MAX_OKG = 18;
@@ -308,7 +310,8 @@ exports.Client = function(socket, profile, sid){
 			exports.onClientMessage(my, data);
 			return;
 		}
-		JLog.log(`Chan @${channel} Msg #${my.id}: ${msg}`);
+		// JLog.log(`Chan @${channel} Msg #${my.id}: ${msg}`);
+		JLog.log(`Chan @${channel} Msg #${my.id}: ${data.type == 'drawingCanvas' ? JSON.stringify({type: data.type, diffed: data.diffed}) : msg}`);
 		if(data.type == "talk" && !data.relay && UseDiscordWebhook && !my.admin){ // dcwh
 			try{
 				DCWH.SendWebhookOnTalk(my.profile, data.value, my.place, my.robot);
@@ -339,6 +342,24 @@ exports.Client = function(socket, profile, sid){
 		}
 	};
 	*/
+	my.drawingCanvas = function(msg) {
+		let $room = ROOM[my.place];
+
+		if(!$room) return;
+		if(!$room.gaming) return;
+		if($room.rule.rule != 'Drawing') return;
+
+		$room.drawingCanvas(msg, my.id);
+	};
+	my.canvasNotValid = function(msg) {
+		let $room = ROOM[my.place];
+
+		if(!$room) return;
+		if(!$room.gaming) return;
+		if($room.rule.rule != 'Drawing') return;
+
+		my.send('drawCanvas', { diffed: false, data: $room.fullImageString })
+	};
 	my.getData = function(gaming){
 		var o = {
 			id: my.id,
@@ -1149,6 +1170,36 @@ exports.Room = function(room, channel){
 		}
 		return false;
 	};
+	my.drawingCanvas = function(msg, userid) { //msg -> Message, userid -> sender ID
+		if(my.game.painter == userid) { // verify this data sended by painter
+			let diffed = true;
+			let diff;
+			let diffResult;
+
+			// { type: "drawingCanvas", diffed: Boolean, data: String }
+			if (msg.diffed) {
+				try {
+					diff = differ.patch_fromText(msg.data);
+					diffResult = differ.patch_apply(diff, my.game.fullImageString);
+
+					if(Array.isArray(diffResult[1]) && diffResult[1].every(function(v){ return v === true; })) {
+						my.game.fullImageString = diffResult[0];
+					} else {
+						my.byMaster('diffNotValid', {}, true);
+						return;
+					}
+				} catch (e) {
+					my.byMaster('diffNotValid', {}, true);
+					return;
+				}
+			} else {
+				my.game.fullImageString = msg.data;
+				diffed = false;
+			}
+
+			my.byMaster('drawCanvas', { diffed, data: msg.data }, true);
+		}
+	};
 	my.ready = function(){
 		var i, all = true;
 		var len = 0;
@@ -1570,6 +1621,12 @@ function getRewards(mode, score, bonus, rank, all, ss){
 			break;
 		case 'ESS':
 			rw.score += score * 0.22;
+			break;
+		case 'KDG':
+			rw.score += score * 0.57;
+			break;
+		case 'EDG':
+			rw.score += score * 0.57;
 			break;
 		default:
 			break;

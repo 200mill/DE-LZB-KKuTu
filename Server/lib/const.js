@@ -52,6 +52,8 @@ exports.OPTIONS = {
 	'onl': { name: "Onlylong" },
 	'ons': { name: "Onlyshort" },
 	'nni': { name: "NoNoInjeong"},
+	'ulm': { name: "Unlimited" },
+	'sht': { name: "Short" }
 }; // 특수규칙 옵션
 exports.MOREMI_PART = [ 'back', 'eye', 'mouth', 'shoes', 'clothes', 'head', 'lhand', 'rhand', 'front' ];
 exports.CATEGORIES = [ "all", "spec", "skin", "badge", "head", "eye", "mouth", "clothes", "hs", "back" ];
@@ -70,6 +72,9 @@ exports.GROUPS = {
 	'hs': [ "Mhand", "Mshoes" ],
 	'back': [ "Mback", "Mfront" ]
 };
+/**
+ * @TODO 비사전의 무언가 제한
+ */
 exports.RULE = { // 규칙
 /*
 	유형: { lang: 언어,
@@ -83,7 +88,7 @@ exports.RULE = { // 규칙
 */
 	'EKT': { lang: "en",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "unk", "wcw", "wpn", "onl", "ons", "nni" ],
+		opts: [ "man", "ext", "mis", /* "unk" */, "wcw", "wpn", "onl", "ons", "nni" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -91,7 +96,7 @@ exports.RULE = { // 규칙
 	},
 	'ESH': { lang: "en",
 		rule: "Classic",
-		opts: [ "ext", "mis", "unk", "wcw", "wpn", "onl", "ons", "nni" ],
+		opts: [ "ext", "mis", /* "unk" */, "wcw", "wpn", "onl", "ons", "nni" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -99,7 +104,7 @@ exports.RULE = { // 규칙
 	},
 	'KKT': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "k32", "unk", "ezm", "wcw", "wpn", "onl", "ons", "nni" ],
+		opts: [ "man", "ext", "mis", "loa", "str", "k32", /* "unk" */, "ezm", "wcw", "wpn", "onl", "ons", "nni" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -107,7 +112,7 @@ exports.RULE = { // 규칙
 	},
 	'KSH': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm", "wcw", "wpn", "onl", "onl", "ons", "nni" ],
+		opts: [ "man", "ext", "mis", "loa", "str", /* "unk" */, "ezm", "wcw", "wpn", "onl", "onl", "ons", "nni" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -147,7 +152,7 @@ exports.RULE = { // 규칙
 	},
 	'KAP': { lang: "ko",
 		rule: "Classic",
-		opts: [ "man", "ext", "mis", "loa", "str", "unk", "ezm", "wcw", "wpn", "onl", "ons", "nni" ],
+		opts: [ "man", "ext", "mis", "loa", "str", /* "unk" */, "ezm", "wcw", "wpn", "onl", "ons", "nni" ],
 		time: 1,
 		ai: true,
 		big: false,
@@ -193,6 +198,22 @@ exports.RULE = { // 규칙
 		ai: false,
 		big: true,
 		ewq: false
+	},
+	'KDG': { lang: "ko",
+		rule: "Drawing",
+		opts: [ "ijp", "sht", "ulm" ],
+		time: 1,
+		ai: false,
+		big: true,
+		ewq: true
+	},
+	'EDG': { lang: "en",
+		rule: "Drawing",
+		opts: [ "ijp", "sht", "ulm" ],
+		time: 1,
+		ai: false,
+		big: true,
+		ewq: true
 	}
 };
 exports.getPreScore = function(text, chain, tr){
@@ -206,7 +227,7 @@ exports.EXAMPLE_TITLE = {
 	'ko': "가나다라마바사아자차",
 	'en': "abcdefghij"
 };
-exports.INIT_SOUNDS = [ "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ" ];
+exports.INIT_SOUNDS = [ "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ", "○" ];
 exports.MISSION_ko = [ "가", "나", "다", "라", "마", "바", "사", "아", "자", "차", "카", "타", "파", "하" ];
 exports.EZ_MISSION_ko = [ "이", "기", "자", "도", "지", "사", "리", "스", "트", "법" ]; // TODO - Add easy missions - OK
 exports.MISSION_en = [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" ];

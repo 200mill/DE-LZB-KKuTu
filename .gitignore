@@ -7,6 +7,8 @@ Server/lib/Web/public/js/**
 !Server/lib/Web/public/js/jquery.js
 !Server/lib/Web/public/js/in_search.js
 !Server/lib/Web/public/js/in_kkutu.min.js
+!Server/lib/Web/public/js/fabric.min.js
+!Server/lib/Web/public/js/diff-match-patch-compressed.js
 Server/lib/sub/auth.json
 Server/lib/sub/global.json
 .vscode

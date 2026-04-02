@@ -179,6 +179,7 @@ iframe{
 	.ranking-3 td:first-child{ font-weight: bold; background-color: chocolate; }
 .moremi{
 	position: relative;
+	/* transform: rotate(180deg); for 4/1 */
 }
 .moremi img{
 	position: absolute;

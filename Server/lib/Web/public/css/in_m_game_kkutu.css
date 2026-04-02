@@ -177,6 +177,7 @@ iframe{
 	.ranking-image{ margin-right: 2px; width: 18px; height: 18px; }
 .moremi{
 	position: relative;
+	/* transform: rotate(180deg); for 4/1 */
 }
 .moremi img{
 	position: absolute;

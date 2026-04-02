@@ -488,7 +488,8 @@ block Middle
 						span#drawing-title
 				div(style="width: 100%")
 					label(for="drawing-line-width")= L('drawingLineWidth')
-					input#drawing-line-width(type="range", value="4", min="1", max="20")
+					//- VVVV ws는 최대 데이터 크기가 있나보다 최대를 잘 제한하자
+					input#drawing-line-width(type="range", value="4", min="1", max="15")
 				.palette
 					div
 						button.button-color#color-red

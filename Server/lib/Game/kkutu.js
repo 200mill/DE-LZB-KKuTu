@@ -311,7 +311,13 @@ exports.Client = function(socket, profile, sid){
 			return;
 		}
 		// JLog.log(`Chan @${channel} Msg #${my.id}: ${msg}`);
-		JLog.log(`Chan @${channel} Msg #${my.id}: ${data.type == 'drawingCanvas' ? JSON.stringify({type: data.type, diffed: data.diffed}) : msg}`);
+		JLog.log(`Chan @${channel} Msg #${my.id}: ${
+			data.type == 'drawingCanvas'
+				? JSON.stringify({ type: data.type, diffed: data.diffed })
+				: (data.type == 'drawingStroke'
+					? JSON.stringify({ type: data.type, phase: data.phase })
+					: msg)
+		}`);
 		if(data.type == "talk" && !data.relay && UseDiscordWebhook && !my.admin){ // dcwh
 			try{
 				DCWH.SendWebhookOnTalk(my.profile, data.value, my.place, my.robot);
@@ -350,6 +356,15 @@ exports.Client = function(socket, profile, sid){
 		if($room.rule.rule != 'Drawing') return;
 
 		$room.drawingCanvas(msg, my.id);
+	};
+	my.drawingStroke = function(msg) {
+		let $room = ROOM[my.place];
+
+		if(!$room) return;
+		if(!$room.gaming) return;
+		if($room.rule.rule != 'Drawing') return;
+
+		$room.drawingStroke(msg, my.id);
 	};
 	my.canvasNotValid = function(msg) {
 		let $room = ROOM[my.place];
@@ -1198,6 +1213,52 @@ exports.Room = function(room, channel){
 			}
 
 			my.byMaster('drawCanvas', { diffed, data: msg.data }, true);
+		}
+	};
+	my.drawingStroke = function(msg, userid) { //msg -> Message, userid -> sender ID
+		if(my.game.painter != userid) return;
+		if(!msg) return;
+
+		var phase = msg.phase;
+		if([ 'start', 'move', 'end', 'clear' ].indexOf(phase) == -1) return;
+
+		var sender = DIC[userid];
+		if(sender){
+			if(sender._strokeWindowAt === undefined){
+				sender._strokeWindowAt = Date.now();
+				sender._strokeWindowCount = 0;
+				sender._lastStrokeMoveAt = 0;
+			}
+			if(Date.now() - sender._strokeWindowAt >= 1000){
+				sender._strokeWindowAt = Date.now();
+				sender._strokeWindowCount = 0;
+			}
+			sender._strokeWindowCount++;
+			if(sender._strokeWindowCount > 120) return;
+			if(phase == 'move'){
+				if(Date.now() - sender._lastStrokeMoveAt < 12) return;
+				sender._lastStrokeMoveAt = Date.now();
+			}
+		}
+
+		if(phase == 'clear'){
+			my.game.fullImageString = "";
+			my.byMaster('drawStroke', { phase: 'clear' }, true);
+			return;
+		}
+
+		if(!isFinite(msg.x) || !isFinite(msg.y)) return;
+
+		var payload = {
+			phase: phase,
+			x: Number(msg.x),
+			y: Number(msg.y),
+			color: ((msg.color || '#000000') + '').slice(0, 24),
+			width: Math.max(1, Math.min(60, Number(msg.width) || 1))
+		};
+
+		for(var i in DIC){
+			if(DIC[i].place == my.id && i != userid) DIC[i].send('drawStroke', payload);
 		}
 	};
 	my.ready = function(){

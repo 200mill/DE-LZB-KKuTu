@@ -1876,6 +1876,7 @@ $lib.Drawing.roundReady = function (data, spec) {
   $data._roundTime = $data.room.time * 1000
   $data._fastTime = 10000
   $data._fullImageString = ""
+  $data._remoteStroke = null
   $stage.game.items.hide()
   $stage.game.hints.show()
   $stage.game.cwcmd.show().css('opacity', 0)
@@ -1903,74 +1904,52 @@ $lib.Drawing.turnStart = function (data, spec) {
       $('#drawing-line-width').change(function () {
         console.log(this.value)
         $stage.game.canvas.freeDrawingBrush.width = this.value
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('#drawing-color').change(function () {
         console.log(this.value)
         $stage.game.canvas.freeDrawingBrush.color = this.value
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('#drawing-clear').click(function () {
         console.log('clear')
         $stage.game.canvas.clear()
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
+        $data._fullImageString = JSON.stringify($stage.game.canvas)
+        send('drawingStroke', { phase: 'clear' }, false)
       })
       $('.button-color#color-red').click(function() {
         console.log('change red')
         $stage.game.canvas.freeDrawingBrush.color = '#FF0000'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('.button-color#color-orange').click(function() {
         console.log('change orange')
         $stage.game.canvas.freeDrawingBrush.color = '#FFA500'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('.button-color#color-yellow').click(function() {
         console.log('change yellow')
         $stage.game.canvas.freeDrawingBrush.color = '#FFFF00'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('.button-color#color-green').click(function() {
         console.log('change green')
         $stage.game.canvas.freeDrawingBrush.color = '#008000'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('.button-color#color-blue').click(function() {
         console.log('change blue')
         $stage.game.canvas.freeDrawingBrush.color = '#0000FF'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('.button-color#color-indigo').click(function() {
         console.log('change indigo')
         $stage.game.canvas.freeDrawingBrush.color = '#4B0082'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('.button-color#color-violet').click(function() {
         console.log('change red')
         $stage.game.canvas.freeDrawingBrush.color = '#9400D3'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('.button-color#color-black').click(function() {
         console.log('change black')
         $stage.game.canvas.freeDrawingBrush.color = '#000000'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
       $('.button-color#color-white').click(function() {
         console.log('change white')
         $stage.game.canvas.freeDrawingBrush.color = '#FFFFFF'
-        var canvasStr = JSON.stringify($stage.game.canvas)
-        send('drawingCanvas', {data: canvasStr}, false)
       })
 
       $stage.game.drawingTitle.text(data.word)
@@ -2044,36 +2023,115 @@ $lib.Drawing.drawDisplay = function () {
 
   $('#drawing-line-width').val(20)
   $('#drawing-color').val('#000000')
+  $data._remoteStroke = null
 
   if ($data._isPainter) {
-    canvas.on('mouse:up', function (e) {
-      // $data._fullImageString -> old canvas data
-      var canvasStr = JSON.stringify(canvas)
-      var payload = { diffed: false, data: canvasStr }
+    var drawingDown = false
+    var lastSendAt = 0
+    var DRAW_SEND_INTERVAL = 130
+    var DRAW_SEND_MIN_DISTANCE = 3.5
+    var lastSentPoint = null
 
-      try {
-        var diffRes = window.differ.patch_make($data._fullImageString, canvasStr)
-        diffRes = window.differ.patch_toText(diffRes)
+    function sendStroke(phase, point){
+      var width = Number(canvas.freeDrawingBrush && canvas.freeDrawingBrush.width) || 1
+      var color = (canvas.freeDrawingBrush && canvas.freeDrawingBrush.color) || '#000000'
+      send('drawingStroke', {
+        phase: phase,
+        x: Math.round(point.x * 100) / 100,
+        y: Math.round(point.y * 100) / 100,
+        width: width,
+        color: color
+      }, false)
+      lastSendAt = Date.now()
+      lastSentPoint = { x: point.x, y: point.y }
+    }
 
-        // Use diff only when it is actually smaller than full canvas JSON.
-        if (diffRes && diffRes.length > 0 && diffRes.length < (canvasStr.length * 0.9)) {
-          payload = { diffed: true, data: diffRes }
-        }
-      } catch (err) {
-        payload = { diffed: false, data: canvasStr }
+    canvas.on('mouse:down', function (opt) {
+      var p = canvas.getPointer(opt.e)
+      drawingDown = true
+      sendStroke('start', p)
+    })
+    canvas.on('mouse:move', function (opt) {
+      if (!drawingDown) return
+      if (Date.now() - lastSendAt < DRAW_SEND_INTERVAL) return
+      var p = canvas.getPointer(opt.e)
+      if (lastSentPoint) {
+        var dx = p.x - lastSentPoint.x
+        var dy = p.y - lastSentPoint.y
+        if ((dx * dx + dy * dy) < (DRAW_SEND_MIN_DISTANCE * DRAW_SEND_MIN_DISTANCE)) return
       }
-
-      // { type: "drawingCanvas", diffed: Boolean, data: String }
-      send('drawingCanvas', payload, false)
-      $data._fullImageString = canvasStr
+      sendStroke('move', p)
+    })
+    canvas.on('mouse:up', function (opt) {
+      if (drawingDown) sendStroke('end', canvas.getPointer(opt.e))
+      drawingDown = false
+      lastSentPoint = null
+    })
+    $(window).off('mouseup.drawingStrokeEnd').on('mouseup.drawingStrokeEnd', function () {
+      if (!drawingDown) return
+      if (lastSentPoint) sendStroke('end', lastSentPoint)
+      drawingDown = false
+      lastSentPoint = null
+    })
+    canvas.on('path:created', function(){
+      $data._fullImageString = JSON.stringify(canvas)
     })
   }
   canvas.renderAll()
   $stage.game.canvas = canvas
 }
+
+$lib.Drawing.drawStroke = function (msg) {
+  if ($data._isPainter) return
+  if (!$stage.game.canvas) return
+
+  var canvas = $stage.game.canvas
+
+  if (msg.phase === 'clear') {
+    canvas.clear()
+    canvas.backgroundColor = '#ffffff'
+    canvas.renderAll()
+    $data._fullImageString = JSON.stringify(canvas)
+    $data._remoteStroke = null
+    return
+  }
+
+  if (!isFinite(msg.x) || !isFinite(msg.y)) return
+
+  var point = { x: Number(msg.x), y: Number(msg.y) }
+  var width = Math.max(1, Math.min(60, Number(msg.width) || 1))
+  var color = msg.color || '#000000'
+
+  if (msg.phase === 'start') {
+    $data._remoteStroke = { point: point, width: width, color: color }
+    return
+  }
+
+  if (!$data._remoteStroke) {
+    $data._remoteStroke = { point: point, width: width, color: color }
+    return
+  }
+
+  var prev = $data._remoteStroke.point
+  var line = new fabric.Line([ prev.x, prev.y, point.x, point.y ], {
+    stroke: color,
+    strokeWidth: width,
+    selectable: false,
+    evented: false,
+    strokeLineCap: 'round'
+  })
+
+  canvas.add(line)
+  canvas.renderAll()
+  $data._remoteStroke = { point: point, width: width, color: color }
+
+  if (msg.phase === 'end') {
+    $data._fullImageString = JSON.stringify(canvas)
+    $data._remoteStroke = null
+  }
+}
 $lib.Drawing.turnGoing = function () {
   var $rtb = $stage.game.roundBar
-  var bgm = $data.bgm
   var bRate
   var tt
 
@@ -2087,14 +2145,10 @@ $lib.Drawing.turnGoing = function () {
 
   if (!$rtb.hasClass('round-extreme')) {
     if ($data._roundTime <= $data._fastTime) {
-      if (bgm && bgm.duration && isFinite(bgm.duration)) {
-        bRate = bgm.currentTime / bgm.duration
-        if (bgm.paused) stopBGM()
-        else playBGM('jaqwiF')
-        if ($data.bgm && $data.bgm.duration) {
-          $data.bgm.currentTime = $data.bgm.duration * bRate
-        }
-      }
+      bRate = $data.bgm.currentTime / $data.bgm.duration
+      if ($data.bgm.paused) stopBGM()
+      else playBGM('jaqwiF')
+      $data.bgm.currentTime = $data.bgm.duration * bRate
       $rtb.addClass('round-extreme')
     }
   }
@@ -2558,6 +2612,11 @@ function onMessage(data, sourceSocket){
 		case 'drawCanvas':
 			if ($stage.game.canvas) {
 				drawCanvas(data);
+			}
+			break;
+		case 'drawStroke':
+			if ($stage.game.canvas) {
+				drawStroke(data);
 			}
 			break;
 		case 'diffNotValid':
@@ -5153,6 +5212,9 @@ function chat(profile, msg, from, timestamp){
 }
 function drawCanvas (data) {
 	route('drawCanvas', data);
+}
+function drawStroke (data) {
+	route('drawStroke', data);
 }
 function diffNotValid(data) {
 	route('diffNotValid', data);

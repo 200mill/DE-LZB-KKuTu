@@ -306,6 +306,11 @@ function onMessage(data, sourceSocket){
 				drawCanvas(data);
 			}
 			break;
+		case 'drawStroke':
+			if ($stage.game.canvas) {
+				drawStroke(data);
+			}
+			break;
 		case 'diffNotValid':
 			if ($stage.game.canvas) {
 				diffNotValid(data);
@@ -2899,6 +2904,9 @@ function chat(profile, msg, from, timestamp){
 }
 function drawCanvas (data) {
 	route('drawCanvas', data);
+}
+function drawStroke (data) {
+	route('drawStroke', data);
 }
 function diffNotValid(data) {
 	route('diffNotValid', data);

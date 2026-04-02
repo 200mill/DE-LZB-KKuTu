@@ -152,7 +152,7 @@ function processAdmin(id, value){
 			try {
 				var args = value.split(",");
 				if(args.length == 2){
-					MainDB.users.update([ '_id', args[0].trim() ]).set([ 'black', args[1].trim() ], [ 'blockedUntil', "NO_BLOCK" ]).on();
+					MainDB.users.update([ '_id', args[0].trim() ]).set([ 'black', args[1].trim() ], [ 'blockedUntil', -1 ]).on();
 					DIC[id].send('yell', { value: "OK" });
 					JLog.info(`[Block] 사용자 #${args[0].trim()}(이)가 ${args[1].trim()}의 이유로 이용제한 처리되었습니다.`);
 					DCWH.sendDiscordWebhookOnBan(args[0].trim(), args[1].trim(), "inf", GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
@@ -187,12 +187,12 @@ function processAdmin(id, value){
 					ipAddr = args[0].trim();
 					reason = args[1].trim();
 					MainDB.ip_block.findOne([ '_id', ipAddr ]).on(function($body){
-						if($body) MainDB.ip_block.update([ '_id', ipAddr ]).set([ 'reasonBlocked', reason ], [ 'ipBlockedUntil', "NO_BLOCK" ]).on();
-						else MainDB.ip_block.insert([ '_id', ipAddr ], [ 'reasonBlocked', reason ], [ 'ipBlockedUntil', "NO_BLOCK" ]).on();
+						if($body) MainDB.ip_block.update([ '_id', ipAddr ]).set([ 'reasonBlocked', reason ], [ 'ipBlockedUntil', -1 ]).on();
+						else MainDB.ip_block.insert([ '_id', ipAddr ], [ 'reasonBlocked', reason ], [ 'ipBlockedUntil', -1 ]).on();
 					});
 					DIC[id].send('yell', { value: "OK" });
 					JLog.info(`[Block] IP 주소 ${ipAddr}(이)가 ${reason}의 이유로 이용제한 처리되었습니다.`);
-					DSWH.sendDiscordWebhookOnIPBan(ipAddr, reason, "inf", GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
+					DCWH.sendDiscordWebhookOnIPBan(ipAddr, reason, "inf", GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 
 				}else if(args.length == 3){
 					var ipBlockDays = parseInt(args[2].trim(), 10);
@@ -221,7 +221,7 @@ function processAdmin(id, value){
 			return null;
 		case 'unban':
 			try {
-				MainDB.users.update([ '_id', value ]).set([ 'black', null ], [ 'blockedUntil', "NO_BLOCK" ]).on();								
+				MainDB.users.update([ '_id', value ]).set([ 'black', null ], [ 'blockedUntil', 0 ]).on();								
 				JLog.info(`[Block] 사용자 #${value}(이)가 이용제한 해제 처리되었습니다.`);
 				DCWH.sendDiscordWebhookOnUnban(value, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 			}catch(e){
@@ -230,7 +230,7 @@ function processAdmin(id, value){
 			return null;
 		case 'ipunban':
 			try {
-				MainDB.ip_block.update([ '_id', value ]).set([ 'reasonBlocked', null ], [ 'ipBlockedUntil', "NO_BLOCK" ]).on();								
+				MainDB.ip_block.update([ '_id', value ]).set([ 'reasonBlocked', null ], [ 'ipBlockedUntil', 0 ]).on();								
 				JLog.info(`[Block] IP 주소 ${value}(이)가 이용제한 해제 처리되었습니다.`);
 				DCWH.sendDiscordWebhookOnIPUnban(value, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 			}catch(e){
@@ -491,20 +491,24 @@ exports.init = function(_SID, CHAN){
 					MainDB.ip_block.findOne([ '_id', $c.remoteAddress ]).on(function($body){
 						if ($body && $body.reasonBlocked) {
 							var ipBlockedUntil = Number($body.ipBlockedUntil);
+							if(isNaN(ipBlockedUntil)) ipBlockedUntil = 0;
 							if(ipBlockedUntil > 0 && ipBlockedUntil < Date.now()) {
-								MainDB.ip_block.update([ '_id', $c.remoteAddress ]).set([ 'ipBlockedUntil', "NO_BLOCK" ], [ 'reasonBlocked', null ]).on();
+								MainDB.ip_block.update([ '_id', $c.remoteAddress ]).set([ 'ipBlockedUntil', 0 ], [ 'reasonBlocked', null ]).on();
 								JLog.info(`IP 주소 ${$c.remoteAddress}의 이용제한이 해제되었습니다.`);
 								DCWH.sendDiscordWebhookOnIPUnban($c.remoteAddress, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 							}
-							else {
+							else if(ipBlockedUntil === -1 || ipBlockedUntil > Date.now()) {
 								$c.socket.send(JSON.stringify({
 									type: 'error',
 									code: 446,
 									reasonBlocked: !$body.reasonBlocked ? GLOBAL.USER_BLOCK_OPTIONS.DEFAULT_BLOCKED_TEXT : $body.reasonBlocked,
-									ipBlockedUntil: ipBlockedUntil > 0 ? ipBlockedUntil : GLOBAL.USER_BLOCK_OPTIONS.BLOCKED_FOREVER
+									ipBlockedUntil: ipBlockedUntil
 								}));
 								$c.socket.close();
 								return;
+							}
+							else {
+								MainDB.ip_block.update([ '_id', $c.remoteAddress ]).set([ 'ipBlockedUntil', 0 ], [ 'reasonBlocked', null ]).on();
 							}
 						}
 					});
@@ -519,6 +523,7 @@ exports.init = function(_SID, CHAN){
 					/* Enhanced User Block System [S] */
 					let isBlockRelease = false;
 					var blockedUntilTs = Number(ref.blockedUntil);
+					if(isNaN(blockedUntilTs)) blockedUntilTs = 0;
 
 					if(ref.result == 444 && blockedUntilTs > 0 && blockedUntilTs < Date.now()) {
 						DIC[$c.id] = $c;
@@ -548,8 +553,8 @@ exports.init = function(_SID, CHAN){
 						}
 					} else {
 						/* Enhanced User Block System [S] */
-						if(ref.blockedUntil) $c.send('error', {
-							code: ref.result, message: ref.black, blockedUntil: ref.blockedUntil
+						if(blockedUntilTs !== 0) $c.send('error', {
+							code: ref.result, message: ref.black, blockedUntil: blockedUntilTs
 						});
 						else $c.send('error', {
 							code: ref.result, message: ref.black

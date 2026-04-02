@@ -194,8 +194,13 @@ KKuTu.onClientMessage = function($c, msg){
 	switch(msg.type){
 		case 'drawingCanvas':
 			$c.drawingCanvas(msg)
+			break;
+		case 'drawingStroke':
+			$c.drawingStroke(msg)
+			break;
 		case 'canvasNotValid':
 			$c.canvasNotValid(msg) // canvas diff not valid
+			break;
 		case 'heartbeat': // TNX to https://github.com/kitt3n69420/KKuTu
 			$c._lastHeartbeat = Date.now();
 			if (msg.ack && typeof msg.t === 'number' && isFinite(msg.t)) {

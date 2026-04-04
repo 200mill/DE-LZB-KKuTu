@@ -46,6 +46,8 @@ const HANGUL_MEDIAL_COMBINE = { "ㅗㅏ":"ㅘ", "ㅗㅐ":"ㅙ", "ㅗㅣ":"ㅚ", 
 const HANGUL_FINAL_INDEX = { "":0, "ㄱ":1, "ㄲ":2, "ㄳ":3, "ㄴ":4, "ㄵ":5, "ㄶ":6, "ㄷ":7, "ㄹ":8, "ㄺ":9, "ㄻ":10, "ㄼ":11, "ㄽ":12, "ㄾ":13, "ㄿ":14, "ㅀ":15, "ㅁ":16, "ㅂ":17, "ㅄ":18, "ㅅ":19, "ㅆ":20, "ㅇ":21, "ㅈ":22, "ㅊ":23, "ㅋ":24, "ㅌ":25, "ㅍ":26, "ㅎ":27 };
 const HANGUL_FINAL_COMBINE = { "ㄱㅅ":"ㄳ", "ㄴㅈ":"ㄵ", "ㄴㅎ":"ㄶ", "ㄹㄱ":"ㄺ", "ㄹㅁ":"ㄻ", "ㄹㅂ":"ㄼ", "ㄹㅅ":"ㄽ", "ㄹㅌ":"ㄾ", "ㄹㅍ":"ㄿ", "ㄹㅎ":"ㅀ", "ㅂㅅ":"ㅄ", "ㄱㄱ":"ㄲ", "ㅅㅅ":"ㅆ" };
 
+const HANGUL_SUNGUI = ["ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ", "ㅏ", "ㅑ", "ㅓ", "ㅕ", "ㅗ", "ㅛ", "ㅜ", "ㅠ", "ㅡ", "ㅣ", "ㄲ", "ㄸ", "ㅃ", "ㅆ", "ㅉ", "ㅐ", "ㅒ", "ㅔ", "ㅖ", "ㅘ", "ㅙ", "ㅚ", "ㅝ", "ㅞ", "ㅟ", "ㅢ", "ㄳ", "ㄵ", "ㄶ", "ㄺ", "ㄻ", "ㄼ", "ㄽ", "ㄾ", "ㄿ", "ㅀ", "ㅄ"];
+
 const EN_PHONETIC = { "alpha":"a", "bravo":"b", "charlie":"c", "delta":"d", "echo":"e", "foxtrot":"f", "golf":"g", "hotel":"h", "india":"i", "juliett":"j", "kilo":"k", "lima":"l", "mike":"m", "november":"n", "oscar":"o", "papa":"p", "quebec":"q", "romeo":"r", "sierra":"s", "tango":"t", "uniform":"u", "victor":"v", "whiskey":"w", "x-ray":"x", "yankee":"y", "zulu":"z" };
 const KO_PHONETIC = { "기러기":"ㄱ", "나포리":"ㄴ", "도라지":"ㄷ", "로오마":"ㄹ", "미나리":"ㅁ", "바가지":"ㅂ", "서울":"ㅅ", "잉어":"ㅇ", "지게":"ㅈ", "치마":"ㅊ", "키다리":"ㅋ", "통신":"ㅌ", "파고다":"ㅍ", "한강":"ㅎ", "아버지":"ㅏ", "야자수":"ㅑ", "어머니":"ㅓ", "연못":"ㅕ", "오징어":"ㅗ", "요지경":"ㅛ", "우편":"ㅜ", "유달산":"ㅠ", "은방울":"ㅡ", "이순신":"ㅣ", "앵무새":"ㅐ", "엑스레이":"ㅔ" };
 
@@ -354,9 +356,12 @@ exports.submit = function(client, text){
 		}
 		if($doc){ 
 			// 해결
-			if ((!my.opts.injeong && ($doc.flag & Const.KOR_FLAG.INJEONG)) && !my.opts.unknown) {
+			if ((!my.opts.injeong && ($doc.flag & Const.KOR_FLAG.INJEONG)) && !my.opts.unknown) { // If opts is unknown then check only has choseong, joseong or jongseong, not approve.
 				denied();
 			} else if (!my.opts.injeong && my.opts.unknown && ($doc.flag & Const.KOR_FLAG.INJEONG)) { // 어인정 아님, 비사전 -> 어인정단어 비사전 doc 적용
+				if(my.rule.lang == "ko" && isUnknownLowEffortWord(text)){
+					denied(413);
+				}
 				$doc = {
 					mean: "Non-dictionary word",
 					theme: "",
@@ -381,6 +386,8 @@ exports.submit = function(client, text){
 			}else if(my.opts.unknown){
 				if(text.length < 2){
 					denied();
+				}else if(my.rule.lang == "ko" && isUnknownLowEffortWord(text)){
+					denied(413);
 				}else{
 					$doc = {
 						mean: "Non-dictionary word",
@@ -722,6 +729,47 @@ function getAuto(char, subc, type){
 }
 function escapeRegExp(str) {
 	return (str || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+function checkunknownSungui(word){ // words be like "가ㅏ32ㅜㅑㅇ노ㅑㄹ23ㅜ"
+	var map = HANGUL_SUNGUI;
+
+	if(word.length != 1) return null;
+	// When unknown check letter like "ㄱ", "ㅂ", "ㅏ"
+	if(map.includes(word)) return word;
+	// When unknown check letter is single char but not in map, return null
+	return null;
+}
+function isUnknownLowEffortWord(word){
+	var chars;
+	var i;
+	var ch;
+	var syllableCount = 0;
+	var sunguiCount = 0;
+	var noiseCount = 0;
+
+	if(typeof word !== "string") return false;
+	word = word.replace(/\s+/g, "");
+	if(!word) return true;
+
+	chars = Array.from(word);
+	for(i = 0; i < chars.length; i++){
+		ch = chars[i];
+		if(/[가-힣]/.test(ch)){
+			syllableCount++;
+		}else if(checkunknownSungui(ch)){
+			sunguiCount++;
+		}else if(/[0-9]/.test(ch)){
+			noiseCount++;
+		}else if(!/[a-zA-Z]/.test(ch)){
+			noiseCount++;
+		}
+	}
+
+	if(syllableCount === 0 && sunguiCount >= 2) return true;
+	if(sunguiCount >= Math.ceil(chars.length * 0.6)) return true;
+	if(noiseCount >= 2 && sunguiCount >= 2 && syllableCount <= 1) return true;
+
+	return false;
 }
 function decodeMorseInput(input, morseMap){ // LZB - Added Morse
 	var normalized;

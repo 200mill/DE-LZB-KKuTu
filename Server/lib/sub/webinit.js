@@ -61,6 +61,16 @@ function getLanguage(locale, page, shop){
 	
 	return R;
 }
+function isInternalIp(ip){
+	if(!ip) return false;
+	var normalized = String(ip).trim().toLowerCase();
+	if(normalized.startsWith("::ffff:")) normalized = normalized.slice(7);
+	if(normalized == "::1" || normalized == "127.0.0.1" || normalized == "localhost") return true;
+	if(normalized.startsWith("10.")) return true;
+	if(normalized.startsWith("192.168.")) return true;
+	if(/^172\.(1[6-9]|2\d|3[0-1])\./.test(normalized)) return true;
+	return false;
+}
 function page(req, res, file, data){
 	if(data == undefined)	data = {};
 	if(req.session.createdAt){
@@ -71,12 +81,16 @@ function page(req, res, file, data){
 		req.session.createdAt = new Date();
 	}
 
-	var addr = GLOBAL.WAF ? req.ip || "" : (req.get('CF-Connecting-IP') || "");
+	var cfConnectingIp = req.get('CF-Connecting-IP');
+	var addr = GLOBAL.WAF ? (req.ip || "") : (cfConnectingIp || "");
 	var sid = req.session.id || "";
 	
 	data.published = global.isPublic;
 	data.lang = req.query.locale || "ko_KR";
 	if(!Language[data.lang]) data.lang = "ko_KR";
+
+	if(GLOBAL.WAF && !cfConnectingIp && !isInternalIp(addr)) return res.status(403).send("Direct ip connection is not allowed.");
+
 	// URL ...?locale=en_US will show the page in English
 	
 	// if(exports.STATIC) data.static = exports.STATIC[data.lang];

@@ -139,7 +139,7 @@
 	},
 	"kkutu": {
 		"title": "Rule the words! KKuTu Online",
-		"version": "2.5.4",
+		"version": "2.5.5",
 		
 		"meta_desc": "Online Word Chain, Shiritori, Initial Quiz, Crossword, Typing Battle! Be the master of vocabulary in KKuTu.",
 		"meta_keys": "kkutu,shiritori,online,web,kungkungtta,english shiritori,typing,word game",
@@ -317,8 +317,8 @@
 		"modex11": "Name an English word matching the given topic.",
 		"modex12": "Find Korean words hidden in the scrambled letters.",
 		"modex13": "Find English words hidden in the scrambled letters.",
-		"modex14": "Explain and guess the word using a picture for 2 to 10 Korean characters. <b>Warning: Not playable on mobile</b>",
-		"modex15": "Explain and guess the word using a picture for 4 to 16 English characters. <b>Warning: Not playable on mobile</b>",
+		"modex14": "Explain and guess the word using a picture for 2 to 10 Korean characters. <b>Warning: Not playable on mobile, connection may be unstable</b>",
+		"modex15": "Explain and guess the word using a picture for 4 to 16 English characters. <b>Warning: Not playable on mobile, connection may be unstable</b>",
 		"numRound": "Rounds",
 		"roundTime": "Round Time",
 		"players": "Players",

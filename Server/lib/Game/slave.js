@@ -41,6 +41,8 @@ var Lizard = require('../sub/lizard');
 var MainDB = require('../Web/db');
 var JLog = require('../sub/jjlog');
 var GLOBAL = require('../sub/global.json');
+var DCWH = require('../sub/dcwh');
+let UseDiscordWebhook = GLOBAL.USE_DISCORD_WEBHOOK && GLOBAL.DISCORD_WEBHOOK_URL && GLOBAL.DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/");
 
 var DIC = {};
 var DNAME = {};
@@ -53,6 +55,103 @@ const GUEST_PERMISSION = Master.GUEST_PERMISSION;
 const ENABLE_ROUND_TIME = Master.ENABLE_ROUND_TIME;
 const ENABLE_FORM = Master.ENABLE_FORM;
 const MODE_LENGTH = Master.MODE_LENGTH;
+const BAD_CHAT_REGEXP = new RegExp([
+	"느으*[^가-힣]*금마?",
+	"니[^가-힣]*(엄|앰|엠)",
+	"(ㅄ|ㅅㅂ|ㅂㅅ)",
+	"미친(년|놈)?",
+	"(병|븅|빙)[^가-힣]*신",
+	"보[^가-힣]*지",
+	"(새|섀|쌔|썌)[^가-힣]*(기|끼)",
+	"섹[^가-힣]*스",
+	"(시|씨|쉬|쒸)이*입?[^가-힣]*(발|빨|벌|뻘|팔|펄)",
+	"십[^가-힣]*새",
+	"씹",
+	"(애|에)[^가-힣]*미",
+	"자[^가-힣]*지",
+	"존[^가-힣]*나",
+	"좆|죶",
+	"지[^가-힣]*랄",
+	"창[^가-힣]*(녀|년|놈)",
+	"fuck",
+	"sex"
+].join('|'), 'i');
+
+function addDate(num){
+	if(isNaN(num)) return;
+	return Date.now() + num * 24 * 60 * 60 * 1000;
+}
+
+function hasBadWord(text){
+	if(typeof text !== 'string') return false;
+	BAD_CHAT_REGEXP.lastIndex = 0;
+	return BAD_CHAT_REGEXP.test(text);
+}
+
+function getAutobanReason(reasonKey){
+	const autoban = GLOBAL.AUTOBAN || {};
+	const reasonMap = autoban.AUTOBAN_REASON || {};
+	return reasonMap[reasonKey] || reasonKey;
+}
+
+function applyAutobanToClient($c, reasonKey){
+	if(!GLOBAL.USE_AUTOBAN) return false;
+	if(!$c || !$c.remoteAddress || !MainDB || !MainDB.ip_block) return false;
+	if($c.admin || (Array.isArray(GLOBAL.ADMIN) && GLOBAL.ADMIN.indexOf($c.id) !== -1)) return false;
+
+	const autoban = GLOBAL.AUTOBAN || {};
+	const reasonText = getAutobanReason(reasonKey);
+	const isForever = !!autoban.IS_AUTOBAN_FOREVER;
+	let reasonBlocked = reasonText;
+	let ipBlockedUntil = -1;
+
+	if(!isForever){
+		let days = Number(autoban.AUTOBAN_DAYS);
+		if(isNaN(days) || days < 1) days = 1;
+		reasonBlocked = `${autoban.AUTOBAN_MESSAGE || ''}${reasonText}`;
+		ipBlockedUntil = addDate(days);
+	}
+
+	MainDB.ip_block.findOne([ '_id', $c.remoteAddress ]).on(function($body){
+		if($body) MainDB.ip_block.update([ '_id', $c.remoteAddress ]).set([ 'reasonBlocked', reasonBlocked ], [ 'ipBlockedUntil', ipBlockedUntil ]).on();
+		else MainDB.ip_block.insert([ '_id', $c.remoteAddress ], [ 'reasonBlocked', reasonBlocked ], [ 'ipBlockedUntil', ipBlockedUntil ]).on();
+	});
+	if(UseDiscordWebhook){
+		if(typeof DCWH.sendDiscordWebhookOnAutoban === 'function') DCWH.sendDiscordWebhookOnAutoban($c.id, $c.remoteAddress, reasonText, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
+	}
+
+	if($c.socket && $c.socket.readyState === 1){
+		$c.socket.send(JSON.stringify({
+			type: 'error',
+			code: 446,
+			reasonBlocked: reasonBlocked,
+			ipBlockedUntil: ipBlockedUntil
+		}));
+	}
+	if($c.socket) $c.socket.close();
+
+	JLog.info(`[AutoBan] IP ${$c.remoteAddress} blocked for ${$c.id} (${reasonText})`);
+	return true;
+}
+
+function shouldAutobanByBadChat($c, text){
+	if(!GLOBAL.USE_AUTOBAN) return false;
+	if(!hasBadWord(text)) return false;
+
+	const autoban = GLOBAL.AUTOBAN || {};
+	let clearSecond = Number(autoban.BAD_CLEAR_SECOND);
+	let maxCount = Number(autoban.MAX_BAD_COUNT_ON_CHAT);
+	const now = Date.now();
+
+	if(isNaN(clearSecond) || clearSecond < 1) clearSecond = 60;
+	if(isNaN(maxCount) || maxCount < 1) maxCount = 1;
+
+	if(!$c._badChatExpireAt || now > $c._badChatExpireAt) $c._badChatCount = 0;
+	$c._badChatCount = ($c._badChatCount || 0) + 1;
+	$c._badChatExpireAt = now + (clearSecond * 1000);
+
+	return $c._badChatCount >= maxCount;
+}
 
 JLog.info(`<< KKuTu Server:${Server.options.port} >>`);
 
@@ -225,6 +324,10 @@ KKuTu.onClientMessage = function($c, msg){
 				return;
 			}
 			msg.value = msg.value.substr(0, 500);
+			if(shouldAutobanByBadChat($c, msg.value)){
+				applyAutobanToClient($c, 'BAD_CHAT');
+				return;
+			}
 			if(msg.relay){
 				if($c.subPlace) temp = $c.pracRoom;
 				else if(!(temp = ROOM[$c.place])) return;

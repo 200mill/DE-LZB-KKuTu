@@ -39,5 +39,19 @@
 	"DISCORD_WEBHOOK_URL": "Your Discord Webhook URL Here",
 	"DISCORD_WEBHOOK_NICKNAME": "KKuTu Alert",
 	"DISCORD_AVATAR": "https://i.imgur.com/AfFp7pu.png",
-	"IS_DISCORD_WEBHOOK_ENGLISH": false
+	"IS_DISCORD_WEBHOOK_ENGLISH": false,
+	"USE_AUTOBAN": false,
+	"AUTOBAN" : {
+		"MAX_BAD_COUNT_ON_CHAT": 3,
+		"BAD_CLEAR_SECOND": 60,
+		"IS_AUTOBAN_FOREVER": false,
+		"AUTOBAN_DAYS" : 5,
+		"AUTOBAN_MESSAGE": "자동으로 이용이 제한되었습니다. 운영자가 확인할 때까지 기다려주세요.\nYou have been automatically restricted. Please wait for the operator to confirm. 사유(Reason): ",
+		"AUTOBAN_REASON": {
+			"SPAM": "스팸 행위",
+			"BAD_NICKNAME": "부적절한 닉네임",
+			"BAD_CHAT": "부적절한 채팅",
+			"ETC": "기타"
+		}
+	}
 }

@@ -1,5 +1,3 @@
-###### English is not available now
-
 # KO
 
 해당 문서는 서버 관리자가 원활한 서버관리를 위해 작성한 문서입니다.
@@ -13,21 +11,21 @@
 ### 서버켜기
 
 ```shell
-sudo sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &' && sudo sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &'
+./server-start-linux.sh
 ```
 nvm을 사용중 이라면
 ```shell
-sh -c 'nohup node lib/Game/cluster.js 0 1 > game.log 2>&1 &'
-sh -c 'nohup node lib/Web/cluster.js 1 > web.log 2>&1 &'
+nvm use 24
+./server-start-linux.sh
 ```
 
-로그는 web.log, game.log에 저장 됩니다.
+로그는 web.log, game0.log, game1.log에 저장 됩니다.
 
 
 ### 서버 끄기
 
 ```shell
-sudo pkill node
+./server-stop-linux.sh
 ```
 
 ### 전체 공지 수정
@@ -52,18 +50,19 @@ sudo pkill node
 | 명령어      |    파라미터1    | 파라미터2 |                            기능                             |
 |----------|:-----------:|:-----:|:---------------------------------------------------------:|
 | yell     |    공지할 글    |   -   |               서버에 있는 모든 유저에게 1번 내용을 공지합니다.                |
-| kill     |    킥할 ID    |   -   |                   1번의 유저의 소켓 연결을 끊습니다.                    |
-| tailroom |  추적할 방 번호   |   -   |                     1번의 방의 정보를 불러옵니다.                     |
-| tailuser |  추적할 유저 ID  |   -   |                    1번의 유저의 정보를 불러옵니다.                     |
+| kill     |    킥할 ID    |   -   |                       유저의 소켓 연결을 끊습니다.                    |
+| tailroom |  추적할 방 번호   |   -   |                         방의 정보를 불러옵니다.                     |
+| tailuser |  추적할 유저 ID  |   -   |                        유저의 정보를 불러옵니다.                     |
 | dump     |      -      |   -   | 메모리 스냅샷을 /home/kkutu_memdump . . . .heapsnapshot으로 저장합니다. |
-| ban      |  밴할 유저 ID   | 밴 기한  |        1번의 유저의 서버출입을 2번의 일까지 불허가 합니다. *2번은 필수가 아닙니다.*        |
-| ipban    |    밴할 IP    | 밴 기한  |        1번의 IP의 서버출입을 2번의 일까지 불허가 합니다. *2번은 필수가 아닙니다.*        |
-| unban    | 밴 해제할 유저 ID |   -   |                    1번 유저의 서버출입을 허가합니다.                    |
-| ipunban  |  밴 해제할 IP   |   -   |                    1번 IP의 서버출입을 허가합니다                     |
+| ban      |  밴할 유저 ID   | 밴 기한  |            유저의 서버출입을   arg2 일까지 불허가 합니다. *2번은 필수가 아닙니다.*        |
+| ipban    |    밴할 IP    | 밴 기한  |        1번의 IP의 서버출입을 arg2 일까지 불허가 합니다. *2번은 필수가 아닙니다.*        |
+| unban    | 밴 해제할 유저 ID |   -   |                       유저의 서버출입을 허가합니다.                    |
+| ipunban  |  밴 해제할 IP   |   -   |                       IP의 서버출입을 허가합니다                     |
+| roommsg  | 방 번호 | 메시지 | 방 번호에 메시지를 보냅니다. |
 
 ### 관리 페이지
 
-`'서버주소'/gwalli` 혹은 [192.168.0.1/gwalli](http://192.168.0.1/gwalli)로 접속합니다
+`'서버주소'/gwalli` 혹은 [localhost/gwalli](http://localhost/gwalli)로 접속합니다
 
 #### 자격
 
@@ -427,7 +426,7 @@ psql -U postgres kkutu < backup_users.sql
 
 ---
 
-## 기타 API
+## API
 
 | 경로              | 메소드 |      옵션       | 예시                                                                                                                                                              |   비고   |
 |-----------------|:---:|:-------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|:------:|
@@ -452,5 +451,455 @@ psql -U postgres kkutu < backup_users.sql
 
 
 # EN
+This document was written to help server administrators manage the server smoothly.
 
-(not available)
+## Common
+
+Dates are configured using **UNIX Time**.
+
+## Server Management
+
+### Start Server
+
+```shell
+./server-start-linux.sh
+```
+
+If you use nvm:
+
+```shell
+nvm use 24
+./server-start-linux.sh
+```
+
+Logs are saved to web.log, game0.log, and game1.log.
+
+### Stop Server
+
+```shell
+./server-stop-linux.sh
+```
+
+### Edit Global Notice
+
+Edit `lib/Web/public/global_notice.html`.
+
+### Edit Portal Notice
+
+Edit `lib/Web/public/kkutu_bulletin.html`.
+
+---
+
+## Admin
+
+To grant admin permissions, add the user's `_id` (for example, `discord-1234567`) to the `ADMIN` array in `lib/sub/global.json`.
+
+### Admin Commands
+
+Type `#` in chat, then enter the command.
+
+| Command  | Parameter 1  | Parameter 2 | Description |
+|----------|:------------:|:-----------:|:------------|
+| yell     | Message      | -           | Broadcasts the message in Parameter 1 to all users on the server. |
+| kill     | User ID      | -           | Disconnects the specified user's socket. |
+| tailroom | Room number  | -           | Loads information about the specified room. |
+| tailuser | User ID      | -           | Loads information about the specified user. |
+| dump     | -            | -           | Saves a memory snapshot to `/home/kkutu_memdump....heapsnapshot`. |
+| ban      | User ID      | Ban expiry  | Blocks the user from entering the server until the date in arg2. *arg2 is optional.* |
+| ipban    | IP           | Ban expiry  | Blocks the IP from entering the server until the date in arg2. *arg2 is optional.* |
+| unban    | User ID      | -           | Removes the ban for the specified user. |
+| ipunban  | IP           | -           | Removes the ban for the specified IP. |
+| roommsg  | Room number  | Message     | Sends a message to the specified room. |
+
+### Admin Page
+
+Visit `'ServerAddress'/gwalli` or [localhost/gwalli](http://localhost/gwalli).
+
+#### Credentials
+
+| Name | Description |
+|------|:------------|
+| Password | Enter `PASS` from `lib/sub/global.json`. |
+| Table | Enter the DB language to edit (`ko` or `en`). |
+
+#### Handle Additional Word Requests
+
+| Name | Description |
+|------|:------------|
+| Fetch | Loads requested words. |
+| Approve? | Checks whether to approve each request. |
+| Link | Opens namu.moe. |
+| Word | Displays the word. |
+| Theme | Displays the injeong theme. |
+| User | Displays the requester. |
+| When | Displays the request time. |
+| Approve All | Checks approval for all items. |
+| Reject All | Unchecks approval for all items. |
+| Apply | Saves changes. |
+
+#### Manage Shop DB
+
+| Name | Description |
+|------|:------------|
+| Item | Enter the item ID. Use `~ALL` to show all items. |
+| Fetch | Searches by item ID. |
+| Hide | Hides the item list. |
+| # | Displays the item ID. |
+| Price | Sets the shop price. |
+| Purchase Count | Shows how many times users bought the item. |
+| term | Sets the ownership duration. |
+| Type | Sets the item type. |
+| Updated At | Shows when the item was updated. |
+| Equip Effect | Sets the effect when equipped. |
+| Korean Name | Sets the Korean name. |
+| Korean Description | Sets the Korean description. |
+| English Name | Sets the English name. |
+| English Description | Sets the English description. |
+
+| Item ID | Korean Name |
+|------------------|:-------------:|
+| black_oxford     |   검정 옥스포드화    |
+| black_shoes      |    검은콩 신발     |
+| blackrobe        |     검은 로브     |
+| blue_name        |     푸른 이름     |
+| blue_vest        |     파란 조끼     |
+| bluecandy        |   포도 막대 사탕    |
+| cat_mouth        |     고양이 입     |
+| choco_ice        |    초코 아이스     |
+| cuspidal         |    송곳니 장식     |
+| darkblack        |   어둠의 다크니스    |
+| double_brows     |    눈썹 두 가닥    |
+| green_name       |    초록빛 이름     |
+| lemoncandy       |   레몬 막대 사탕    |
+| loosesocks       |     루즈삭스      |
+| melon_ice        |    멜론 아이스     |
+| mustache         |      콧수염      |
+| orange_headphone |    주황 헤드폰     |
+| orange_vest      |     귤색 조끼     |
+| pinkcandy        |   딸기 막대 사탕    |
+| purple_ice       |    보라 아이스     |
+| red_name         |     붉은 이름     |
+| scouter          |     스카우터      |
+| sunglasses       |     선글라스      |
+| taengja          |     탱자 벽지     |
+| water            |      물옷       |
+| white_mask       |     하얀 복면     |
+| b1_gm            |    운영자의 휘장    |
+| brownbere        |    갈색 베레모     |
+| $WPA             |   희귀 글자 조각    |
+| b2_fire          | 불꽃같이 날아오르는 휘장 |
+| b3_do            |   도전의 ㄷ 휘장    |
+| b4_hongsi        |    귤색 띠 휘장    |
+| b4_mint          |    민트 띠 휘장    |
+| b3_pok           |   폭풍의 ㅍ 휘장    |
+| beardoll         |     곰인형 입     |
+| black_mask       |     검은 복면     |
+| blackbere        |    검은 베레모     |
+| blue_headphone   |    파란 헤드폰     |
+| brave_eyes       |    용감한 눈매     |
+| brown_oxford     |   갈색 옥스포드화    |
+| decayed_mouth    |     썩은 미소     |
+| haksamo          |      학사모      |
+| medal            |      금메달      |
+| miljip           |     밀짚모자      |
+| nekomimi         |     고양이 귀     |
+| pink_vest        |     분홍 조끼     |
+| redbere          |    붉은 베레모     |
+| rio_seonghwa     |     리우 성화     |
+| twoeight         |    2:8 가르마    |
+| $WPC             |     글자 조각     |
+| $WPB             |   고급 글자 조각    |
+| b2_metal         |  강철같이 굳건한 휘장  |
+| merong           |     메롱 입      |
+| oh               |     오! 입      |
+| pants_korea      |    한국한국 바지    |
+| pants_china      |    중국중국 바지    |
+| orange_name      |     주황 이름     |
+| purple_name      |     보라 이름     |
+| boxB3            |   고급 휘장 상자    |
+| boxB2            |   희귀 휘장 상자    |
+| boxB4            |   일반 휘장 상자    |
+| sqpants          |     네모 바지     |
+| tile             |      타일       |
+| cwd              |      청와대      |
+| close_eye        |     감은 눈      |
+| lazy_eye         |     게으른 눈     |
+| bokjori          |      복조리      |
+| hamster_O        |   주황 햄스터 머리   |
+| hamster_G        |   잿빛 햄스터 머리   |
+| b3_hwa           |   조화의 ㅎ 휘장    |
+| dictPage         |    백과사전 낱장    |
+| laugh            |    웃으며 말해요    |
+| bigeye           |     서클렌즈      |
+| inverteye        |     반전 눈      |
+| pants_japan      |    일본일본 바지    |
+| indigo_name      |     남색 이름     |
+| pink_name        |     분홍 이름     |
+| stars            |    밤하늘의 별     |
+| spanner          |      스패너      |
+| b4_bb            |   블루베리 띠 휘장   |
+
+| Item Type | Type Name |
+|----------|:------:|
+| NIK      | Name Skin |
+| BDG1     | Treasure Badge |
+| BDG2     | Rare Badge |
+| BDG3     | Advanced Badge |
+| BDG4     | Common Badge |
+| Mhead    | Moremi Head |
+| Meye     | Moremi Eye |
+| Mmouth   | Moremi Mouth |
+| Mhand    | Moremi Hand |
+| Mclothes | Moremi Clothes |
+| Mshoes   | Moremi Shoes |
+| Mback    | Moremi Foreground |
+
+Equip effects are written in **JSON**.
+
+| Equip Effect | Value Type | Description |
+| -------- | :----: | :--------------: |
+| gEXP     | Float  | Extra gained EXP |
+| gMNY     | Float  | Extra gained Ping |
+| hEXP     | Integer | Additional EXP per minute |
+| hMNY     | Integer | Additional Ping per minute |
+| gif      | Boolean | Whether GIF is enabled |
+
+#### Manage User DB
+
+| Name | Description |
+|------|:------------|
+| ID | Enter user ID. |
+| Nickname | Enter user nickname. |
+| Fetch | Loads user information. |
+| # | Displays the ID. |
+| Money | Displays Ping. |
+| Record | Shows KKuTu record, EXP, and login days. |
+| Inventory | Shows inventory. |
+| Equipped | Shows currently equipped items. |
+| Nickname | Shows nickname. |
+| Nickname Changed At | Shows the nickname change date. |
+| Status Message | Shows profile status text. |
+| Last Login | Shows the last login date. |
+| Ban Reason | Shows ban reason; if empty, user is not banned. |
+| Ban Ends | Shows ban end date; if empty, ban is permanent. |
+| Friends | Shows friend IDs as JSON. |
+
+#### Monitor Users
+
+| Name | Description |
+|------|:------------|
+| ID | Enter IDs to monitor, separated by `,`. |
+| Monitor | Starts monitoring. |
+
+#### Manage KKuTu DB
+
+| Name | Description |
+|------|:------------|
+| Word | Enter the word to edit. |
+| Fetch | Loads word information. |
+| # | Splits meanings of the word. |
+| Type | Enter the word type. (TODO: add details for each type) |
+| Theme | Enter the word theme. |
+| Meaning | Enter the word meaning. |
+| Action | Add, delete, or manually input meanings. |
+| Add | Adds a meaning. |
+| Apply | Saves changes. |
+
+#### Add Words to KKuTu DB
+
+| Name | Description |
+|------|:------------|
+| Theme | Enter the word theme. |
+| Word List | Enter words to add. |
+| Confirm | Adds words to DB using the language table selected in Credentials. |
+
+---
+
+## Game Server
+
+### Server Structure
+
+- **master (`lib/Game/master.js`)**: Central process for managing slaves
+- **slave (`lib/Game/slave.js`)**: Process that handles game logic
+
+### Main Classes
+
+| Class | File | Role |
+|--------|---------------------|--------------------------|
+| Room   | `lib/Game/kkutu.js` | Manages game rooms (players, game state, score) |
+| Client | `lib/Game/kkutu.js` | Manages individual client connections |
+| Robot  | `lib/Game/kkutu.js` | AI bot player |
+
+### Game Modes
+
+Game modes are located in `lib/Game/games/`.
+
+| File | Game Mode | Description |
+|----------------|:-------:|----------------|
+| `classic.js`   | Basic Word Chain | Standard word-chain mode |
+| `crossword.js` | Crossword | Guess proper Korean words |
+| `daneo.js`     | Word Duel | Word standby/duel mode |
+| `hunmin.js`    | Hunminjeongeum | Initial-consonant quiz |
+| `jaqwi.js`     | Consonant Quiz | Guess initials by theme |
+| `sock.js`      | SockSock | Word filtering mode |
+| `typing.js`    | Typing Duel | Type given words quickly |
+
+### Game Constants
+
+You can configure the following in `lib/Game/const.js`:
+
+- **Game modes**: language, rules, special rules, etc.
+- **Mission letters**: mission settings
+- **Injeong themes**: approved-word theme settings
+
+---
+
+## Web Server
+
+(TODO)
+
+---
+
+## WebSocket
+
+The client and server communicate through WebSocket.
+
+#### Main Events (Client -> Server)
+
+- `enter`: Enter room
+- `setRoom`: Set room options
+- `leave`: Leave room
+- `ready`: Ready up
+- `start`: Start game
+- `practice`: Practice mode
+- `invite`: Invite to room
+- `inviteRes`: Invitation result
+- `heartbeat`: Prevent Cloudflare timeout
+
+#### Main Events (Server -> Client)
+
+- `roundReady`: Round ready
+- `turnStart`: Turn start
+- `turnError`: Turn error
+- `turnHint`: Turn hint
+- `turnEnd`: Turn end
+- `roundEnd`: Round end
+- `kickVote`: Start kick vote
+- `kickDeny`: Kick vote denied
+- `heartbeat`: Prevent Cloudflare timeout
+
+For detailed events, see [here](https://github.com/horyu1234/KKuTu-Protocol-Docs).
+
+---
+
+## Database
+
+This project uses PostgreSQL, and main queries/configs are defined in `lib/Web/db.js`.
+
+#### Main Contents of db.sql
+
+- `ip_block` table: blocked IP list
+- `kkutu_cw_ko` table: crossword entries
+- `kkutu_en` table: English word list
+- `kkutu_injeong` table: injeong request history
+- `kkutu_ko` table: Korean word list
+- `kkutu_manner_en` table: English manner list
+- `kkutu_manner_ko` table: Korean manner list
+- `kkutu_shop` table: item list
+- `kkutu_shop_desc` table: item name/description list
+- `session` table: active session list
+- `users` table: user information
+
+### Main Table Schemas
+
+#### users table
+
+Stores user account information.
+
+| Column Name | Type | Description |
+|----------------|----------|--------------------------------|
+| `_id`          | VARCHAR  | Unique user ID (e.g. `discord-123456`) |
+| `money`        | INTEGER  | Ping (in-game currency) |
+| `kkutu`        | JSON     | Game records |
+| `lastLogin`    | INTERGER | Nickname change date |
+| `box`          | JSON     | Inventory |
+| `equip`        | JSON     | Equipped items |
+| `nickname`     | VARCHAR  | Nickname |
+| `exordial`     | BIGINT   | Profile intro |
+| `black`        | VARCHAR  | Ban reason; empty means not banned |
+| `blockedUntil` | INTERGER | Ban expiry |
+| `server`       | VARCHAR  | Current connected server |
+| `password`     | VARCHAR  | (TODO) |
+| `friend`       | JSON     | Friend list |
+
+#### kkutu_en / kkutu_ko tables
+
+Store word information.
+
+| Column Name | Type | Description |
+|---------|----------|-------|
+| `_id`   | VARCHAR  | Word |
+| `type`  | VARCHAR  | Word type |
+| `mean`  | VARCHAR  | Meaning |
+| `hit`   | INTERGER | Usage count |
+| `flag`  | INTERGER | Type flag |
+| `theme` | VARCHER  | Theme |
+
+#### kkutu_injeong table
+
+Stores injeong words.
+
+| Column Name | Type | Description |
+|-------------|----------|--------|
+| `_id`       | VARCHAR  | Word |
+| `theme`     | VARCHAR  | Theme |
+| `createdAt` | INTERGER | Request time |
+| `writer`    | VARCHAR  | Requester |
+
+### DB Maintenance
+
+#### Database Backup
+
+```bash
+# Full backup
+pg_dump -U postgres kkutu > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Backup a specific table
+pg_dump -U postgres -t users kkutu > backup_users.sql
+```
+
+#### Backup Restore
+
+```bash
+# Full restore
+psql -U postgres kkutu < backup_20260205_120000.sql
+
+# Restore a specific table
+psql -U postgres kkutu < backup_users.sql
+```
+
+---
+
+## API
+
+| Path | Method | Option | Example | Notes |
+|-----------------|:---:|:-------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|:------:|
+| /shop | get | - | GET /shop -> {"goods":[{"cost":"-1","term":0,"group":"PIX","options":{},"updatedAt:null,"_id":"$WPA"} . . .]} | - |
+| /servers | get | - | GET /servers -> {"list":[1],"max":400} | - |
+| /box | get | - | GET /box -> {"bokjori":1,"boxB2":4} | Login required |
+| /dict/"word" | get | lang - ko, en | GET /dict/사과?lang=ko -> {"word":"사과","mean":" (omitted) INJEONG,INJEONG"} | - |
+| /injeong/"word" | get | theme - word theme | GET /injeong/놈놈놈?theme=MAN -> {message: "OK"} | Login required |
+| /language/flush | get | - | GET /language/flush -> OK | - |
+| /ranking | get | p - page | GET /ranking?p=0 -> {"page":0,"data":[{"id":"discord-1234567","rank":0,"score":"161971"} . . . ]} | - |
+| /cf/"word" | get | - | GET /cf/사과 -> {"data":[{"key":"dictPage","value":1,"rate":1},{"key":"boxB4","value":1,"rate":0},{"key":"$WPC?","value":1,"rate":0.05555555555555555}],"cost":0} | - |
+| /search/words | get | theme - word theme | GET /search/words?theme=gsi -> {"words":["요요","사과","가연" . . .]} | - |
+
+---
+
+## Notes
+
+- If you edited a language pack, refresh by visiting `'ServerAddress'/language/flush`.
+- Bots (except cheat bots) require a minimum `hit` value. To use normal bots, update `hit` in `kkutu_en`/`kkutu_ko` tables.
+- When using Cloudflare, all server-client communication ports must be one of [Cloudflare supported ports](https://developers.cloudflare.com/fundamentals/reference/network-ports/).
+- Discord Webhook notification was added. Enable `USE_DISCORD_WEBHOOK` and set `DISCORD_WEBHOOK_URL` in `global.json`.
+- Discord Webhook notification has been verified on `node 24.13.1`.

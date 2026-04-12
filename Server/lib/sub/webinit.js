@@ -115,7 +115,7 @@ function page(req, res, file, data){
 	}
 	
 	JLog.log(`${addr}@${sid.slice(0, 10)} ${data.page}, ${JSON.stringify(req.params)}`);
-	JLog.log(req.get('X-Forwarded-For'));
+	JLog.log(`${req.get('X-Forwarded-For')}, ${cfConnectingIp}`);
 	res.render(data.page, data, function(err, html){
 		if(err) res.send(err.toString());
 		else res.send(html);

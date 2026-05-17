@@ -334,7 +334,7 @@ exports.submit = function(client, text){
 				setTimeout(my.turnNext, my.game.turnTime / 6);
 				if(!client.robot){
 					client.invokeWordPiece(text, 1);
-					if($doc) DB.kkutu[l].update([ '_id', text ]).set([ 'hit', $doc.hit + 1 ]).on();
+					if($doc && !$doc._nickname) DB.kkutu[l].update([ '_id', text ]).set([ 'hit', $doc.hit + 1 ]).on();
 				}
 			}
 			// 첫턴 혹은 매너, 비사전 아님 lzb - 모를땐 기능이라 우기면 됨
@@ -354,14 +354,53 @@ exports.submit = function(client, text){
 			my.game.loading = false;
 			client.publish('turnError', { code: code || 404, value: escapeHTML(text) }, true);
 		}
+		function handleUnknown(){
+			if(my.opts.nonoinjeong){
+				denied(412);
+			}else if(my.opts.unknown || my.opts.ggangganunknown){
+				if(text.length < 2){
+					denied();
+				}else{
+					$doc = {
+						mean: "Non-dictionary word",
+						theme: "",
+						type: "unknown",
+						hit: 0,
+						baby: false,
+						flag: 0
+					};
+					preApproved();
+				}
+			}else if(my.rule.lang == "ko" && isUnknownLowEffortWord(text)){
+				denied(413);
+			}else{
+				denied();
+			}
+		}
+		function handleNickname(){
+			if(!my.opts.nicknam) return handleUnknown();
+			DB.users.findOne([ 'nickname', text ]).limit([ 'nickname', true ]).on(function($user){
+				if($user && $user.nickname){
+					$doc = {
+						mean: "User nickname",
+						theme: "",
+						type: "nickname",
+						hit: 0,
+						baby: false,
+						flag: 0,
+						_nickname: true
+					};
+					preApproved();
+				}else{
+					handleUnknown();
+				}
+			});
+		}
 		if($doc){ 
 			// 해결
 			if ((!my.opts.injeong && ($doc.flag & Const.KOR_FLAG.INJEONG)) && !my.opts.unknown) { // If opts is unknown then check only has choseong, joseong or jongseong, not approve.
 				denied();
 			} else if (!my.opts.injeong && my.opts.unknown && ($doc.flag & Const.KOR_FLAG.INJEONG)) { // 어인정 아님, 비사전 -> 어인정단어 비사전 doc 적용
-				if(my.rule.lang == "ko" && isUnknownLowEffortWord(text)){
-					denied(413);
-				}
 				$doc = {
 					mean: "Non-dictionary word",
 					theme: "",
@@ -381,27 +420,7 @@ exports.submit = function(client, text){
 				preApproved();
 			}
 		}else{
-			if(my.opts.nonoinjeong){
-				denied(412);
-			}else if(my.opts.unknown){
-				if(text.length < 2){
-					denied();
-				}else if(my.rule.lang == "ko" && isUnknownLowEffortWord(text)){
-					denied(413);
-				}else{
-					$doc = {
-						mean: "Non-dictionary word",
-						theme: "",
-						type: "unknown",
-						hit: 0,
-						baby: false,
-						flag: 0
-					};
-					preApproved();
-				}
-			}else{
-				denied();
-			}
+			handleNickname();
 		}
 	}
 	function isChainable(){
@@ -746,6 +765,8 @@ function isUnknownLowEffortWord(word){
 	var syllableCount = 0;
 	var sunguiCount = 0;
 	var noiseCount = 0;
+	var nonHangulAlphaCount = 0;
+	var total;
 
 	if(typeof word !== "string") return false;
 	word = word.replace(/\s+/g, "");
@@ -760,14 +781,22 @@ function isUnknownLowEffortWord(word){
 			sunguiCount++;
 		}else if(/[0-9]/.test(ch)){
 			noiseCount++;
-		}else if(!/[a-zA-Z]/.test(ch)){
+		}else if(/[a-zA-Z]/.test(ch)){
+			nonHangulAlphaCount++;
+		}else{
 			noiseCount++;
 		}
 	}
+	total = chars.length;
+
+	// 완성형 한글 비율이 충분하면 성의 있는 입력으로 본다.
+	if(syllableCount >= Math.ceil(total * 0.6)) return false;
+	if(syllableCount >= 2 && sunguiCount <= 1 && noiseCount === 0) return false;
 
 	if(syllableCount === 0 && sunguiCount >= 2) return true;
-	if(sunguiCount >= Math.ceil(chars.length * 0.6)) return true;
+	if(sunguiCount >= Math.ceil(total * 0.5) && syllableCount <= 1) return true;
 	if(noiseCount >= 2 && sunguiCount >= 2 && syllableCount <= 1) return true;
+	if(nonHangulAlphaCount >= Math.ceil(total * 0.7) && syllableCount === 0) return true;
 
 	return false;
 }

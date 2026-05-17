@@ -103,16 +103,24 @@ function getAutobanReason(reasonKey){
 	return reasonMap[reasonKey] || reasonKey;
 }
 
+function getClientBlockIp($c){
+	if(!$c) return null;
+	return $c.forwardedIp || $c.remoteAddress || null;
+}
+
 function applyAutobanToClient($c, reasonKey){
 	if(!GLOBAL.USE_AUTOBAN) return false;
-	if(!$c || !$c.remoteAddress || !MainDB || !MainDB.ip_block) return false;
+	if(!MainDB || !MainDB.ip_block) return false;
 	if($c.admin || (Array.isArray(GLOBAL.ADMIN) && GLOBAL.ADMIN.indexOf($c.id) !== -1)) return false;
+
+	const blockIp = getClientBlockIp($c);
+	if(!$c || !blockIp) return false;
 
 	const autoban = GLOBAL.AUTOBAN || {};
 	const reasonText = getAutobanReason(reasonKey);
 	const isForever = !!autoban.IS_AUTOBAN_FOREVER;
 	let reasonBlocked = reasonText;
-	let ipBlockedUntil = -1;
+	let ipBlockedUntil = GLOBAL.AUTOBAN.IS_AUTOBAN_FOREVER === true ? -1 : GLOBAL.AUTOBAN.AUTOBAN_DAYS ? addDate(Number(autoban.AUTOBAN_DAYS)) : addDate(5);
 
 	if(!isForever){
 		let days = Number(autoban.AUTOBAN_DAYS);
@@ -121,12 +129,12 @@ function applyAutobanToClient($c, reasonKey){
 		ipBlockedUntil = addDate(days);
 	}
 
-	MainDB.ip_block.findOne([ '_id', $c.remoteAddress ]).on(function($body){
-		if($body) MainDB.ip_block.update([ '_id', $c.remoteAddress ]).set([ 'reasonBlocked', reasonBlocked ], [ 'ipBlockedUntil', ipBlockedUntil ]).on();
-		else MainDB.ip_block.insert([ '_id', $c.remoteAddress ], [ 'reasonBlocked', reasonBlocked ], [ 'ipBlockedUntil', ipBlockedUntil ]).on();
+	MainDB.ip_block.findOne([ '_id', blockIp ]).on(function($body){
+		if($body) MainDB.ip_block.update([ '_id', blockIp ]).set([ 'reasonBlocked', reasonBlocked ], [ 'ipBlockedUntil', ipBlockedUntil ]).on();
+		else MainDB.ip_block.insert([ '_id', blockIp ], [ 'reasonBlocked', reasonBlocked ], [ 'ipBlockedUntil', ipBlockedUntil ]).on();
 	});
 	if(UseDiscordWebhook){
-		if(typeof DCWH.sendDiscordWebhookOnAutoban === 'function') DCWH.sendDiscordWebhookOnAutoban($c.id, $c.remoteAddress, reasonText, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
+		if(typeof DCWH.sendDiscordWebhookOnAutoban === 'function') DCWH.sendDiscordWebhookOnAutoban($c.id, blockIp, reasonText, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 	}
 
 	if($c.socket && $c.socket.readyState === 1){
@@ -139,13 +147,14 @@ function applyAutobanToClient($c, reasonKey){
 	}
 	if($c.socket) $c.socket.close();
 
-	JLog.info(`[AutoBan] IP ${$c.remoteAddress} blocked for ${$c.id} (${reasonText})`);
+	JLog.info(`[AutoBan] IP ${blockIp} blocked for ${$c.id} (${reasonText})`);
 	return true;
 }
 
 function shouldAutobanByBadChat($c, text){
 	if(!GLOBAL.USE_AUTOBAN) return false;
 	if(!hasBadWord(text)) return false;
+	if($c && $c.place && ROOM[$c.place] && ROOM[$c.place].gaming) return false;
 
 	const autoban = GLOBAL.AUTOBAN || {};
 	let clearSecond = Number(autoban.BAD_CLEAR_SECOND);
@@ -549,12 +558,19 @@ exports.init = function(_SID, CHAN){
 				$c = new KKuTu.Client(socket, $body ? $body.profile : null, key);
 				$c.admin = GLOBAL.ADMIN.indexOf($c.id) != -1;
 				/* Enhanced User Block System [S] */
+				var forwardedTo = info.headers['x-forwarded-for'];
 				var forwardedFor = info.headers['x-forwarded-for'];
+				var forwardedToIp = forwardedTo ? forwardedTo.split(',')[0].trim() : null;
 				var forwardedIp = forwardedFor ? forwardedFor.split(',')[0].trim() : null;
 				var cfConnectingIp = info.headers['cf-connecting-ip'];
-				$c.remoteAddress = GLOBAL.USER_BLOCK_OPTIONS.USE_X_FORWARDED_FOR
-					? (cfConnectingIp || forwardedIp || info.connection.remoteAddress)
-					: info.connection.remoteAddress;
+				$c.forwardedIp = forwardedIp || null;
+				if(GLOBAL.WAF){
+					$c.remoteAddress = forwardedToIp || forwardedIp || info.connection.remoteAddress;
+				}else{
+					$c.remoteAddress = GLOBAL.USER_BLOCK_OPTIONS.USE_X_FORWARDED_FOR
+						? (cfConnectingIp || forwardedIp || info.connection.remoteAddress)
+						: info.connection.remoteAddress;
+				}
 				/* Enhanced User Block System [E] */
 				
 				if(DIC[$c.id]){
@@ -580,14 +596,16 @@ exports.init = function(_SID, CHAN){
 				}
 				/* Enhanced User Block System [S] */
 				if(GLOBAL.USER_BLOCK_OPTIONS.USE_MODULE && ((GLOBAL.USER_BLOCK_OPTIONS.BLOCK_IP_ONLY_FOR_GUEST && $c.guest) || !GLOBAL.USER_BLOCK_OPTIONS.BLOCK_IP_ONLY_FOR_GUEST)){
-					MainDB.ip_block.findOne([ '_id', $c.remoteAddress ]).on(function($body){
+					var blockIp = getClientBlockIp($c);
+					if(!blockIp) return;
+					MainDB.ip_block.findOne([ '_id', blockIp ]).on(function($body){
 						if ($body && $body.reasonBlocked) {
 							var ipBlockedUntil = Number($body.ipBlockedUntil);
 							if(isNaN(ipBlockedUntil)) ipBlockedUntil = 0;
 							if(ipBlockedUntil > 0 && ipBlockedUntil < Date.now()) {
-								MainDB.ip_block.update([ '_id', $c.remoteAddress ]).set([ 'ipBlockedUntil', 0 ], [ 'reasonBlocked', null ]).on();
-								JLog.info(`IP 주소 ${$c.remoteAddress}의 이용제한이 해제되었습니다.`);
-								DCWH.sendDiscordWebhookOnIPUnban($c.remoteAddress, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
+								MainDB.ip_block.update([ '_id', blockIp ]).set([ 'ipBlockedUntil', 0 ], [ 'reasonBlocked', null ]).on();
+								JLog.info(`IP 주소 ${blockIp}의 이용제한이 해제되었습니다.`);
+								DCWH.sendDiscordWebhookOnIPUnban(blockIp, GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 							}
 							else if(ipBlockedUntil === -1 || ipBlockedUntil > Date.now()) {
 								$c.socket.send(JSON.stringify({
@@ -600,7 +618,7 @@ exports.init = function(_SID, CHAN){
 								return;
 							}
 							else {
-								MainDB.ip_block.update([ '_id', $c.remoteAddress ]).set([ 'ipBlockedUntil', 0 ], [ 'reasonBlocked', null ]).on();
+								MainDB.ip_block.update([ '_id', blockIp ]).set([ 'ipBlockedUntil', 0 ], [ 'reasonBlocked', null ]).on();
 							}
 						}
 					});

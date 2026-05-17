@@ -13,6 +13,7 @@ Server/lib/sub/auth.json
 Server/lib/sub/global.json
 .vscode
 .vscodes
+Server/lib/Web/public/media/NanumBarunGothicLight...woff
 
 # db search
 # but html is not used
@@ -31,6 +32,8 @@ Server/web.log
 Server/game.log
 Server/game0.log
 Server/game1.log
+Server/game*.log
+Server/web*.log
 web.log
 game.log
 

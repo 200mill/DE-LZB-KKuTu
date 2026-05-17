@@ -139,7 +139,7 @@
 	},
 	"kkutu": {
 		"title": "Rule the words! KKuTu Online",
-		"version": "2.5.5",
+		"version": "2.5.6",
 		
 		"meta_desc": "Online Word Chain, Shiritori, Initial Quiz, Crossword, Typing Battle! Be the master of vocabulary in KKuTu.",
 		"meta_keys": "kkutu,shiritori,online,web,kungkungtta,english shiritori,typing,word game",
@@ -381,11 +381,16 @@
 		"explOnlylong": "Only long words allowed.",
 		"optOnlyshort": "Only Short",
 		"explOnlyshort": "Only short words allowed. Cannot be used with Special Rules \"Only Long\".",
+		"optNoNoIjeong": "No Flexible",
+		"explNoNoIjeong": "Prevents use of special words. Used with Special Rules \"Flexible\", Cannot be used with \"Native\", \"Strict\".",
 		"optUnlimited": "Infinite",
 		"explUnlimited": "Allows the length of words in the drawing quiz to be adjusted infinitely.",
 		"optShort": "Short",
 		"explShort": "Limits the length of words in the drawing quiz to a maximum of 4 characters.",
-
+		"optNicknam": "Nickname",
+		"explNicknam": "Allows user nicknames on this server.",
+		"optGganGganunknown": "Strict Non-dictionary",
+		"explGganGganunknown": "Allows only completed words among non-dictionary words.",
 		"hidden": "(Hidden)",
 		"pickInjeong": "Select Topic",
 		"explInjPick": "Select topics to use in the game.",

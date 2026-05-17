@@ -260,6 +260,7 @@ Server.get("/servers", function(req, res){
 	var list = [];
 
 	gameServers.forEach(function(v, i){
+		// list[i] = v.seek + 400; // lol
 		list[i] = v.seek;
 	});
 	res.send({ list: list, max: Const.KKUTU_MAX, ports: Const.MAIN_PORTS });

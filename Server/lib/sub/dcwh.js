@@ -60,36 +60,6 @@ exports.SendWebhookOnDeleteRoom = function(roomid) {
         JLog.error(`Error on sending Discord webhook: ${error}`);
     });
 }
-// exports.SendWebhookOnTestingEvent = function(eventType, payload) {
-//     if (!UseDiscordWebhook) return;
-//     var eventText = String(eventType == null ? "unknown" : eventType);
-//     var payloadText;
-
-//     try{
-//         payloadText = JSON.stringify(payload == null ? {} : payload);
-//     }catch(e){
-//         payloadText = String(payload);
-//     }
-//     if(payloadText.length > 1024) payloadText = payloadText.slice(0, 1021) + "...";
-
-//     const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
-//     const embed = new EmbedBuilder()
-//         .setTitle(GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? `Testing Event: ${eventText}` : `테스트 이벤트: ${eventText}`)
-//         .addFields(
-//             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Event" : "이벤트", value: eventText },
-//             { name: GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH ? "Payload" : "데이터", value: `\`\`\`${payloadText || "{}"}\`\`\`` }
-//         )
-//         .setColor(0x3498DB)
-//         .setTimestamp();
-
-//     webhookClient.send({
-//         username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',
-//         avatarURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png',
-//         embeds: [embed],
-//     }).catch(function(error){
-//         JLog.error(`Error on sending Discord webhook: ${error}`);
-//     });
-// }
 exports.SendWebhookOnRoomsetting = function(roomid, passwd, mode, opts) { // TODO - modify에 JSON정보 확인안됨 - 해결
     if (!UseDiscordWebhook) return;
 

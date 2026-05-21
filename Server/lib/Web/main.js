@@ -63,6 +63,9 @@ require("../sub/checkpub");
 JLog.info("<< KKuTu Web >>");
 Server.set('views', __dirname + "/views");
 Server.set('view engine', "pug");
+// Behind a local reverse proxy (e.g., nginx), trust X-Forwarded-* headers from loopback.
+// This prevents https redirect loops and restores correct client IP/protocol.
+Server.set('trust proxy', 'loopback');
 Server.use(Express.static(__dirname + "/public"));
 Server.use("/lib", Express.static(__dirname + "/lib"));
 Server.use(Parser.urlencoded({ extended: true }));
@@ -90,8 +93,8 @@ Server.use((req, res, next) => {
 });	
 Server.use((req, res, next) => {
 	if(Const.IS_SECURED || Const.WAF) {
-		if(req.protocol == 'http') {
-			let url = 'https://'+req.get('host')+req.path;
+		if(!req.secure) {
+			let url = 'https://' + req.hostname + req.originalUrl;
 			res.status(302).redirect(url);
 		} else {
 			next();
@@ -148,10 +151,12 @@ DB.ready = function(){
 			}
 		}
 	});
-	Server.listen(80);
-	if(Const.IS_SECURED || Const.WAF) {
+	const portalHttpPort = Number(GLOBAL.KKT_PORTAL_HTTP_PORT) || 80;
+	Server.listen(portalHttpPort); // reverse-proxy friendly
+	if((Const.IS_SECURED || Const.WAF) && !GLOBAL.KKT_PORTAL_BEHIND_PROXY) {
 		const options = Secure();
-		https.createServer(options, Server).listen(443);
+		const portalHttpsPort = Number(GLOBAL.KKT_PORTAL_HTTPS_PORT) || 443;
+		https.createServer(options, Server).listen(portalHttpsPort);
 	}
 };
 Const.MAIN_PORTS.forEach(function(v, i){

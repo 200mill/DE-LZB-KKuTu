@@ -26,6 +26,7 @@ Server/lib/Web/public/daneodb/list.txt
 Server/ca_bundle.crt
 Server/certificate.crt
 Server/private.key
+Server/fullchain.pem
 
 # log
 Server/web.log
@@ -49,3 +50,4 @@ Server/lib/Web/public/media/kkutu/LobbySeolBGM.mp3
 Server/lib/Web/views/*copy.pug
 Server/lib/Web/public/css/*copy.css
 Server/data/kkutuhot.json
+Server/data/nginx/default copy

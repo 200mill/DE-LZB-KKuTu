@@ -242,7 +242,7 @@ exports.KO_INJEONG = [ // 한국어 어인정 주제
 	"MOB", "HYK", "CYP", "HRH", "STA", "OIJ",
 	"KGR", "ESB", "ELW", "OIM", "OVW", "NEX", /*"WOW",*/ // 왜 주석임
 	"YRY", "KPO", "JLN", "JAN", "ZEL", "POK", "HAI",
-	"HSS", "KMV", "HDC", "HOS", "BMK", "SCO", "RMJ", "MAN", "HGS", "SSH", "UNU", "HHG", "MCT", "GBD", "GSI", "HRP"
+	"HSS", "KMV", "HDC", "HOS", "BMK", "SCO", "RMJ", "MAN", "HGS", "SSH", "UNU", "HHG", "MCJ", "GBD", "GSI", "HRP"
 ];
 exports.EN_INJEONG = [
 	"LOL"

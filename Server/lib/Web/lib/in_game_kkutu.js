@@ -38,7 +38,7 @@ var OPTIONS;
 var MAX_LEVEL = 360;
 var TICK = 30;
 var EXP = [];
-var BAD = new RegExp([ "느으*[^가-힣]*금마?", "니[^가-힣]*(엄|앰|엠)", "(ㅄ|ㅅㅂ|ㅂㅅ)", "미친(년|놈)?", "(병|븅|빙)[^가-힣]*신", "보[^가-힣]*지", "(새|섀|쌔|썌)[^가-힣]*(기|끼)", "섹[^가-힣]*스", "(시|씨|쉬|쒸)이*입?[^가-힣]*(발|빨|벌|뻘|팔|펄)", "십[^가-힣]*새", "씹", "(애|에)[^가-힣]*미", "자[^가-힣]*지", "존[^가-힣]*나", "좆|죶", "지랄", "창[^가-힣]*(녀|년|놈)", "fuck", "sex" ].join('|'), "g");
+var BAD = new RegExp([ "느으*[^가-힣]*금마?", "니[^가-힣]*(엄|앰|엠)", "(ㅄ|ㅅㅂ|ㅂㅅ)", "미친(년|놈)?", "(병|븅|빙)[^가-힣]*신", "보[^가-힣]*지", "(새|섀|쌔|썌)[^가-힣]*(기|끼)", "섹[^가-힣]*스", "(시|씨|쉬|쒸)이*입?[^가-힣]*(발|빨|벌|뻘|팔|펄)", "십[^가-힣]*새", "씹", "(애|에)[^가-힣]*미", "자[^가-힣]*지", "존[^가-힣]*나", "좆|죶", "지[^가-힣]*랄", "창[^가-힣]*(녀|년|놈)", "fuck", "sex" ].join('|'), "g");
 
 var ws, rws;
 var $stage;
@@ -330,9 +330,11 @@ $(document).ready(function(){
 	$data.opts = $.cookie('kks');
 	if($data.opts){
 		var opts = JSON.parse($data.opts);
-		opts.bv = $("#bgm-volume").val();
-		opts.ev = $("#effect-volume").val();
+		if(typeof opts.bv === "undefined") opts.bv = $("#bgm-volume").val();
+		if(typeof opts.ev === "undefined") opts.ev = $("#effect-volume").val();
 		applyOptions(opts);
+	}else{
+		$("#jjoriping-fold").attr('checked', false);
 	}
 	$(".dialog-head .dialog-title").on('mousedown', function(e){
 		var $pd = $(e.currentTarget).parents(".dialog");
@@ -696,11 +698,12 @@ $(document).ready(function(){
 			dw: $("#deny-whisper").is(":checked"),
 			df: $("#deny-friend").is(":checked"),
 			ar: $("#auto-ready").is(":checked"),
+			jf: $("#jjoriping-fold").is(":checked"),
 			su: $("#sort-user").is(":checked"),
 			ow: $("#only-waiting").is(":checked"),
 			ou: $("#only-unlock").is(":checked")
 		});
-		$.cookie('kks', JSON.stringify($data.opts));
+		$.cookie('kks', JSON.stringify($data.opts), { path: '/' });
 		$stage.dialog.setting.hide();
 	});
 	$stage.dialog.profileLevel.on('click', function(e){
@@ -1068,7 +1071,7 @@ $(document).ready(function(){
 					var $p;
 					
 					$players.append($p = $("<div>").addClass("replay-player-bar ellipse")
-						.html(u.title)
+						.text(u.title)
 						.prepend(getLevelImage(u.data.score).addClass("users-level"))
 					);
 					if(u.id == data.me) $p.css('font-weight', "bold");
@@ -2371,6 +2374,7 @@ function showDialog($d, noToggle){
 }
 function applyOptions(opt){
 	$data.opts = opt;
+	if(typeof $data.opts.jf === "undefined") $data.opts.jf = false;
 	
 	$data.BGMVolume = parseFloat($data.opts.bv);
 	$data.EffectVolume = parseFloat($data.opts.ev);
@@ -2381,6 +2385,7 @@ function applyOptions(opt){
 	$("#deny-whisper").attr('checked', $data.opts.dw);
 	$("#deny-friend").attr('checked', $data.opts.df);
 	$("#auto-ready").attr('checked', $data.opts.ar);
+	$("#jjoriping-fold").attr('checked', $data.opts.jf);
 	$("#sort-user").attr('checked', $data.opts.su);
 	$("#only-waiting").attr('checked', $data.opts.ow);
 	$("#only-unlock").attr('checked', $data.opts.ou);
@@ -2444,6 +2449,54 @@ function clearTrespasses(){ return; // 일단 비활성화
 		censor(i);
 	}
 	$data._xintv = xEnd;
+}
+function getSoundDurationMs(key, src){
+	var snd = ($sound && key) ? $sound[key] : null;
+	var dur;
+
+	if(snd && isFinite(snd.durationMs) && snd.durationMs > 0) return snd.durationMs;
+	if(src && isFinite(src.durationMs) && src.durationMs > 0) return src.durationMs;
+
+	if(window.hasOwnProperty("AudioBuffer") && snd instanceof AudioBuffer) dur = snd.duration;
+	else if(src && src.buffer) dur = src.buffer.duration;
+	else if(snd && snd.audio) dur = snd.audio.duration;
+	else if(src && src.audio) dur = src.audio.duration;
+
+	if(!isFinite(dur) || dur <= 0) return null;
+	return dur * 1000;
+}
+function foldJjoripingOnKSound(key, src){
+	if(!$data || !$data.room) return;
+	if(typeof key != "string") return;
+	if(!/^K\d+$/.test(key)) return;
+	if(!$data.opts || !$data.opts.jf) return;
+
+	var rule = (RULE && MODE) ? RULE[MODE[$data.room.mode]] : null;
+	if(!rule || rule.big) return;
+
+	var durationMs = getSoundDurationMs(key, src) || 220;
+
+	var $jjo = $(".game-head .jjoriping");
+	if(!$jjo || !$jjo.length) return;
+
+	if($data._jjoripingFoldTimer) clearTimeout($data._jjoripingFoldTimer);
+
+	$jjo.each(function(){
+		if(!this || !this.style) return;
+		if(this.style.setProperty){
+			this.style.setProperty("--jjoriping-fold-duration", durationMs + "ms");
+		}else{
+			this.style.animationDuration = durationMs + "ms";
+			this.style.webkitAnimationDuration = durationMs + "ms";
+		}
+	});
+	$jjo.removeClass("jjoriping-fold");
+	if($jjo[0]) void $jjo[0].offsetHeight;
+	$jjo.addClass("jjoriping-fold");
+
+	$data._jjoripingFoldTimer = addTimeout(function(){
+		$jjo.removeClass("jjoriping-fold");
+	}, durationMs + 20);
 }
 function route(func, a0, a1, a2, a3, a4){
 	if(!$data.room) return;
@@ -3270,7 +3323,7 @@ function updateMe(){
 	renderMoremi(".my-image", my.equip);
 	// $(".my-image").css('background-image', "url('"+my.profile.image+"')");
 	$(".my-stat-level").replaceWith(getLevelImage(my.data.score).addClass("my-stat-level"));
-	$(".my-stat-name").html(getDisplayName(my));
+	$(".my-stat-name").text(getDisplayName(my));
 	var span = goal - prev;
 	var remainExp = Math.max(0, goal - my.data.score);
 	var expPercent = span > 0 && isFinite(span) ? (my.data.score - prev) / span * 100 : 100;
@@ -3343,7 +3396,7 @@ function userListBar(o, forInvite){
 		.append($("<div>").addClass("jt-image users-image").css('background-image', "url('"+o.profile.image+"')"))
 		.append(getLevelImage(o.data.score).addClass("users-level"))
 		// .append($("<div>").addClass("jt-image users-from").css('background-image', "url('/img/kkutu/"+o.profile.type+".png')"))
-		.append($("<div>").addClass("users-name").html(getDisplayName(o)))
+		.append($("<div>").addClass("users-name").text(getDisplayName(o)))
 		.on('click', function(e){
 			requestInvite($(e.currentTarget).attr('id').slice(12));
 		});
@@ -3352,7 +3405,7 @@ function userListBar(o, forInvite){
 		.append($("<div>").addClass("jt-image users-image").css('background-image', "url('"+o.profile.image+"')"))
 		.append(getLevelImage(o.data.score).addClass("users-level"))
 		// .append($("<div>").addClass("jt-image users-from").css('background-image', "url('/img/kkutu/"+o.profile.type+".png')"))
-		.append($("<div>").addClass("users-name ellipse").html(getDisplayName(o)))
+		.append($("<div>").addClass("users-name ellipse").text(getDisplayName(o)))
 		.on('click', function(e){
 			requestProfile($(e.currentTarget).attr('id').slice(11));
 		});
@@ -3999,7 +4052,7 @@ function requestRoomInfo(id){
 	
 	$data._roominfo = id;
 	$("#RoomInfoDiag .dialog-title").html(id + L['sRoomInfo']);
-	$("#ri-title").html((o.password ? "<i class='fa fa-lock'></i>&nbsp;" : "") + o.title);
+	$("#ri-title").html((o.password ? "<i class='fa fa-lock'></i>&nbsp;" : "") + o.title).replaceAll(/\<|\>|\"|\'|\%|\;|\(|\)|\&|\+|\-/g, "");
 	$("#ri-mode").html(L['mode' + MODE[o.mode]]);
 	$("#ri-round").html(o.round + ", " + o.time + L['SECOND']);
 	$("#ri-limit").html(o.players.length + " / " + o.limit);
@@ -4015,7 +4068,7 @@ function requestRoomInfo(id){
 		
 		$pls.append($("<div>").addClass("ri-player")
 			.append($moremi = $("<div>").addClass("moremi rip-moremi"))
-			.append($p = $("<div>").addClass("ellipse rip-title").html(getDisplayName(p)))
+			.append($p = $("<div>").addClass("ellipse rip-title").text(getDisplayName(p)))
 			.append($("<div>").addClass("rip-team team-" + rd.t).html($("#team-" + rd.t).html()))
 			.append($("<div>").addClass("rip-form").html(L['pform_' + rd.f]))
 		);
@@ -4037,11 +4090,11 @@ function requestProfile(id){
 		notice(L['error_405']);
 		return;
 	}
-	$("#ProfileDiag .dialog-title").html(getDisplayName(o) + L['sProfile']);
+	$("#ProfileDiag .dialog-title").text(getDisplayName(o) + L['sProfile']);
 	$(".profile-head").empty().append($pi = $("<div>").addClass("moremi profile-moremi"))
 		.append($("<div>").addClass("profile-head-item")
 			.append(getImage(o.profile.image).addClass("profile-image"))
-			.append($("<div>").addClass("profile-title ellipse").html(getDisplayName(o))
+			.append($("<div>").addClass("profile-title ellipse").text(getDisplayName(o))
 				.append($("<label>").addClass("profile-tag").html(" #" + o.id.toString().substr(0, 5)))
 			)
 		)
@@ -4476,7 +4529,7 @@ function roundEnd(result, data){
 		$b.append($o = $("<div>").addClass("result-board-item")
 			.append($p = $("<div>").addClass("result-board-rank").html(r.rank + 1))
 			.append(getLevelImage(sc).addClass("result-board-level"))
-			.append($("<div>").addClass("result-board-name").html(getDisplayName(o)))
+			.append($("<div>").addClass("result-board-name").text(getDisplayName(o)))
 			.append($("<div>").addClass("result-board-score")
 				.html(data.scores ? (L['avg'] + " " + commify(data.scores[r.id]) + L['kpm']) : (commify(r.score || 0) + L['PTS']))
 			)
@@ -4614,7 +4667,7 @@ function drawRanking(ranks){
 		$b.append($o = $("<div>").addClass("result-board-item")
 			.append($("<div>").addClass("result-board-rank").html(r.rank + 1))
 			.append(getLevelImage(r.score).addClass("result-board-level"))
-			.append($("<div>").addClass("result-board-name").html(getDisplayName(o)))
+			.append($("<div>").addClass("result-board-name").text(getDisplayName(o)))
 			.append($("<div>").addClass("result-board-score").html(commify(r.score) + L['PTS']))
 			.append($("<div>").addClass("result-board-reward").html(""))
 			.append($v = $("<div>").addClass("result-board-lvup").css('display', me ? "block" : "none")
@@ -4632,7 +4685,7 @@ function drawRanking(ranks){
 function kickVoting(target){
 	var op = $data.users[target].profile;
 	
-	$("#kick-vote-text").html((op.title || op.name) + L['kickVoteText']);
+	$("#kick-vote-text").text((op.title || op.name) + L['kickVoteText']);
 	$data.kickTime = 10;
 	$data._kickTime = 10;
 	$data._kickTimer = addTimeout(kickVoteTick, 1000);
@@ -4851,7 +4904,10 @@ function pushDisplay(text, mean, theme, wc){
 			}, i * tick * 2, i);
 		}
 		addTimeout(pushHistory, tick * 4, text, mean, theme, wc);
-		if(!isKKT) playSound(kkt);
+		if(!isKKT){
+			var ks = playSound(kkt);
+			foldJjoripingOnKSound(kkt, ks);
+		}
 	}, sg);
 }
 function pushHint(hint){
@@ -5056,7 +5112,19 @@ function getAudio(k, url, cb){
 		var my = this;
 		
 		this.audio = new Audio(url);
+		this.audio.preload = "metadata";
+		this.durationMs = null;
+		
+		function updateDuration(){
+			var d = my.audio && my.audio.duration;
+			if(isFinite(d) && d > 0) my.durationMs = d * 1000;
+		}
+		if(this.audio.addEventListener){
+			this.audio.addEventListener("loadedmetadata", updateDuration);
+			this.audio.addEventListener("durationchange", updateDuration);
+		}
 		this.audio.load();
+		updateDuration();
 		this.start = function(){
 			my.audio.play();
 		};
@@ -5226,7 +5294,7 @@ function notice(msg, head){
 	stackChat();
 	$("#Chat,#chat-log-board").append($("<div>").addClass("chat-item chat-notice")
 		.append($("<div>").addClass("chat-head").text(head || L['notice']))
-		.append($("<div>").addClass("chat-body").html(msg))
+		.append($("<div>").addClass("chat-body").text(msg))
 		.append($("<div>").addClass("chat-stamp").text(time.toLocaleTimeString()))
 	);
 	$stage.chat.scrollTop(999999999);

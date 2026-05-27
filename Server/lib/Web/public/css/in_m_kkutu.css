@@ -504,6 +504,11 @@ iframe{
 			background-color: #111111;
 		}
 	.jjoriping{ width: 100%; }
+	.jjoriping.jjoriping-fold{
+		transform-origin: 50% 50%;
+		animation: JjoripingFold var(--jjoriping-fold-duration, 220ms) linear;
+		will-change: transform;
+	}
 	.cw.jjoriping{ margin-top: -10px; }
 	.dg.jjoriping{
 		margin-left: 1.5em;
@@ -943,6 +948,20 @@ iframe{
 	25%		{ text-decoration: inherit; }
 	50%		{ text-decoration: line-through; }
 	75%		{ text-decoration: inherit; }
+}
+@keyframes JjoripingFold{
+	0%		{ transform: scaleX(1) scaleY(1); }
+	25%		{ transform: scaleX(1.004) scaleY(0.98); }
+	40%		{ transform: scaleX(1.02) scaleY(0.95); }
+	46%		{ transform: scaleX(1.03) scaleY(0.85); }
+	48%		{ transform: scaleX(1.05) scaleY(0.60); }
+	49%		{ transform: scaleX(1.09) scaleY(0.20); }
+	50%		{ transform: scaleX(1.06) scaleY(0); }
+	51%		{ transform: scaleX(1.09) scaleY(0.20); }
+	52%		{ transform: scaleX(1.05) scaleY(0.60); }
+	54%		{ transform: scaleX(1.03) scaleY(0.85); }
+	70%		{ transform: scaleX(1.02) scaleY(0.96); }
+	100%	{ transform: scaleX(1) scaleY(1); }
 }
 @keyframes ModifiedBlink{
 	0%		{ background-color: #FFFF44; }

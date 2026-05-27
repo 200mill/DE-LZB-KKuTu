@@ -275,9 +275,11 @@ $(document).ready(function(){
 	$data.opts = $.cookie('kks');
 	if($data.opts){
 		var opts = JSON.parse($data.opts);
-		opts.bv = $("#bgm-volume").val();
-		opts.ev = $("#effect-volume").val();
+		if(typeof opts.bv === "undefined") opts.bv = $("#bgm-volume").val();
+		if(typeof opts.ev === "undefined") opts.ev = $("#effect-volume").val();
 		applyOptions(opts);
+	}else{
+		$("#jjoriping-fold").attr('checked', false);
 	}
 	$(".dialog-head .dialog-title").on('mousedown', function(e){
 		var $pd = $(e.currentTarget).parents(".dialog");
@@ -641,11 +643,12 @@ $(document).ready(function(){
 			dw: $("#deny-whisper").is(":checked"),
 			df: $("#deny-friend").is(":checked"),
 			ar: $("#auto-ready").is(":checked"),
+			jf: $("#jjoriping-fold").is(":checked"),
 			su: $("#sort-user").is(":checked"),
 			ow: $("#only-waiting").is(":checked"),
 			ou: $("#only-unlock").is(":checked")
 		});
-		$.cookie('kks', JSON.stringify($data.opts));
+		$.cookie('kks', JSON.stringify($data.opts), { path: '/' });
 		$stage.dialog.setting.hide();
 	});
 	$stage.dialog.profileLevel.on('click', function(e){

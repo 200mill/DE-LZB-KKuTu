@@ -29,9 +29,9 @@
 		{ key: 'GAMES', sub: [
 			{ key: 'GAMES_KKUTU', href: "/" },
 			{ key: 'KKUTU_FREE_II', href: "https://kkutu.site" },
-			{ key: 'GAMES_FATES', href: "https://free.kkutu.kr/" },
+			{ key: 'GAMES_FATES', href: "https://free.kkutu.kr/", target: "_blank" },
 		]},
-		{ key: 'GALLERY', href: "https://github.com/minjun1177/DE-LZB-KKuTu" }
+		{ key: 'GALLERY', href: "https://github.com/minjun1177/DE-LZB-KKuTu", target: "_blank" }
 	];
 	const PUBLIC = locals.published;
 	
@@ -61,7 +61,8 @@ mixin Menu()
 	div.Menu
 		- for(i in MENU)
 			- if(MENU[i].href)
-				button.menu-btn(id='menu-item-'+MENU[i].key, onclick='location.href = "'+MENU[i].href+'";')!= L(MENU[i].key)
+				- var clickAction = MENU[i].target ? ('window.open("' + MENU[i].href + '", "' + MENU[i].target + '");') : ('location.href = "' + MENU[i].href + '";');
+				button.menu-btn(id='menu-item-'+MENU[i].key, onclick=clickAction)!= L(MENU[i].key)
 			- else if(MENU[i].sub)
 				div.menu-btn(id='menu-item-'+MENU[i].key)!= L(MENU[i].key)
 					div.menu-sub-separator

@@ -66,6 +66,12 @@ function getEnhanceableOptions(options){
 
 exports.run = function(Server, page){
 
+Server.get("/cf-notice", function(req, res){
+	page(req, res, "cf-notice", {
+		'KO_INJEONG': Const.KO_INJEONG
+	});
+});
+
 Server.get("/search", function(req, res){ // LZB - Added for word search
 	page(req, res, "search", {
 		'KO_INJEONG': Const.KO_INJEONG

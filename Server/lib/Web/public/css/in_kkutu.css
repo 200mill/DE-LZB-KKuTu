@@ -1028,6 +1028,12 @@ iframe{
 }
 @keyframes JjoripingFold{
 	0%		{ transform: scaleX(1) scaleY(1); }
+	5%		{ transform: scaleX(0.85) scaleY(1.17);}
+	10%		{ transform: scaleX(0.8) scaleY(1.35);}
+	15%		{ transform: scaleX(0.8) scaleY(1.35);}
+	21%		{ transform: scaleX(0.85) scaleY(1.17);}
+	24%		{ transform: scaleX(1) scaleY(1);}
+
 	25%		{ transform: scaleX(1.004) scaleY(0.98); }
 	35%		{ transform: scaleX(1.02) scaleY(0.95); }
 	/* 42%		{ transform: scaleX(1.03) scaleY(0.90); } */
@@ -1039,14 +1045,14 @@ iframe{
 
 	40%		{ transform: scaleX(1.09) scaleY(0.85); }
 	43%		{ transform: scaleX(1.1) scaleY(0.60); }
-	45%		{ transform: scaleX(1.15) scaleY(0.40); }
+	45%		{ transform: scaleX(1.15) scaleY(0.45); }
 
 
-	50%		{ transform: scaleX(1.2) scaleY(0.25); }
-	57%		{ transform: scaleX(1.2) scaleY(0.25); }
+	50%		{ transform: scaleX(1.2) scaleY(0.4); }
+	55%		{ transform: scaleX(1.2) scaleY(0.4); }
 
 
-	64%		{ transform: scaleX(1.15) scaleY(0.40); }
+	64%		{ transform: scaleX(1.15) scaleY(0.45); }
 	69%		{ transform: scaleX(1.1) scaleY(0.60); }
 	71%		{ transform: scaleX(1.09) scaleY(0.85); }
 

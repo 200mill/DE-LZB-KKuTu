@@ -200,4 +200,15 @@ TypeError: Cannot read properties of null (reading '_id')
     at Client._handleReadyForQuery (/DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/client.js:361:19)
     at Connection.emit (node:events:508:28)
     at /DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/connection.js:115:12
+    at Parser.parse (/DE-LZB-KKuTu/Server/lib/node_modules/pg-protocol/dist/parser.js:38:17):2083 [28/05/2026, 00:27:24] ERROR: TypeError: Cannot read properties of null (reading '_id')
+TypeError: Cannot read properties of null (reading '_id')
+    at /DE-LZB-KKuTu/Server/lib/Game/games/drawing.js:66:27
+    at exports.Tail.go (/DE-LZB-KKuTu/Server/lib/sub/lizard.js:43:16)
+    at /DE-LZB-KKuTu/Server/lib/Game/games/drawing.js:256:23
+    at callback (/DE-LZB-KKuTu/Server/lib/sub/collection.js:323:13)
+    at Query.preCB (/DE-LZB-KKuTu/Server/lib/sub/collection.js:305:6)
+    at Query.handleReadyForQuery (/DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/query.js:142:14)
+    at Client._handleReadyForQuery (/DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/client.js:361:19)
+    at Connection.emit (node:events:508:28)
+    at /DE-LZB-KKuTu/Server/lib/node_modules/pg/lib/connection.js:115:12
     at Parser.parse (/DE-LZB-KKuTu/Server/lib/node_modules/pg-protocol/dist/parser.js:38:17)

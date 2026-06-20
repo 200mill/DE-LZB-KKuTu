@@ -8,6 +8,8 @@ If you only want to *run* a server, start with the install guides; if you want
 to *understand or modify* the code, read the architecture and configuration
 documents below.
 
+> 한국어 버전: [`README.ko.md`](./README.ko.md)
+
 ## Document index
 
 | Document | Audience | What it covers |

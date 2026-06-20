@@ -5,6 +5,8 @@ KKuTu reads configuration from a few JSON files. Two of them
 are **git-ignored** — you must create them before the server will start.
 Templates ship in the repository.
 
+> 한국어 버전: [`CONFIGURATION.ko.md`](./CONFIGURATION.ko.md)
+
 | File | Tracked in git | Purpose |
 |------|:--------------:|---------|
 | `settings.json` (repo root) | ✅ | High-level launcher settings (server name, CPU counts) |

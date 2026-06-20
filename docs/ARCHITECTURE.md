@@ -4,6 +4,8 @@ This document describes how the KKuTu server is structured and how a game
 request flows through the system. It is meant for developers who need to modify
 or extend the code.
 
+> 한국어 버전: [`ARCHITECTURE.ko.md`](./ARCHITECTURE.ko.md)
+
 ## 1. High-level overview
 
 KKuTu runs as **two separate Node.js programs** that are started independently

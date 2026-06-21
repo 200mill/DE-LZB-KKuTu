@@ -1,0 +1,73 @@
+//- Tlqkf v3라니
+
+-
+    if(LANG == undefined) LANG = locals.locale;
+    function L(id){
+        var R = LANG[id] || "(L#"+id+")", i;
+        
+        R = R.toString();
+        for(i=1; arguments[i]; i++) R = R.replace(new RegExp("{V"+i+"}", 'g'), arguments[i]);
+        return R.replace(/FA\{[^\}]+\}/g, _L_Replace);
+    }
+block Subject
+    title= L('title') + ' v3'
+
+block CSS
+    script(src='https://cdn.tailwindcss.com')
+
+block Top
+    //- navbar
+    div(class="w-full bg-white text-black shadow-lg")
+        div(class="max-w-7xl mx-auto px-4")
+            div(class="flex items-center justify-between h-16")
+                div(class="flex items-center")
+                    div(class="text-xl font-bold")= L('title')
+                div(class="flex space-x-4 content-center")
+                    a(href="/", class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700")= L('HOME')
+                    a(href="http://free.kkutu.kr/", target="_blank", class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white-700")= L('GAMES_KKUTU')
+                    a(href="http://cafe.naver.com/sdbx", target="_blank", class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700")= L('sandbox')
+
+block Middle
+    div(class="p-6")
+        div(class="text-3xl font-bold text-white mb-4")= L('title').replace(/\[.+?\]/g, "")
+        div(class="text-lg text-gray-300 mb-6")= L('META_DESC')
+        div(class="grid gap-6 md:grid-cols-2 lg:grid-cols-3")
+            div(class="bg-gray-800 rounded-lg p-6")
+                div(class="text-sm font-semibold uppercase tracking-wide text-gray-400")= L('serverStatus')
+                div(class="mt-2 text-2xl font-bold text-white") --
+                div(class="text-sm text-gray-400")= L('serverStatusDesc')
+            div(class="bg-gray-800 rounded-lg p-6")
+                div(class="text-sm font-semibold uppercase tracking-wide text-gray-400")= L('serverList')
+                div(class="mt-2 text-2xl font-bold text-white") --
+                div(class="text-sm text-gray-400")= L('serverListDesc')
+            div(class="bg-gray-800 rounded-lg p-6")
+                div(class="text-sm font-semibold uppercase tracking-wide text-gray-400")= L('gameStart')
+                div(class="mt-2 text-2xl font-bold text-white") --
+                div(class="text-sm text-gray-400")= L('gameStartDesc')
+        div(class="mt-6")
+            button(id="v2-quick-start", class="inline-flex items-center justify-center rounded-lg bg-cyan-500 px-6 py-3 text-base font-bold text-gray-900 transition hover:bg-cyan-600")= L('gameStart')
+
+block Bottom
+    div(class="mt-6 text-sm text-gray-400")= L('dictionarySupport')
+    div(class="text-sm text-gray-400")= L('etcSupport')
+    script.
+        function setParam(name, value) {
+        var l = window.location;
+        var params = {};
+        var matcher = /(?:\??)([^=&?]+)=?([^&?]*)/g;
+        var search = l.search;
+        for(var r = matcher.exec(search); r; r = matcher.exec(search))
+        {        r[1] = decodeURIComponent(r[1]);
+        if (!r[2]) r[2] = '%%';
+        params[r[1]] = r[2];
+        }
+        params[name] = encodeURIComponent(value);
+        var search = [];
+        for(var i in params)        {
+        var p = encodeURIComponent(i);
+        var v = params[i];
+        if (v != '%%') p += '=' + v;
+        search.push(p);
+        }        search = search.join('&');
+        l.search = search;
+        }

@@ -268,6 +268,7 @@ Server.on('connection', function(socket, info){
 						ipBlockedUntil: !$body.ipBlockedUntil ? GLOBAL.USER_BLOCK_OPTIONS.BLOCKED_FOREVER : $body.ipBlockedUntil
 					}));
 					$c.socket.close();
+					DCWH.sendDiscordWebhookOnJoinBaneduser($c.id, blockIp, !$body.reasonBlocked ? GLOBAL.USER_BLOCK_OPTIONS.DEFAULT_BLOCKED_TEXT : $body.reasonBlocked, $body.ipBlockedUntil || "Unknown", GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 					return;
 				}
 			});

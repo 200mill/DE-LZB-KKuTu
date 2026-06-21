@@ -319,3 +319,23 @@ exports.sendDiscordWebhookOnAutoban = function(userid, ipAddr, reason, iseng) {
             JLog.error(`Error on sending Discord webhook: ${error}`);
         });
 }
+exports.sendDiscordWebhookOnJoinBaneduser = function(userid, ipAddr, reason, day, iseng) {
+    const webhookClient = new WebhookClient({ url: GLOBAL.DISCORD_WEBHOOK_URL });
+    const embed = new EmbedBuilder()
+        .setTitle(iseng ? "A banned user has attempted to join." : "차단된 사용자가 접속을 시도했습니다.")
+        .addFields(
+            { name: iseng ? "User" : "유저", value: String(userid || "Unknown").slice(0, 1024) },
+            { name: iseng ? "IP" : "IP", value: String(ipAddr || "Unknown").slice(0, 1024) },
+            { name: iseng ? "Reason" : "사유", value: String(reason || "Unknown").slice(0, 1024) },
+            { name: iseng ? "Days" : "일수", value: String(day || "Unknown").slice(0, 1024) }
+        )
+        .setColor(0xFF6347)
+        .setTimestamp();
+    webhookClient.send({
+            username: GLOBAL.DISCORD_WEBHOOK_NICKNAME || 'KKuTu Alert',
+            avatarURL: GLOBAL.DISCORD_AVATAR || 'https://i.imgur.com/AfFp7pu.png',
+            embeds: [embed]
+        }).catch(function(error){
+            JLog.error(`Error on sending Discord webhook: ${error}`);
+        });
+}

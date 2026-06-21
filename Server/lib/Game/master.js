@@ -191,11 +191,14 @@ function processAdmin(id, value){
 			KKuTu.publish('yell', { value: value });
 			return null;
 		case "kill":
-			if(temp = DIC[value]){
-				temp.socket.send('{"type":"error","code":410}');
-				temp.socket.close();
-			}
-			return null;
+    		if(temp = DIC[value]){ // TNX TO @200mill
+    		    try {
+    		        if(temp.socket.readyState === 1 /* WebSocket.OPEN */)
+    		            temp.socket.send('{"type":"error","code":410}');
+    		    } catch(e){ /* socket already gone */ }
+    		    temp.socket.close();
+    		}
+    		return null;
 		case "tailroom":
 			if(temp = ROOM[value]){
 				if(T_ROOM[value] == id){
@@ -339,6 +342,35 @@ function processAdmin(id, value){
 			}
 			return null;
 		/* Enhanced User Block System [E] */
+		case 'banlist':
+			try {
+				MainDB.users.find([ 'black', { $ne: true } ] ).on(function($body){
+					var list = $body.map(function(item){
+						return { id: item._id, reason: item.black, blockedUntil: item.blockedUntil };
+					});
+					if(DIC[id]) DIC[id].send('yell', { value: JSON.stringify(list) });
+				});
+			}catch(e){
+				processAdminErrorCallback(e, id);
+			}
+			return null;
+		case 'ipbanlist':
+			try {
+				MainDB.ip_block.find([ '_id', { $ne: true } ]).on(function($body){
+					var now = Date.now();
+					var list = $body.filter(function(item){
+						var blockedUntil = Number(item.ipBlockedUntil);
+						if(!item.reasonBlocked) return false;
+						return blockedUntil === -1 || blockedUntil > now;
+					}).map(function(item){
+						return { id: item._id, reason: item.reasonBlocked, blockedUntil: item.ipBlockedUntil };
+					});
+					if(DIC[id]) DIC[id].send('yell', { value: JSON.stringify(list) });
+				});
+			}catch(e){
+				processAdminErrorCallback(e, id);
+			}
+			return null;
 	}
 	return value;
 }
@@ -565,7 +597,7 @@ exports.init = function(_SID, CHAN){
 				var cfConnectingIp = info.headers['cf-connecting-ip'];
 				$c.forwardedIp = forwardedIp || null;
 				if(GLOBAL.WAF){
-					$c.remoteAddress = forwardedToIp || forwardedIp || info.connection.remoteAddress;
+					$c.remoteAddress = forwardedIp || info.connection.remoteAddress;
 				}else{
 					$c.remoteAddress = GLOBAL.USER_BLOCK_OPTIONS.USE_X_FORWARDED_FOR
 						? (cfConnectingIp || forwardedIp || info.connection.remoteAddress)
@@ -615,6 +647,7 @@ exports.init = function(_SID, CHAN){
 									ipBlockedUntil: ipBlockedUntil
 								}));
 								$c.socket.close();
+								DCWH.sendDiscordWebhookOnJoinBaneduser($c.id, blockIp, !$body.reasonBlocked ? GLOBAL.USER_BLOCK_OPTIONS.DEFAULT_BLOCKED_TEXT : $body.reasonBlocked, $body.ipBlockedUntil || "Unknown", GLOBAL.IS_DISCORD_WEBHOOK_ENGLISH);
 								return;
 							}
 							else {

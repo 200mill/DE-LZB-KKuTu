@@ -73,7 +73,7 @@ Server.use(Exession({
 
 	// use only for redis-installed
 	store: new Redission({
-		client: Redis.createClient(),
+		client: Redis.createClient(process.env.REDIS_URL),
 		ttl: 3600 * 12
 	}),
 	// use only for redis-installed

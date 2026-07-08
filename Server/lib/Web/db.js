@@ -39,7 +39,7 @@ const FAKE_REDIS = {
 };
 
 Pub.ready = function(isPub){
-	var Redis	 = require("redis").createClient();
+	var Redis	 = require("redis").createClient(process.env.REDIS_URL);
     var Pg = new PgPool({
         user: GLOBAL.PG_USER,
         password: GLOBAL.PG_PASSWORD,

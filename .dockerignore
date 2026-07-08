@@ -1,3 +1,14 @@
-/Server/lib/sub
-/docker-compose.yml
-/Dockerfile
+.git
+docs
+deploy
+db.sql
+KKUTU_ERROR.log
+*.log
+**/node_modules
+Server/lib/sub/global.json
+Server/lib/sub/auth.json
+docker-compose.yml
+Dockerfile
+psql.Dockerfile
+server-*.bat
+server-flush-linux.sh

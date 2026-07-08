@@ -1,14 +1,16 @@
-FROM node:12
+FROM node:24-bookworm-slim
 
-WORKDIR /app
+WORKDIR /app/Server
 
-COPY ./Server/setup.js ./Server/
-COPY ./Server/package*.json ./Server/
-COPY ./Server/lib/package*.json ./Server/lib/
-COPY ./Server/lib/ ./Server/lib/
+# Dependency layer (cacheable). heapdump is optional and skipped:
+# its nan-based build fails on modern Node, and Game/master.js tolerates its absence.
+COPY Server/lib/package.json Server/lib/package-lock.json ./lib/
+RUN cd lib && npm ci --omit=optional --no-audit --no-fund
 
-RUN cd Server && node setup
+# Source + client bundle build (views load grunt-generated js not in git)
+COPY Server/lib ./lib
+RUN cd lib && npx grunt default pack
 
-RUN cd Server/lib && npx grunt default pack
-
-WORKDIR /kkutu
+USER node
+EXPOSE 80 8080 8496
+CMD ["node", "lib/Game/cluster.js", "0", "1"]

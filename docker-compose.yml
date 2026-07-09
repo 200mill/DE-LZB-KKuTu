@@ -45,8 +45,9 @@ services:
       - "8080:8080"
       - "8496:8496"
     healthcheck:
-      # Master listens on 8080 only after PG is ready, so this gates web correctly.
-      test: ["CMD", "node", "-e", "const s=require('net').connect(8080,'127.0.0.1');s.on('connect',()=>process.exit(0));s.on('error',()=>process.exit(1));setTimeout(()=>process.exit(1),3000)"]
+      # Master listens on MAIN_PORTS[0] only after PG is ready, so this gates web correctly.
+      # Port is read from the mounted global.json (same file the app uses) so it can't drift.
+      test: ["CMD", "node", "-e", "const p=require('/app/Server/lib/sub/global.json').MAIN_PORTS[0];const s=require('net').connect(p,'127.0.0.1');s.on('connect',()=>process.exit(0));s.on('error',()=>process.exit(1));setTimeout(()=>process.exit(1),3000)"]
       interval: 10s
       timeout: 5s
       retries: 12
